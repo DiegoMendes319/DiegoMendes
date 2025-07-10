@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +28,11 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
   const [serviceType, setServiceType] = useState("");
   const [comment, setComment] = useState("");
   const [wouldRecommend, setWouldRecommend] = useState(true);
+  
+  // Identification system
+  const [showIdentification, setShowIdentification] = useState(false);
+  const [reviewerFirstName, setReviewerFirstName] = useState("");
+  const [reviewerLastName, setReviewerLastName] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -55,6 +61,12 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
   });
 
   const handleSubmit = () => {
+    // If not authenticated, show identification form first
+    if (!currentUserId) {
+      setShowIdentification(true);
+      return;
+    }
+
     if (!serviceType) {
       toast({
         title: "Erro",
@@ -64,8 +76,43 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
       return;
     }
 
-    // Generate a temporary reviewer ID if not authenticated
-    const reviewerId = currentUserId || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const reviewData: InsertReview = {
+      reviewer_id: currentUserId,
+      reviewee_id: user.id,
+      rating,
+      comment: comment || null,
+      service_type: serviceType,
+      work_quality: workQuality,
+      punctuality,
+      communication,
+      value_for_money: valueForMoney,
+      would_recommend: wouldRecommend
+    };
+
+    createReviewMutation.mutate(reviewData);
+  };
+
+  const handleIdentificationSubmit = () => {
+    if (!reviewerFirstName.trim() || !reviewerLastName.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor preencha o primeiro e último nome.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!serviceType) {
+      toast({
+        title: "Erro",
+        description: "Por favor selecione o tipo de serviço.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create temporary reviewer ID with names
+    const reviewerId = `temp_${reviewerFirstName.trim()}_${reviewerLastName.trim()}_${Date.now()}`;
 
     const reviewData: InsertReview = {
       reviewer_id: reviewerId,
@@ -92,6 +139,9 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
     setServiceType("");
     setComment("");
     setWouldRecommend(true);
+    setShowIdentification(false);
+    setReviewerFirstName("");
+    setReviewerLastName("");
     onClose();
   };
 
@@ -105,6 +155,40 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Identification Form */}
+          {showIdentification && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">
+                Identificação Necessária
+              </h3>
+              <p className="text-sm text-blue-700 mb-4">
+                Para enviar uma avaliação, precisa de se identificar com o seu nome completo.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="reviewer-first-name">Primeiro Nome</Label>
+                  <Input
+                    id="reviewer-first-name"
+                    value={reviewerFirstName}
+                    onChange={(e) => setReviewerFirstName(e.target.value)}
+                    placeholder="Ex: João"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reviewer-last-name">Último Nome</Label>
+                  <Input
+                    id="reviewer-last-name"
+                    value={reviewerLastName}
+                    onChange={(e) => setReviewerLastName(e.target.value)}
+                    placeholder="Ex: Silva"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Overall Rating */}
           <div>
             <Label className="text-base font-semibold">Avaliação Geral</Label>
@@ -222,20 +306,41 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
 
           {/* Submit Button */}
           <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleSubmit}
-              disabled={createReviewMutation.isPending}
-              className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-            >
-              {createReviewMutation.isPending ? "A enviar..." : "Enviar Avaliação"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1"
-            >
-              Cancelar
-            </Button>
+            {showIdentification ? (
+              <>
+                <Button
+                  onClick={handleIdentificationSubmit}
+                  disabled={createReviewMutation.isPending}
+                  className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                >
+                  {createReviewMutation.isPending ? "A enviar..." : "Confirmar e Enviar Avaliação"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowIdentification(false)}
+                  className="flex-1"
+                >
+                  Voltar
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={createReviewMutation.isPending}
+                  className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                >
+                  {createReviewMutation.isPending ? "A enviar..." : "Enviar Avaliação"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </DialogContent>

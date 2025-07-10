@@ -443,6 +443,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reviewsWithReviewers = await Promise.all(
         reviews.map(async (review) => {
           const reviewer = await storage.getUser(review.reviewer_id);
+          
+          // If reviewer not found but has temp ID, extract name from ID
+          if (!reviewer && review.reviewer_id.startsWith('temp_')) {
+            const idParts = review.reviewer_id.split('_');
+            if (idParts.length >= 3) {
+              const firstName = idParts[1];
+              const lastName = idParts[2];
+              return {
+                ...review,
+                reviewer: {
+                  id: review.reviewer_id,
+                  name: `${firstName} ${lastName}`,
+                  first_name: firstName,
+                  last_name: lastName,
+                  profile_url: null
+                }
+              };
+            }
+          }
+          
           return {
             ...review,
             reviewer: reviewer ? {
@@ -451,7 +471,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               first_name: reviewer.first_name,
               last_name: reviewer.last_name,
               profile_url: reviewer.profile_url
-            } : null
+            } : {
+              id: review.reviewer_id,
+              name: 'Utilizador',
+              first_name: 'Utilizador',
+              last_name: '',
+              profile_url: null
+            }
           };
         })
       );
