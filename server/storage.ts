@@ -1,5 +1,5 @@
-import { users, type User, type InsertUser, type UpdateUser } from "@shared/schema";
-import { eq, and, ilike, or, sql } from "drizzle-orm";
+import { users, reviews, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview } from "@shared/schema";
+import { eq, and, ilike, or, sql, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import bcrypt from "bcrypt";
@@ -28,6 +28,12 @@ export interface IStorage {
   createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }>;
   validateSession(sessionToken: string): Promise<User | null>;
   logout(sessionToken: string): Promise<boolean>;
+  
+  // Review methods
+  createReview(review: InsertReview): Promise<Review>;
+  getReviewsForUser(userId: string): Promise<Review[]>;
+  updateUserRating(userId: string): Promise<void>;
+  deleteReview(reviewId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -35,12 +41,14 @@ export class MemStorage implements IStorage {
   private usersByEmail: Map<string, User>;
   private usersByAuthId: Map<string, User>;
   private sessions: Map<string, { userId: string; expiresAt: Date }>;
+  private reviews: Map<string, Review>;
 
   constructor() {
     this.users = new Map();
     this.usersByEmail = new Map();
     this.usersByAuthId = new Map();
     this.sessions = new Map();
+    this.reviews = new Map();
     // No sample data - only real users
   }
 
@@ -337,6 +345,71 @@ export class MemStorage implements IStorage {
       }
     }
   }
+
+  async createReview(insertReview: InsertReview): Promise<Review> {
+    const id = crypto.randomUUID();
+    const review: Review = {
+      ...insertReview,
+      id,
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+    
+    this.reviews.set(id, review);
+    await this.updateUserRating(insertReview.reviewee_id);
+    
+    return review;
+  }
+
+  async getReviewsForUser(userId: string): Promise<Review[]> {
+    const userReviews = Array.from(this.reviews.values())
+      .filter(review => review.reviewee_id === userId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    
+    return userReviews;
+  }
+
+  async updateUserRating(userId: string): Promise<void> {
+    const userReviews = await this.getReviewsForUser(userId);
+    const totalReviews = userReviews.length;
+    
+    const user = this.users.get(userId);
+    if (!user) return;
+    
+    if (totalReviews === 0) {
+      const updatedUser = { ...user, average_rating: 0, total_reviews: 0 };
+      this.users.set(userId, updatedUser);
+      if (user.email) {
+        this.usersByEmail.set(user.email, updatedUser);
+      }
+      if (user.auth_user_id) {
+        this.usersByAuthId.set(user.auth_user_id, updatedUser);
+      }
+      return;
+    }
+    
+    const averageRating = userReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+    const updatedUser = { ...user, average_rating: averageRating, total_reviews: totalReviews };
+    
+    this.users.set(userId, updatedUser);
+    if (user.email) {
+      this.usersByEmail.set(user.email, updatedUser);
+    }
+    if (user.auth_user_id) {
+      this.usersByAuthId.set(user.auth_user_id, updatedUser);
+    }
+  }
+
+  async deleteReview(reviewId: string): Promise<boolean> {
+    const review = this.reviews.get(reviewId);
+    if (!review) {
+      return false;
+    }
+    
+    this.reviews.delete(reviewId);
+    await this.updateUserRating(review.reviewee_id);
+    return true;
+  }
 }
 
 // Database storage implementation
@@ -482,6 +555,90 @@ class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error fetching all users:", error);
       return [];
+    }
+  }
+
+  // Review methods for database storage
+  async createReview(insertReview: InsertReview): Promise<Review> {
+    if (!this.db) {
+      throw new Error("Database not available");
+    }
+    try {
+      const result = await this.db.insert(reviews).values(insertReview).returning();
+      const review = result[0];
+      
+      // Update user rating
+      await this.updateUserRating(insertReview.reviewee_id);
+      
+      return review;
+    } catch (error) {
+      console.error("Error creating review:", error);
+      throw error;
+    }
+  }
+
+  async getReviewsForUser(userId: string): Promise<Review[]> {
+    if (!this.db) return [];
+    try {
+      const result = await this.db
+        .select()
+        .from(reviews)
+        .where(eq(reviews.reviewee_id, userId))
+        .orderBy(desc(reviews.created_at));
+      return result;
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      return [];
+    }
+  }
+
+  async updateUserRating(userId: string): Promise<void> {
+    if (!this.db) return;
+    try {
+      const userReviews = await this.getReviewsForUser(userId);
+      const totalReviews = userReviews.length;
+      
+      if (totalReviews === 0) {
+        await this.db
+          .update(users)
+          .set({ average_rating: 0, total_reviews: 0 })
+          .where(eq(users.id, userId));
+        return;
+      }
+      
+      const averageRating = userReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+      
+      await this.db
+        .update(users)
+        .set({ average_rating: averageRating, total_reviews: totalReviews })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error("Error updating user rating:", error);
+    }
+  }
+
+  async deleteReview(reviewId: string): Promise<boolean> {
+    if (!this.db) return false;
+    try {
+      const reviewToDelete = await this.db
+        .select()
+        .from(reviews)
+        .where(eq(reviews.id, reviewId))
+        .limit(1);
+      
+      if (reviewToDelete.length === 0) {
+        return false;
+      }
+      
+      const result = await this.db.delete(reviews).where(eq(reviews.id, reviewId));
+      
+      // Update user rating after deletion
+      await this.updateUserRating(reviewToDelete[0].reviewee_id);
+      
+      return result.count > 0;
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      return false;
     }
   }
 }

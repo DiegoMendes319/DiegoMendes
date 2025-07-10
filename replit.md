@@ -15,6 +15,9 @@ Casa Rápida is a full-stack web application designed to connect families with q
 ✓ **Social Media Integration**: Added dedicated social media tab in user profiles with Facebook, Instagram, TikTok links
 ✓ **Location Input Enhancement**: Manual neighborhood input option alongside dropdown selection
 ✓ **Portuguese (Portugal) Localization**: Complete interface using Portuguese from Portugal terminology
+✓ **Comprehensive Rating & Review System**: Implemented 5-star rating system with detailed feedback categories (quality, punctuality, communication, value), review modals, and reviews display
+✓ **Enhanced Profile Interactions**: Added tabbed profile modal with dedicated sections for details, reviews, and contact information
+✓ **Real-time Rating Updates**: Automatic calculation and display of average ratings and review counts across all user profiles
 
 ## User Preferences
 

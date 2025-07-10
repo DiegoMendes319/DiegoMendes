@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, updateUserSchema } from "@shared/schema";
+import { insertUserSchema, updateUserSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
 
 const searchFiltersSchema = z.object({
@@ -277,6 +277,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ 
         message: "Failed to upload photo",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Review endpoints
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      const reviewData = insertReviewSchema.parse(req.body);
+      const review = await storage.createReview(reviewData);
+      
+      res.status(201).json(review);
+    } catch (error) {
+      res.status(400).json({ 
+        message: "Invalid review data",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.get("/api/reviews", async (req, res) => {
+    try {
+      const { reviewee_id } = req.query;
+      
+      if (!reviewee_id || typeof reviewee_id !== 'string') {
+        return res.status(400).json({ message: "reviewee_id is required" });
+      }
+      
+      const reviews = await storage.getReviewsForUser(reviewee_id);
+      
+      // Add reviewer info to each review
+      const reviewsWithReviewers = await Promise.all(
+        reviews.map(async (review) => {
+          const reviewer = await storage.getUser(review.reviewer_id);
+          return {
+            ...review,
+            reviewer: reviewer ? {
+              id: reviewer.id,
+              name: reviewer.name,
+              first_name: reviewer.first_name,
+              last_name: reviewer.last_name,
+              profile_url: reviewer.profile_url
+            } : null
+          };
+        })
+      );
+      
+      res.json(reviewsWithReviewers);
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to fetch reviews",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.delete("/api/reviews/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteReview(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Review not found" });
+      }
+      
+      res.json({ message: "Review deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to delete review",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

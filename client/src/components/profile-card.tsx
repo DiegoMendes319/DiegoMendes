@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Star, Calendar, Eye } from "lucide-react";
+import RatingStars from "./rating-stars";
 import type { User } from "@/types/user";
 
 interface ProfileCardProps {
@@ -26,10 +27,11 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
-          <div className="flex items-center text-yellow-500">
-            <Star className="h-4 w-4 mr-1 fill-current" />
-            <span className="text-sm font-medium">4.9</span>
-          </div>
+          {(user.average_rating || 0) > 0 ? (
+            <RatingStars rating={user.average_rating || 0} size="sm" />
+          ) : (
+            <span className="text-sm text-gray-500">Sem avaliações</span>
+          )}
         </div>
         
         <p className="text-gray-600 mb-3 flex items-center">
