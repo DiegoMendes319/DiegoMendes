@@ -55,6 +55,7 @@ export class MemStorage implements IStorage {
         facebook_url: "https://facebook.com/maria.santos",
         instagram_url: "https://instagram.com/maria_santos_domestica",
         tiktok_url: null,
+        password: null,
         created_at: new Date("2024-01-15"),
         auth_user_id: null,
         // Computed fields
@@ -80,6 +81,7 @@ export class MemStorage implements IStorage {
         facebook_url: null,
         instagram_url: "https://instagram.com/ana_jardins",
         tiktok_url: "https://tiktok.com/@ana_domestica",
+        password: null, // OAuth user or email auth
         created_at: new Date("2024-02-20"),
         auth_user_id: null,
         // Computed fields
@@ -105,6 +107,7 @@ export class MemStorage implements IStorage {
         facebook_url: "https://facebook.com/joao.silva.jardins",
         instagram_url: null,
         tiktok_url: null,
+        password: null,
         created_at: new Date("2024-01-10"),
         auth_user_id: null,
         // Computed fields
@@ -130,6 +133,7 @@ export class MemStorage implements IStorage {
         facebook_url: null,
         instagram_url: "https://instagram.com/carmen_cozinha",
         tiktok_url: "https://tiktok.com/@carmen_receitas",
+        password: null,
         created_at: new Date("2024-03-05"),
         auth_user_id: null,
         // Computed fields
@@ -155,6 +159,7 @@ export class MemStorage implements IStorage {
         facebook_url: "https://facebook.com/pedro.costa.huambo",
         instagram_url: null,
         tiktok_url: null,
+        password: null,
         created_at: new Date("2024-02-28"),
         auth_user_id: null,
         // Computed fields
@@ -180,6 +185,7 @@ export class MemStorage implements IStorage {
         facebook_url: null,
         instagram_url: "https://instagram.com/lucia_lavanderia",
         tiktok_url: null,
+        password: null,
         created_at: new Date("2024-01-25"),
         auth_user_id: null,
         // Computed fields
@@ -223,6 +229,7 @@ export class MemStorage implements IStorage {
       facebook_url: insertUser.facebook_url || null,
       instagram_url: insertUser.instagram_url || null,
       tiktok_url: insertUser.tiktok_url || null,
+      password: insertUser.password || null,
       // Computed fields
       name: `${insertUser.first_name} ${insertUser.last_name}`,
       age: new Date().getFullYear() - new Date(insertUser.date_of_birth).getFullYear(),

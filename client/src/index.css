@@ -147,6 +147,19 @@
     background-size: 400% 100%;
     animation: skeleton-loading 1.4s ease-in-out infinite;
   }
+
+  /* Navbar Styles */
+  .nav-link {
+    @apply text-gray-700 hover:text-[var(--angola-red)] px-3 py-2 rounded-md text-sm font-medium transition-colors;
+  }
+
+  .nav-link.active {
+    @apply text-[var(--angola-red)] font-semibold;
+  }
+
+  .mobile-nav-link {
+    @apply text-gray-700 hover:text-[var(--angola-red)] block px-3 py-2 rounded-md text-base font-medium transition-colors;
+  }
   
   @keyframes skeleton-loading {
     0% { background-position: 100% 50%; }

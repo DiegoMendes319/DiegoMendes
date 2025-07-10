@@ -21,6 +21,7 @@ export interface User {
   facebook_url?: string | null;
   instagram_url?: string | null;
   tiktok_url?: string | null;
+  password?: string | null;
   created_at: Date;
   auth_user_id?: string | null;
 }

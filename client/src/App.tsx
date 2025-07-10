@@ -8,10 +8,12 @@ import Auth from "@/pages/auth";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar";
 
 function Router() {
   return (
     <div className="min-h-screen flex flex-col">
+      <Navbar />
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />

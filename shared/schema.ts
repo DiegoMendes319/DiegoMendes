@@ -21,6 +21,7 @@ export const users = pgTable("users", {
   facebook_url: text("facebook_url"),
   instagram_url: text("instagram_url"),
   tiktok_url: text("tiktok_url"),
+  password: text("password"), // For simple auth (hashed in real app)
   created_at: timestamp("created_at").defaultNow().notNull(),
   auth_user_id: uuid("auth_user_id").unique(), // For Supabase auth integration
 });

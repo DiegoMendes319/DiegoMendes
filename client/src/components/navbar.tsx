@@ -1,105 +1,106 @@
-import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, UserPlus, LogIn, User, Search } from "lucide-react";
+import { Menu, X, User, Home, LogIn } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const isActive = (path: string) => {
+    return location === path;
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <nav className="bg-white shadow-lg border-b-2 border-[var(--angola-red)]">
+    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <div className="w-10 h-10 bg-[var(--angola-red)] rounded-lg flex items-center justify-center">
-                <Home className="h-6 w-6 text-white" />
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="flex items-center justify-center w-8 h-8 bg-angola-red rounded-full">
+                <span className="text-white font-bold text-sm">D</span>
               </div>
-              <span className="ml-3 text-xl font-bold text-[var(--angola-black)]">
+              <span className="text-xl font-bold text-gray-900">
                 Doméstica Angola
               </span>
             </Link>
           </div>
-          
-          {/* Desktop Menu */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link href="/">
-                <Button variant="ghost" className="text-gray-700 hover:text-[var(--angola-red)]">
-                  <Search className="h-4 w-4 mr-2" />
-                  Encontrar Diaristas
-                </Button>
-              </Link>
-              <Link href="/auth">
-                <Button variant="ghost" className="text-gray-700 hover:text-[var(--angola-red)]">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Cadastrar-se
-                </Button>
-              </Link>
-              <Link href="/profile">
-                <Button variant="ghost" className="text-gray-700 hover:text-[var(--angola-red)]">
-                  <User className="h-4 w-4 mr-2" />
-                  Perfil
-                </Button>
-              </Link>
-              <Link href="/auth">
-                <Button className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Entrar
-                </Button>
-              </Link>
-            </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              href="/" 
+              className={`nav-link ${isActive('/') ? 'active' : ''}`}
+            >
+              <Home className="w-4 h-4 inline mr-2" />
+              Início
+            </Link>
+            <Link 
+              href="/auth" 
+              className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
+            >
+              <LogIn className="w-4 h-4 inline mr-2" />
+              Entrar
+            </Link>
+            <Link 
+              href="/profile" 
+              className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
+            >
+              <User className="w-4 h-4 inline mr-2" />
+              Perfil
+            </Link>
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMenu}
+              className="text-gray-600"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </Button>
           </div>
         </div>
-      </div>
-      
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            <Link href="/">
-              <Button variant="ghost" className="w-full justify-start">
-                <Search className="h-4 w-4 mr-2" />
-                Encontrar Diaristas
-              </Button>
-            </Link>
-            <Link href="/auth">
-              <Button variant="ghost" className="w-full justify-start">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Cadastrar-se
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="ghost" className="w-full justify-start">
-                <User className="h-4 w-4 mr-2" />
-                Perfil
-              </Button>
-            </Link>
-            <Link href="/auth">
-              <Button variant="ghost" className="w-full justify-start">
-                <LogIn className="h-4 w-4 mr-2" />
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+              <Link 
+                href="/" 
+                className={`mobile-nav-link ${isActive('/') ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Home className="w-4 h-4 inline mr-2" />
+                Início
+              </Link>
+              <Link 
+                href="/auth" 
+                className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <LogIn className="w-4 h-4 inline mr-2" />
                 Entrar
-              </Button>
-            </Link>
+              </Link>
+              <Link 
+                href="/profile" 
+                className={`mobile-nav-link ${isActive('/profile') ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <User className="w-4 h-4 inline mr-2" />
+                Perfil
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 }
