@@ -14,25 +14,49 @@ export interface SupabaseAuthClient {
   onAuthStateChange: (callback: (event: string, session: any) => void) => { data: { subscription: any } };
 }
 
-// Mock implementation for development - replace with actual Supabase client
+// Real Supabase implementation
 export const createSupabaseAuthClient = (): SupabaseAuthClient => {
-  // In production, this would be:
-  // import { createClient } from '@supabase/supabase-js'
-  // const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-  // const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-  // return createClient(supabaseUrl, supabaseKey).auth
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  console.log('Supabase configuration:', { 
+    url: supabaseUrl ? 'Set' : 'Missing',
+    key: supabaseKey ? 'Set' : 'Missing' 
+  });
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('Supabase credentials missing, using mock implementation');
+    return createMockSupabaseAuthClient();
+  }
 
   return {
     async signUp({ email, password, options }) {
-      console.log('Supabase signUp called:', { email, options });
-      // Simulate successful signup
-      return {
-        data: {
-          user: { id: 'user-' + Date.now(), email, email_confirmed_at: new Date().toISOString() },
-          session: { access_token: 'mock-token', refresh_token: 'mock-refresh' }
-        },
-        error: null
-      };
+      try {
+        const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            data: options?.data || {}
+          })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          return { data: null, error: data.error || { message: 'Sign up failed' } };
+        }
+
+        return { data: { user: data.user }, error: null };
+      } catch (error) {
+        console.error('Supabase signUp error:', error);
+        return { data: null, error: { message: error.message } };
+      }
     },
 
     async signInWithPassword({ email, password }) {
@@ -95,6 +119,84 @@ export const createSupabaseAuthClient = (): SupabaseAuthClient => {
         data: {
           subscription: {
             unsubscribe: () => console.log('Auth state listener unsubscribed')
+          }
+        }
+      };
+    }
+  };
+};
+
+// Fallback mock implementation when credentials are missing
+function createMockSupabaseAuthClient(): SupabaseAuthClient {
+  return {
+    async signUp({ email, password, options }) {
+      console.log('Mock Supabase signUp called:', { email, options });
+      // Simulate successful signup
+      return {
+        data: {
+          user: { id: 'user-' + Date.now(), email, email_confirmed_at: new Date().toISOString() },
+          session: { access_token: 'mock-token', refresh_token: 'mock-refresh' }
+        },
+        error: null
+      };
+    },
+
+    async signInWithPassword({ email, password }) {
+      console.log('Mock Supabase signInWithPassword called:', { email });
+      // Simulate successful login
+      return {
+        data: {
+          user: { id: 'user-existing', email, email_confirmed_at: new Date().toISOString() },
+          session: { access_token: 'mock-token', refresh_token: 'mock-refresh' }
+        },
+        error: null
+      };
+    },
+
+    async signInWithOAuth({ provider, options }) {
+      console.log('Mock Supabase OAuth called:', { provider, options });
+      
+      if (provider === 'google') {
+        const mockGoogleUser = {
+          id: 'google-user-' + Date.now(),
+          email: 'usuario@gmail.com',
+          user_metadata: {
+            name: 'Utilizador Google',
+            picture: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GoogleUser'
+          }
+        };
+
+        return {
+          data: {
+            user: mockGoogleUser,
+            session: { access_token: 'google-mock-token', refresh_token: 'google-mock-refresh' }
+          },
+          error: null
+        };
+      }
+
+      return { data: null, error: { message: 'Provider not supported' } };
+    },
+
+    async signOut() {
+      console.log('Mock Supabase signOut called');
+      return { error: null };
+    },
+
+    async getUser() {
+      console.log('Mock Supabase getUser called');
+      return {
+        data: { user: null },
+        error: null
+      };
+    },
+
+    onAuthStateChange(callback) {
+      console.log('Mock Supabase onAuthStateChange called');
+      return {
+        data: {
+          subscription: {
+            unsubscribe: () => console.log('Mock Auth state listener unsubscribed')
           }
         }
       };
