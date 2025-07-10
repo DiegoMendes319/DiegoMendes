@@ -48,13 +48,15 @@ npm run db:push
 
 ## 📊 RESULTADOS ACTUAIS (TESTADOS E FUNCIONAIS):
 
-✅ **Registo**: FUNCIONANDO - Utilizadores criados são guardados correctamente
-✅ **Login**: FUNCIONANDO - Email e palavra-passe validados com sessões
-✅ **Edição de perfil**: FUNCIONANDO - PUT /api/users/:id actualiza dados
-✅ **Dados limpos**: FUNCIONANDO - Base de dados sem dados falsos 
-✅ **Upload de imagens**: Interface preparada para implementação
-✅ **Autenticação completa**: Sessions, cookies, logout funcionais
-✅ **API REST**: Todos os endpoints CRUD operacionais
+✅ **Registo com Email**: FUNCIONANDO - Utilizadores registados com email e palavra-passe
+✅ **Registo Simples**: FUNCIONANDO - Registo apenas com primeiro nome, último nome e palavra-passe
+✅ **Login com Email**: FUNCIONANDO - Autenticação com email e palavra-passe
+✅ **Login Simples**: FUNCIONANDO - Autenticação com nome e palavra-passe
+✅ **Edição de perfil**: FUNCIONANDO - Todas as informações editáveis
+✅ **Upload de imagens**: IMPLEMENTADO - Upload de imagens de perfil em base64
+✅ **Validação**: FUNCIONANDO - Validação de tamanho (5MB) e tipo de ficheiro
+✅ **Interface responsiva**: FUNCIONANDO - Completamente adaptável a todos os ecrãs
+✅ **Dados limpos**: FUNCIONANDO - Apenas utilizadores reais criados
 
 ## 🧪 COMO TESTAR:
 

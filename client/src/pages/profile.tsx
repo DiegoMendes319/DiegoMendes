@@ -200,6 +200,50 @@ export default function Profile() {
     setDeleteDialogOpen(false);
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Ficheiro muito grande",
+        description: "A imagem deve ter no máximo 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Tipo de ficheiro inválido",
+        description: "Por favor seleccione uma imagem válida",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Convert to base64 for now (later we'll upload to Supabase Storage)
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64String = e.target?.result as string;
+      
+      // Update form data with the image
+      setFormData(prev => ({
+        ...prev,
+        profile_url: base64String
+      }));
+
+      toast({
+        title: "Imagem carregada",
+        description: "A imagem foi adicionada ao perfil. Clique em 'Guardar' para actualizar.",
+      });
+    };
+    
+    reader.readAsDataURL(file);
+  };
+
   const handleServiceToggle = (service: string) => {
     setFormData(prev => ({
       ...prev,
@@ -271,9 +315,17 @@ export default function Profile() {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-2xl bg-[var(--angola-red)] text-white">
-                    {userInitials}
-                  </AvatarFallback>
+                  {(formData.profile_url || profile?.profile_url) ? (
+                    <img 
+                      src={formData.profile_url || profile?.profile_url} 
+                      alt="Foto de perfil" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <AvatarFallback className="text-2xl bg-[var(--angola-red)] text-white">
+                      {userInitials}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
                 {editMode && (
                   <div>
@@ -282,15 +334,7 @@ export default function Profile() {
                       accept="image/*"
                       id="profile-image-upload"
                       className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          toast({
-                            title: "Upload de imagem",
-                            description: "Funcionalidade será implementada em breve",
-                          });
-                        }
-                      }}
+                      onChange={handleImageUpload}
                     />
                     <Button
                       size="sm"

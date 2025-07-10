@@ -517,23 +517,58 @@ class DatabaseStorage implements IStorage {
 
   // Authentication methods for DatabaseStorage
   async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
-    // For now, fallback to MemStorage auth since DB is failing
-    return null;
+    if (!this.db) return null;
+    try {
+      const user = await this.getUserByEmail(email);
+      if (!user || !user.password) return null;
+      
+      const bcrypt = await import('bcrypt');
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) return null;
+      
+      const sessionToken = crypto.randomUUID();
+      return { user, sessionToken };
+    } catch (error) {
+      console.error("Error authenticating user:", error);
+      return null;
+    }
   }
 
   async createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }> {
-    // For now, fallback to MemStorage auth since DB is failing
-    throw new Error('Database authentication not available');
+    if (!this.db) throw new Error('Database not available');
+    try {
+      // Hash password
+      const bcrypt = await import('bcrypt');
+      const hashedPassword = await bcrypt.hash(userData.password || '', 12);
+      
+      const userToCreate = {
+        ...userData,
+        password: hashedPassword,
+        id: crypto.randomUUID(),
+        created_at: new Date(),
+        average_rating: 0,
+        total_reviews: 0
+      };
+      
+      const user = await this.createUser(userToCreate);
+      const sessionToken = crypto.randomUUID();
+      
+      return { user, sessionToken };
+    } catch (error) {
+      console.error("Error creating user with auth:", error);
+      throw error;
+    }
   }
 
   async validateSession(sessionToken: string): Promise<User | null> {
-    // For now, fallback to MemStorage auth since DB is failing
+    // For DatabaseStorage, we'll need to implement session storage
+    // For now, return null to force re-authentication
     return null;
   }
 
   async logout(sessionToken: string): Promise<boolean> {
-    // For now, fallback to MemStorage auth since DB is failing
-    return false;
+    // For DatabaseStorage, we'll need to implement session storage
+    return true;
   }
 
   async searchUsers(filters: {
@@ -676,6 +711,11 @@ class DatabaseStorage implements IStorage {
   }
 }
 
-// Force MemStorage for now due to DATABASE_URL connection issues
+// Force MemStorage for now since DATABASE_URL connection is failing
+// Will switch to DatabaseStorage once Supabase connection is properly configured  
 export const storage = new MemStorage();
-console.log('Using MemStorage - DATABASE_URL connection failed');
+
+console.log('Using MemStorage - Supabase connection will be configured later');
+
+// For testing Supabase connection (uncomment when DATABASE_URL is working)
+// export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
