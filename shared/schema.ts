@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   province: text("province").notNull(),
   municipality: text("municipality").notNull(),
   neighborhood: text("neighborhood").notNull(),
+  address_complement: text("address_complement"), // Address complement (number, block, reference)
   contract_type: text("contract_type").notNull(), // "diarista" | "mensal" | "verbal" | "escrito"
   services: text("services").array().notNull(), // ["limpeza", "jardinagem", ...]
   availability: text("availability").notNull(),

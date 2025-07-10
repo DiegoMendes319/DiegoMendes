@@ -12,6 +12,7 @@ export interface User {
   province: string;
   municipality: string;
   neighborhood: string;
+  address_complement?: string | null;
   contract_type: string;
   services: string[];
   availability: string;
@@ -32,6 +33,7 @@ export interface CreateUserData {
   province: string;
   municipality: string;
   neighborhood: string;
+  address_complement?: string;
   contract_type: string;
   services: string[];
   availability: string;
@@ -46,6 +48,7 @@ export interface UpdateUserData {
   province?: string;
   municipality?: string;
   neighborhood?: string;
+  address_complement?: string;
   contract_type?: string;
   services?: string[];
   availability?: string;

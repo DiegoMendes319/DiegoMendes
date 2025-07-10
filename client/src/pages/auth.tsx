@@ -24,6 +24,8 @@ export default function Auth() {
     services: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [agreeAge, setAgreeAge] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const { toast } = useToast();
 
   const validateAge = (dateOfBirth: string) => {
@@ -99,15 +101,12 @@ export default function Auth() {
         newErrors.availability = 'Disponibilidade é obrigatória';
       }
 
-      // URL validation
-      if (formData.facebook_url && formData.facebook_url.trim() && !/^https?:\/\/.+/.test(formData.facebook_url)) {
-        newErrors.facebook_url = 'URL do Facebook inválida';
+      // Required checkbox validations
+      if (!agreeAge) {
+        newErrors.agreeAge = 'Você deve confirmar que tem 18 anos ou mais';
       }
-      if (formData.instagram_url && formData.instagram_url.trim() && !/^https?:\/\/.+/.test(formData.instagram_url)) {
-        newErrors.instagram_url = 'URL do Instagram inválida';
-      }
-      if (formData.tiktok_url && formData.tiktok_url.trim() && !/^https?:\/\/.+/.test(formData.tiktok_url)) {
-        newErrors.tiktok_url = 'URL do TikTok inválida';
+      if (!agreeTerms) {
+        newErrors.agreeTerms = 'Você deve concordar com os Termos de Serviço';
       }
     }
 
@@ -377,6 +376,30 @@ export default function Auth() {
                   }}
                 />
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="neighborhood">Bairro *</Label>
+                    <Input
+                      id="neighborhood"
+                      required
+                      value={formData.neighborhood || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                      placeholder="Digite o nome do seu bairro"
+                      className={errors.neighborhood ? 'border-red-500' : ''}
+                    />
+                    {errors.neighborhood && <p className="text-red-500 text-sm mt-1">{errors.neighborhood}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="address_complement">Complemento do Endereço</Label>
+                    <Input
+                      id="address_complement"
+                      value={formData.address_complement || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
+                      placeholder="Número, bloco, referência..."
+                    />
+                  </div>
+                </div>
+                
                 <div>
                   <Label htmlFor="contract_type">Tipo de Contrato *</Label>
                   <Select 
@@ -440,59 +463,40 @@ export default function Auth() {
                   />
                 </div>
 
-                {/* Social Media Links */}
-                <div className="space-y-4">
-                  <Label className="text-sm font-medium">Redes Sociais (Opcional)</Label>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <Label htmlFor="facebook_url" className="flex items-center gap-2">
-                        <Facebook className="h-4 w-4 text-blue-600" />
-                        Facebook
-                      </Label>
-                      <Input
-                        id="facebook_url"
-                        type="url"
-                        value={formData.facebook_url || ""}
-                        onChange={(e) => setFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
-                        placeholder="https://facebook.com/seu.perfil"
-                        className={errors.facebook_url ? 'border-red-500' : ''}
-                      />
-                      {errors.facebook_url && <p className="text-red-500 text-sm mt-1">{errors.facebook_url}</p>}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="instagram_url" className="flex items-center gap-2">
-                        <Instagram className="h-4 w-4 text-pink-600" />
-                        Instagram
-                      </Label>
-                      <Input
-                        id="instagram_url"
-                        type="url"
-                        value={formData.instagram_url || ""}
-                        onChange={(e) => setFormData(prev => ({ ...prev, instagram_url: e.target.value }))}
-                        placeholder="https://instagram.com/seu.perfil"
-                        className={errors.instagram_url ? 'border-red-500' : ''}
-                      />
-                      {errors.instagram_url && <p className="text-red-500 text-sm mt-1">{errors.instagram_url}</p>}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="tiktok_url" className="flex items-center gap-2">
-                        <Music className="h-4 w-4 text-black" />
-                        TikTok
-                      </Label>
-                      <Input
-                        id="tiktok_url"
-                        type="url"
-                        value={formData.tiktok_url || ""}
-                        onChange={(e) => setFormData(prev => ({ ...prev, tiktok_url: e.target.value }))}
-                        placeholder="https://tiktok.com/@seu.perfil"
-                        className={errors.tiktok_url ? 'border-red-500' : ''}
-                      />
-                      {errors.tiktok_url && <p className="text-red-500 text-sm mt-1">{errors.tiktok_url}</p>}
-                    </div>
+                {/* Required Checkboxes */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-start space-x-3">
+                    <Checkbox
+                      id="agree_age"
+                      checked={agreeAge}
+                      onCheckedChange={(checked) => setAgreeAge(checked as boolean)}
+                      className={errors.agreeAge ? 'border-red-500' : ''}
+                    />
+                    <Label htmlFor="agree_age" className="text-sm leading-relaxed">
+                      Declaro que tenho 18 anos ou mais
+                    </Label>
                   </div>
+                  {errors.agreeAge && <p className="text-red-500 text-sm ml-7">{errors.agreeAge}</p>}
+
+                  <div className="flex items-start space-x-3">
+                    <Checkbox
+                      id="agree_terms"
+                      checked={agreeTerms}
+                      onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                      className={errors.agreeTerms ? 'border-red-500' : ''}
+                    />
+                    <Label htmlFor="agree_terms" className="text-sm leading-relaxed">
+                      Concordo com os{" "}
+                      <a href="/termos" target="_blank" className="text-[var(--angola-red)] hover:underline">
+                        Termos de Serviço
+                      </a>
+                      {" "}e{" "}
+                      <a href="/privacidade" target="_blank" className="text-[var(--angola-red)] hover:underline">
+                        Política de Privacidade
+                      </a>
+                    </Label>
+                  </div>
+                  {errors.agreeTerms && <p className="text-red-500 text-sm ml-7">{errors.agreeTerms}</p>}
                 </div>
               </>
             )}

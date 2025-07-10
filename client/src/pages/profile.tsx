@@ -1,69 +1,72 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/navbar";
 import LocationSelector from "@/components/location-selector";
-import { Edit, Save, Camera, Trash2, User as UserIcon } from "lucide-react";
+import { 
+  User, 
+  Edit3, 
+  Save, 
+  X, 
+  Upload, 
+  Camera, 
+  Facebook, 
+  Instagram, 
+  Music, 
+  Trash2,
+  Home,
+  Settings,
+  LogOut
+} from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import type { User, UpdateUser } from "@shared/schema";
+import type { User as UserType, UpdateUserData } from "@/types/user";
 
 export default function Profile() {
+  const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<UpdateUser>>({});
+  const [formData, setFormData] = useState<Partial<UpdateUserData>>({});
+  const [socialMedia, setSocialMedia] = useState({
+    facebook_url: '',
+    instagram_url: '',
+    tiktok_url: ''
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // TODO: Get current user ID from auth context
-  const currentUserId = "mock-user-id";
+  // Mock user ID for demonstration - in real app, this would come from auth context
+  const userId = "mock-user-id";
 
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ['/api/users', currentUserId],
-    enabled: !!currentUserId,
+  const { data: user, isLoading } = useQuery({
+    queryKey: [`/api/users/${userId}`],
+    enabled: !!userId,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async (data: UpdateUser) => {
-      const response = await apiRequest('PUT', `/api/users/${currentUserId}`, data);
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: UpdateUserData) => {
+      const response = await apiRequest('PUT', `/api/users/${userId}`, data);
       return response.json();
     },
     onSuccess: () => {
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
+        title: "Perfil atualizado com sucesso!",
+        description: "Suas informações foram salvas.",
       });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}`] });
       setIsEditing(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/users', currentUserId] });
     },
     onError: (error) => {
       toast({
-        title: "Erro ao atualizar",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('DELETE', `/api/users/${currentUserId}`);
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Conta excluída",
-        description: "Sua conta foi excluída com sucesso.",
-      });
-      // TODO: Redirect to home and clear auth state
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro ao excluir",
+        title: "Erro ao atualizar perfil",
         description: error.message,
         variant: "destructive",
       });
@@ -72,71 +75,117 @@ export default function Profile() {
 
   const uploadPhotoMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Mock file upload - in real app, this would upload to Supabase Storage
       const formData = new FormData();
-      formData.append('photo', file);
-      const response = await apiRequest('POST', '/api/upload-photo', formData);
-      return response.json();
+      formData.append('file', file);
+      
+      // For now, just return a mock URL
+      return { url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.first_name}` };
     },
     onSuccess: (data) => {
-      setFormData(prev => ({ ...prev, profile_url: data.url }));
-      toast({
-        title: "Foto enviada",
-        description: "Sua foto de perfil foi atualizada.",
+      updateProfileMutation.mutate({
+        profile_url: data.url
       });
     },
     onError: (error) => {
       toast({
-        title: "Erro no upload",
+        title: "Erro ao fazer upload da foto",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      setFormData(user);
-    }
-  }, [user]);
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('DELETE', `/api/users/${userId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Conta excluída com sucesso",
+        description: "Todos os seus dados foram removidos.",
+      });
+      // Redirect to home
+      setLocation("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir conta",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateMutation.mutate(formData);
+  const handleEdit = () => {
+    if (user) {
+      setFormData({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : '',
+        province: user.province,
+        municipality: user.municipality,
+        neighborhood: user.neighborhood,
+        address_complement: user.address_complement,
+        contract_type: user.contract_type,
+        services: user.services,
+        availability: user.availability,
+        about_me: user.about_me
+      });
+      setSocialMedia({
+        facebook_url: user.facebook_url || '',
+        instagram_url: user.instagram_url || '',
+        tiktok_url: user.tiktok_url || ''
+      });
+      setIsEditing(true);
+    }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      uploadPhotoMutation.mutate(file);
-    }
+  const handleSave = () => {
+    updateProfileMutation.mutate({
+      ...formData,
+      ...socialMedia
+    });
   };
 
   const handleLocationChange = (location: { province?: string; municipality?: string; neighborhood?: string }) => {
     setFormData(prev => ({ ...prev, ...location }));
   };
 
-  const handleDeleteAccount = () => {
-    if (window.confirm("Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.")) {
-      deleteMutation.mutate();
+  const handleServiceChange = (service: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      services: checked
+        ? [...(prev.services || []), service]
+        : (prev.services || []).filter(s => s !== service)
+    }));
+  };
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      uploadPhotoMutation.mutate(file);
     }
+  };
+
+  const handleLogout = () => {
+    // Clear auth state and redirect
+    setLocation("/");
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+    });
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="bg-white rounded-lg p-6">
-              <div className="h-32 bg-gray-200 rounded mb-4"></div>
-              <div className="space-y-4">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded"></div>
-                ))}
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--angola-red)] mx-auto mb-4"></div>
+          <p>Carregando perfil...</p>
         </div>
       </div>
     );
@@ -144,200 +193,443 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <UserIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Perfil não encontrado
-                </h3>
-                <p className="text-gray-600">
-                  Você precisa estar logado para ver seu perfil.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl text-[var(--angola-red)]">Perfil não encontrado</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-gray-600 mb-4">Você precisa estar logado para acessar esta página.</p>
+            <Button onClick={() => setLocation("/auth")} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
+              Fazer Login
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
-          <div className="flex gap-2">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
             <Button
-              variant="outline"
-              onClick={() => setIsEditing(!isEditing)}
-              disabled={updateMutation.isPending}
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/")}
+              className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
             >
-              <Edit className="h-4 w-4 mr-2" />
-              {isEditing ? "Cancelar" : "Editar"}
+              <Home className="h-4 w-4 mr-2" />
+              Voltar ao Início
             </Button>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
-              variant="destructive"
-              onClick={handleDeleteAccount}
-              disabled={deleteMutation.isPending}
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-gray-600 hover:text-[var(--angola-red)]"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Excluir Conta
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
             </Button>
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-4">
-              <div className="relative">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={formData.profile_url || user.profile_url} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                {isEditing && (
-                  <div className="absolute bottom-0 right-0">
-                    <Label htmlFor="photo-upload" className="cursor-pointer">
-                      <div className="bg-[var(--angola-red)] text-white p-2 rounded-full hover:bg-[var(--angola-red)]/90">
-                        <Camera className="h-4 w-4" />
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="profile">Perfil</TabsTrigger>
+            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl text-[var(--angola-red)]">
+                    Meu Perfil
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {isEditing ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsEditing(false)}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Cancelar
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleSave}
+                          disabled={updateProfileMutation.isPending}
+                          className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Salvar
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={handleEdit}
+                        className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                      >
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Profile Photo */}
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-24 w-24 ring-4 ring-[var(--angola-yellow)]">
+                    <AvatarImage src={user.profile_url || undefined} alt={user.name} />
+                    <AvatarFallback className="text-2xl">
+                      {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">{user.name}</h3>
+                    <p className="text-gray-600">{user.email}</p>
+                    <div className="mt-2">
+                      <label htmlFor="photo-upload" className="cursor-pointer">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-white hover:bg-gray-50"
+                          disabled={uploadPhotoMutation.isPending}
+                          asChild
+                        >
+                          <div>
+                            <Camera className="h-4 w-4 mr-2" />
+                            {uploadPhotoMutation.isPending ? 'Enviando...' : 'Alterar Foto'}
+                          </div>
+                        </Button>
+                      </label>
+                      <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form Fields */}
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="first_name">Primeiro Nome</Label>
+                        <Input
+                          id="first_name"
+                          value={formData.first_name || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                        />
                       </div>
-                    </Label>
-                    <Input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoChange}
-                      className="hidden"
+                      <div>
+                        <Label htmlFor="last_name">Último Nome</Label>
+                        <Input
+                          id="last_name"
+                          value={formData.last_name || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Telefone</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="date_of_birth">Data de Nascimento</Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                      />
+                    </div>
+
+                    <LocationSelector 
+                      onLocationChange={handleLocationChange}
+                      defaultValues={{
+                        province: formData.province,
+                        municipality: formData.municipality,
+                        neighborhood: formData.neighborhood
+                      }}
                     />
+
+                    <div>
+                      <Label htmlFor="neighborhood">Bairro</Label>
+                      <Input
+                        id="neighborhood"
+                        value={formData.neighborhood || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                        placeholder="Digite o nome do seu bairro"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="address_complement">Complemento de Endereço</Label>
+                      <Input
+                        id="address_complement"
+                        value={formData.address_complement || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
+                        placeholder="Ex: Prédio A, Apartamento 3B, Casa 15"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contract_type">Tipo de Contrato</Label>
+                      <Select 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}
+                        value={formData.contract_type || ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo de contrato" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="diarista">Diarista</SelectItem>
+                          <SelectItem value="mensal">Mensal</SelectItem>
+                          <SelectItem value="verbal">Acordo Verbal</SelectItem>
+                          <SelectItem value="escrito">Contrato Escrito</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Serviços Oferecidos</Label>
+                      <div className="grid grid-cols-2 gap-3 mt-2">
+                        {['limpeza', 'cozinha', 'lavanderia', 'jardinagem', 'cuidados'].map((service) => (
+                          <div key={service} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={service}
+                              checked={formData.services?.includes(service)}
+                              onCheckedChange={(checked) => handleServiceChange(service, checked as boolean)}
+                            />
+                            <Label htmlFor={service} className="text-sm capitalize">
+                              {service === 'cuidados' ? 'Cuidados Pessoais' : service}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="availability">Disponibilidade</Label>
+                      <Textarea
+                        id="availability"
+                        value={formData.availability || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
+                        placeholder="Ex: Segunda a Sexta, 8h às 17h"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="about_me">Sobre Mim</Label>
+                      <Textarea
+                        id="about_me"
+                        value={formData.about_me || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, about_me: e.target.value }))}
+                        placeholder="Conte um pouco sobre sua experiência e especialidades..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Telefone</Label>
+                        <p className="text-gray-900">{user.phone}</p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Idade</Label>
+                        <p className="text-gray-900">{user.age} anos</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium text-gray-600">Localização</Label>
+                      <p className="text-gray-900">
+                        {user.province}, {user.municipality}, {user.neighborhood}
+                        {user.address_complement && <span className="text-gray-600"> - {user.address_complement}</span>}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium text-gray-600">Tipo de Contrato</Label>
+                      <p className="text-gray-900 capitalize">{user.contract_type}</p>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium text-gray-600">Serviços Oferecidos</Label>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {user.services.map((service) => (
+                          <span key={service} className="service-tag px-3 py-1 text-sm font-medium rounded-full">
+                            {service}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium text-gray-600">Disponibilidade</Label>
+                      <p className="text-gray-900">{user.availability}</p>
+                    </div>
+
+                    {user.about_me && (
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">Sobre Mim</Label>
+                        <p className="text-gray-900 leading-relaxed">{user.about_me}</p>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">{user.name}</h2>
-                <p className="text-gray-600">{user.email}</p>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    value={formData.name || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="age">Idade</Label>
-                  <Input
-                    id="age"
-                    type="number"
-                    value={formData.age || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, age: parseInt(e.target.value) }))}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Social Media Tab */}
+          <TabsContent value="social" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl text-[var(--angola-red)]">
+                  Minhas Redes Sociais
+                </CardTitle>
+                <p className="text-gray-600">
+                  Adicione suas redes sociais para que os clientes possam conhecer melhor seu trabalho
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="facebook_url" className="flex items-center gap-2">
+                    <Facebook className="h-4 w-4 text-blue-600" />
+                    Facebook
+                  </Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    disabled={!isEditing}
+                    id="facebook_url"
+                    type="url"
+                    value={socialMedia.facebook_url}
+                    onChange={(e) => setSocialMedia(prev => ({ ...prev, facebook_url: e.target.value }))}
+                    placeholder="https://facebook.com/seu.perfil"
                   />
                 </div>
+
                 <div>
-                  <Label htmlFor="phone">Telefone</Label>
+                  <Label htmlFor="instagram_url" className="flex items-center gap-2">
+                    <Instagram className="h-4 w-4 text-pink-600" />
+                    Instagram
+                  </Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    disabled={!isEditing}
+                    id="instagram_url"
+                    type="url"
+                    value={socialMedia.instagram_url}
+                    onChange={(e) => setSocialMedia(prev => ({ ...prev, instagram_url: e.target.value }))}
+                    placeholder="https://instagram.com/seu.perfil"
                   />
                 </div>
-              </div>
 
-              {isEditing && (
-                <LocationSelector 
-                  onLocationChange={handleLocationChange}
-                  defaultValues={{
-                    province: user.province,
-                    municipality: user.municipality,
-                    neighborhood: user.neighborhood,
-                  }}
-                />
-              )}
-
-              {!isEditing && (
                 <div>
-                  <Label>Localização</Label>
-                  <p className="text-sm text-gray-600">
-                    {user.province}, {user.municipality}, {user.neighborhood}
+                  <Label htmlFor="tiktok_url" className="flex items-center gap-2">
+                    <Music className="h-4 w-4 text-black" />
+                    TikTok
+                  </Label>
+                  <Input
+                    id="tiktok_url"
+                    type="url"
+                    value={socialMedia.tiktok_url}
+                    onChange={(e) => setSocialMedia(prev => ({ ...prev, tiktok_url: e.target.value }))}
+                    placeholder="https://tiktok.com/@seu.perfil"
+                  />
+                </div>
+
+                <Button 
+                  onClick={() => updateProfileMutation.mutate(socialMedia)}
+                  disabled={updateProfileMutation.isPending}
+                  className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Redes Sociais
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl text-[var(--angola-red)]">
+                  Configurações da Conta
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="border border-red-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-red-700 mb-2">Zona de Perigo</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos.
                   </p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir Conta
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta ação não pode ser desfeita. Isso excluirá permanentemente sua conta
+                          e removerá todos os seus dados de nossos servidores.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteAccountMutation.mutate()}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Sim, excluir conta
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
-              )}
-
-              <div>
-                <Label htmlFor="contract_type">Tipo de Contrato</Label>
-                <Input
-                  id="contract_type"
-                  value={formData.contract_type || ""}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contract_type: e.target.value }))}
-                  disabled={!isEditing}
-                />
-              </div>
-
-              <div>
-                <Label>Serviços Oferecidos</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {user.services.map((service) => (
-                    <span key={service} className="service-tag px-3 py-1 text-sm font-medium rounded-full">
-                      {service}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="availability">Disponibilidade</Label>
-                <Textarea
-                  id="availability"
-                  value={formData.availability || ""}
-                  onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
-                  disabled={!isEditing}
-                  rows={3}
-                />
-              </div>
-
-              {isEditing && (
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-                    disabled={updateMutation.isPending}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Salvar Alterações
-                  </Button>
-                </div>
-              )}
-            </form>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

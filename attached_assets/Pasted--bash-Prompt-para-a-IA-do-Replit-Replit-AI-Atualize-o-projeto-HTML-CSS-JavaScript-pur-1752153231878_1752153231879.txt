@@ -1,0 +1,46 @@
+```bash
+# Prompt para a IA do Replit:
+
+/* Replit AI:  
+Atualize o projeto (HTML, CSS, JavaScript puros + Supabase) do portal de diaristas em Angola para implementar os seguintes ajustes:
+
+1. **Janela de Cadastro / Login**  
+   - Ao clicar em “Cadastrar‑se” no cabeçalho, abra uma página com três opções de inscrição:  
+     a) **E‑mail + senha**: campos “E‑mail” + “Senha”.  
+     b) **Conta Google**: botão “Conectar com Google” (OAuth via Supabase Auth).  
+     c) **Formulário simples**: campos “Primeiro nome”, “Último nome” e “Senha”.  
+   - Na mesma interface, inclua uma aba ou botão “Já tenho conta” para fazer login por e‑mail+senha ou Google.  
+
+2. **Validações obrigatórias**  
+   - Adicione checkboxes obrigatórios:  
+     • “Declaro que tenho 18 anos ou mais”  
+     • “Concordo com os Termos de Serviço e Política de Privacidade”  
+   - Bloqueie o envio se não estiverem marcados.  
+
+3. **Endereço / Bairro**  
+   - Substitua o dropdown de bairros por um **campo livre de texto** para o usuário digitar o nome do bairro.  
+   - Abaixo, inclua um campo “Complemento de endereço” (número, bloco, referência, etc.).  
+
+4. **Dashboard de Perfil**  
+   - Após criar a conta, direcione o usuário a um **painel de perfil** onde possa:  
+     • Adicionar/atualizar foto de perfil  
+     • Editar todos os seus dados pessoais (nome, e‑mail, senha, telefone, endereço, “Sobre mim”)  
+     • Excluir sua conta e todos os dados  
+
+5. **Redes Sociais**  
+   - **Não** exibir campos de redes sociais na página de cadastro.  
+   - Após login, no painel de perfil, disponibilize uma seção “Minhas Redes Sociais” com campos para inserir URLs de Facebook, Instagram e TikTok.  
+
+6. **Footer (Rodapé)**  
+   - Crie um rodapé global com:  
+     • Logo e nome do site  
+     • Links para páginas institucionais: Sobre, Termos de Serviço, Política de Privacidade, Contato, etc.  
+     • Pequena descrição ou missão do portal  
+
+7. **Integração Supabase**  
+   - Garanta que **todas** as ações de cadastro e login (e-mail/senha e Google) sejam feitas via Supabase Auth JS SDK.  
+   - Todos os dados inseridos (nome, senha hash, data de nascimento, login Google, telefone, bairro livre, complementos, checkbox de idade e políticas) devem ser gravados em tempo real no Supabase.  
+   - Ajuste `/api/proxy` para tratar corretamente os novos campos e validações.  
+
+*/  
+```
