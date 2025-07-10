@@ -38,105 +38,155 @@ export class MemStorage implements IStorage {
     const sampleUsers = [
       {
         id: "1",
-        name: "Maria Santos",
+        first_name: "Maria",
+        last_name: "Santos",
         email: "maria.santos@email.com",
         phone: "+244 923 456 789",
-        age: 32,
+        date_of_birth: new Date("1992-05-15"),
         province: "luanda",
         municipality: "ingombota",
         neighborhood: "maianga",
         contract_type: "mensal",
         services: ["limpeza", "cozinha", "lavanderia"],
         availability: "Segunda a Sexta, 8h às 17h",
+        about_me: "Profissional dedicada com 10 anos de experiência em serviços domésticos. Especializada em limpeza profunda e organização.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+        facebook_url: "https://facebook.com/maria.santos",
+        instagram_url: "https://instagram.com/maria_santos_domestica",
+        tiktok_url: null,
         created_at: new Date("2024-01-15"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "Maria Santos",
+        age: 32
       },
       {
         id: "2",
-        name: "Ana Rodrigues",
+        first_name: "Ana",
+        last_name: "Rodrigues",
         email: "ana.rodrigues@email.com",
         phone: "+244 912 345 678",
-        age: 28,
+        date_of_birth: new Date("1996-08-22"),
         province: "luanda",
         municipality: "maianga",
         neighborhood: "rangel",
         contract_type: "diarista",
         services: ["limpeza", "jardinagem"],
         availability: "Terça e Quinta, 9h às 16h",
+        about_me: "Jovem profissional com experiência em jardinagem e limpeza. Trabalhei em várias casas da região.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ana",
+        facebook_url: null,
+        instagram_url: "https://instagram.com/ana_jardins",
+        tiktok_url: "https://tiktok.com/@ana_domestica",
         created_at: new Date("2024-02-20"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "Ana Rodrigues",
+        age: 28
       },
       {
         id: "3",
-        name: "João Silva",
+        first_name: "João",
+        last_name: "Silva",
         email: "joao.silva@email.com",
         phone: "+244 934 567 890",
-        age: 35,
+        date_of_birth: new Date("1989-03-10"),
         province: "benguela",
         municipality: "benguela",
         neighborhood: "centro",
         contract_type: "escrito",
         services: ["jardinagem", "limpeza"],
         availability: "Segunda a Sábado, 7h às 15h",
+        about_me: "Especialista em jardinagem e manutenção de espaços verdes. Tenho conhecimento em plantas tropicais.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Joao",
+        facebook_url: "https://facebook.com/joao.silva.jardins",
+        instagram_url: null,
+        tiktok_url: null,
         created_at: new Date("2024-01-10"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "João Silva",
+        age: 35
       },
       {
         id: "4",
-        name: "Carmen Ferreira",
+        first_name: "Carmen",
+        last_name: "Ferreira",
         email: "carmen.ferreira@email.com",
         phone: "+244 945 678 901",
-        age: 29,
+        date_of_birth: new Date("1995-11-30"),
         province: "luanda",
         municipality: "kilamba_kiaxi",
         neighborhood: "kilamba",
         contract_type: "mensal",
         services: ["cozinha", "cuidados", "limpeza"],
         availability: "Segunda a Sexta, 8h às 18h",
+        about_me: "Cozinheira experiente que também cuida de idosos. Especializada em culinária angolana e internacional.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carmen",
+        facebook_url: null,
+        instagram_url: "https://instagram.com/carmen_cozinha",
+        tiktok_url: "https://tiktok.com/@carmen_receitas",
         created_at: new Date("2024-03-05"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "Carmen Ferreira",
+        age: 29
       },
       {
         id: "5",
-        name: "Pedro Costa",
+        first_name: "Pedro",
+        last_name: "Costa",
         email: "pedro.costa@email.com",
         phone: "+244 956 789 012",
-        age: 31,
+        date_of_birth: new Date("1993-07-18"),
         province: "huambo",
         municipality: "huambo",
         neighborhood: "centro",
         contract_type: "verbal",
         services: ["jardinagem", "limpeza"],
         availability: "Disponível fins de semana",
+        about_me: "Trabalho principalmente nos fins de semana. Tenho experiência em manutenção de jardins e limpeza geral.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro",
+        facebook_url: "https://facebook.com/pedro.costa.huambo",
+        instagram_url: null,
+        tiktok_url: null,
         created_at: new Date("2024-02-28"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "Pedro Costa",
+        age: 31
       },
       {
         id: "6",
-        name: "Lucia Mendes",
+        first_name: "Lucia",
+        last_name: "Mendes",
         email: "lucia.mendes@email.com",
         phone: "+244 967 890 123",
-        age: 26,
+        date_of_birth: new Date("1998-09-05"),
         province: "luanda",
-        municipality: "samba",
+        municipality: "sambizanga",
         neighborhood: "sambizanga",
         contract_type: "diarista",
         services: ["lavanderia", "cozinha"],
         availability: "Flexível, contactar por telefone",
+        about_me: "Jovem e dedicada, especializada em lavanderia e cozinha. Sempre disponível para ajudar as famílias.",
         profile_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucia",
+        facebook_url: null,
+        instagram_url: "https://instagram.com/lucia_lavanderia",
+        tiktok_url: null,
         created_at: new Date("2024-01-25"),
-        auth_user_id: null
+        auth_user_id: null,
+        // Computed fields
+        name: "Lucia Mendes",
+        age: 26
       }
     ];
 
     sampleUsers.forEach(user => {
       this.users.set(user.id, user as User);
-      this.usersByEmail.set(user.email, user as User);
+      if (user.email) {
+        this.usersByEmail.set(user.email, user as User);
+      }
     });
   }
 
@@ -160,10 +210,21 @@ export class MemStorage implements IStorage {
       created_at: new Date(),
       profile_url: insertUser.profile_url || null,
       auth_user_id: insertUser.auth_user_id || null,
+      email: insertUser.email || null,
+      date_of_birth: new Date(insertUser.date_of_birth),
+      about_me: insertUser.about_me || null,
+      facebook_url: insertUser.facebook_url || null,
+      instagram_url: insertUser.instagram_url || null,
+      tiktok_url: insertUser.tiktok_url || null,
+      // Computed fields
+      name: `${insertUser.first_name} ${insertUser.last_name}`,
+      age: new Date().getFullYear() - new Date(insertUser.date_of_birth).getFullYear(),
     };
     
     this.users.set(id, user);
-    this.usersByEmail.set(user.email, user);
+    if (user.email) {
+      this.usersByEmail.set(user.email, user);
+    }
     if (user.auth_user_id) {
       this.usersByAuthId.set(user.auth_user_id, user);
     }
@@ -178,17 +239,26 @@ export class MemStorage implements IStorage {
     }
 
     // Remove from email index if email is changing
-    if (updateUser.email && updateUser.email !== existingUser.email) {
+    if (updateUser.email && updateUser.email !== existingUser.email && existingUser.email) {
       this.usersByEmail.delete(existingUser.email);
     }
 
     const updatedUser: User = {
       ...existingUser,
       ...updateUser,
+      // Update computed fields if names change
+      name: updateUser.first_name || updateUser.last_name 
+        ? `${updateUser.first_name || existingUser.first_name} ${updateUser.last_name || existingUser.last_name}`
+        : existingUser.name,
+      age: updateUser.date_of_birth 
+        ? new Date().getFullYear() - new Date(updateUser.date_of_birth).getFullYear()
+        : existingUser.age,
     };
 
     this.users.set(id, updatedUser);
-    this.usersByEmail.set(updatedUser.email, updatedUser);
+    if (updatedUser.email) {
+      this.usersByEmail.set(updatedUser.email, updatedUser);
+    }
     if (updatedUser.auth_user_id) {
       this.usersByAuthId.set(updatedUser.auth_user_id, updatedUser);
     }
@@ -203,7 +273,9 @@ export class MemStorage implements IStorage {
     }
 
     this.users.delete(id);
-    this.usersByEmail.delete(user.email);
+    if (user.email) {
+      this.usersByEmail.delete(user.email);
+    }
     if (user.auth_user_id) {
       this.usersByAuthId.delete(user.auth_user_id);
     }
