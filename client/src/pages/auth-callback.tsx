@@ -11,19 +11,32 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Give some time for the auth state to update
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log('Processing auth callback...');
+        
+        // Check URL for errors
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        const error = urlParams.get('error') || hashParams.get('error');
+        if (error) {
+          console.error('OAuth error:', error);
+          setLocation('/auth?error=oauth_failed');
+          return;
+        }
+        
+        // Give time for auth state to update
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
         if (user) {
-          console.log('User authenticated, redirecting to home');
-          setLocation('/');
+          console.log('User authenticated successfully, redirecting to profile');
+          setLocation('/profile');
         } else {
-          console.log('No user found, redirecting to auth');
-          setLocation('/auth');
+          console.log('No user found after timeout, redirecting to auth');
+          setLocation('/auth?error=timeout');
         }
       } catch (error) {
         console.error('Error in auth callback:', error);
-        setLocation('/auth');
+        setLocation('/auth?error=callback_error');
       } finally {
         setProcessing(false);
       }

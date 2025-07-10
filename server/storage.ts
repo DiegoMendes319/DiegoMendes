@@ -647,4 +647,6 @@ class DatabaseStorage implements IStorage {
 // TODO: Switch to DatabaseStorage when DATABASE_URL is properly configured
 // Use in-memory storage for now since database connection is failing
 // Use database storage when DATABASE_URL is available, otherwise use memory storage
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+// Temporarily use MemStorage due to Supabase connection issues
+// export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+export const storage = new MemStorage();
