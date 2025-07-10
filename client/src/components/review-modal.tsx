@@ -47,8 +47,16 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
         title: "Avaliação enviada!",
         description: "Obrigado pelo seu feedback.",
       });
+      // Invalidate all related queries to update the UI immediately
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/reviews", user.id] });
+      
+      // Also force refetch to ensure immediate update
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/reviews", user.id] });
+        queryClient.refetchQueries({ queryKey: ["/api/users"] });
+      }, 100);
       handleClose();
     },
     onError: (error) => {

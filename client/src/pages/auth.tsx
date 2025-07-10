@@ -15,6 +15,7 @@ import LocationSelector from "@/components/location-selector";
 import { UserPlus, LogIn, Home, Mail, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
+import { scrollToElement } from "@/hooks/use-scroll-to-top";
 import type { InsertUser } from "@shared/schema";
 
 type AuthMethod = 'email' | 'google' | 'simple';
@@ -140,6 +141,15 @@ export default function Auth() {
     }
 
     setErrors(newErrors);
+    
+    // Scroll to first error field if validation fails
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      setTimeout(() => {
+        scrollToElement(firstErrorField);
+      }, 100);
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 

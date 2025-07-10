@@ -22,7 +22,7 @@ interface ReviewWithReviewer extends Review {
 export default function ReviewsDisplay({ userId, user, showAddReview = false, onAddReview }: ReviewsDisplayProps) {
   const [showAll, setShowAll] = useState(false);
 
-  const { data: reviews = [], isLoading } = useQuery({
+  const { data: reviews = [], isLoading, refetch } = useQuery({
     queryKey: ["/api/reviews", userId],
     queryFn: async () => {
       const response = await fetch(`/api/reviews?reviewee_id=${userId}`, {
@@ -30,7 +30,8 @@ export default function ReviewsDisplay({ userId, user, showAddReview = false, on
       });
       if (!response.ok) throw new Error('Failed to fetch reviews');
       return response.json();
-    }
+    },
+    refetchInterval: 5000 // Refresh every 5 seconds for real-time updates
   });
 
   if (isLoading) {
@@ -158,26 +159,34 @@ export default function ReviewsDisplay({ userId, user, showAddReview = false, on
                       )}
                       
                       {/* Detailed Ratings */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 flex-shrink-0">Qualidade:</span>
-                          <RatingStars rating={review.work_quality} size="sm" />
-                          <span className="ml-1 text-gray-500">{review.work_quality.toFixed(1)}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 mb-2">
+                        <div className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded">
+                          <span className="min-w-0 flex-shrink-0 font-medium">Qualidade:</span>
+                          <div className="flex items-center gap-1">
+                            <RatingStars rating={review.work_quality} size="sm" />
+                            <span className="text-gray-500 font-medium">{review.work_quality.toFixed(1)}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 flex-shrink-0">Pontualidade:</span>
-                          <RatingStars rating={review.punctuality} size="sm" />
-                          <span className="ml-1 text-gray-500">{review.punctuality.toFixed(1)}</span>
+                        <div className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded">
+                          <span className="min-w-0 flex-shrink-0 font-medium">Pontualidade:</span>
+                          <div className="flex items-center gap-1">
+                            <RatingStars rating={review.punctuality} size="sm" />
+                            <span className="text-gray-500 font-medium">{review.punctuality.toFixed(1)}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 flex-shrink-0">Comunicação:</span>
-                          <RatingStars rating={review.communication} size="sm" />
-                          <span className="ml-1 text-gray-500">{review.communication.toFixed(1)}</span>
+                        <div className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded">
+                          <span className="min-w-0 flex-shrink-0 font-medium">Comunicação:</span>
+                          <div className="flex items-center gap-1">
+                            <RatingStars rating={review.communication} size="sm" />
+                            <span className="text-gray-500 font-medium">{review.communication.toFixed(1)}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 flex-shrink-0">Custo-Benefício:</span>
-                          <RatingStars rating={review.value_for_money} size="sm" />
-                          <span className="ml-1 text-gray-500">{review.value_for_money.toFixed(1)}</span>
+                        <div className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded">
+                          <span className="min-w-0 flex-shrink-0 font-medium">Custo-Benefício:</span>
+                          <div className="flex items-center gap-1">
+                            <RatingStars rating={review.value_for_money} size="sm" />
+                            <span className="text-gray-500 font-medium">{review.value_for_money.toFixed(1)}</span>
+                          </div>
                         </div>
                       </div>
                       
