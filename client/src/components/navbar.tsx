@@ -29,20 +29,13 @@ export default function Navbar() {
                 </div>
               </div>
               <span className="text-xl font-bold text-gray-900">
-                Casa Rápida
+                Jikulumessu
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="/" 
-              className={`nav-link ${isActive('/') ? 'active' : ''}`}
-            >
-              <Home className="w-4 h-4 inline mr-2" />
-              Início
-            </Link>
             <Link 
               href="/auth" 
               className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
@@ -76,14 +69,6 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-              <Link 
-                href="/" 
-                className={`mobile-nav-link ${isActive('/') ? 'active' : ''}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Home className="w-4 h-4 inline mr-2" />
-                Início
-              </Link>
               <Link 
                 href="/auth" 
                 className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}
