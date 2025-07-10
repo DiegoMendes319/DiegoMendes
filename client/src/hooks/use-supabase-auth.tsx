@@ -131,6 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       console.log('Iniciando Google OAuth...');
+      
+      // Check if Google OAuth is properly configured
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -145,6 +147,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         console.error('Erro no Google OAuth:', error);
         console.error('Detalhes do erro:', JSON.stringify(error, null, 2));
+        
+        // Provide helpful error message
+        if (error.message?.includes('Provider not found') || error.message?.includes('invalid_request')) {
+          throw new Error('Google OAuth não está configurado correctamente no Supabase. Verifique as configurações.');
+        }
+        
         throw error;
       }
       
@@ -156,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.location.href = data.url;
       } else {
         console.error('Nenhum URL de redirecionamento recebido');
+        throw new Error('Nenhum URL de redirecionamento recebido. Verifique a configuração do Google OAuth.');
       }
       
       return data
