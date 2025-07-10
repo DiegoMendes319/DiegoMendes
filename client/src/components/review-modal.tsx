@@ -55,15 +55,6 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
   });
 
   const handleSubmit = () => {
-    if (!currentUserId) {
-      toast({
-        title: "Erro",
-        description: "Deve estar autenticado para avaliar.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!serviceType) {
       toast({
         title: "Erro",
@@ -73,8 +64,11 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
       return;
     }
 
+    // Generate a temporary reviewer ID if not authenticated
+    const reviewerId = currentUserId || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const reviewData: InsertReview = {
-      reviewer_id: currentUserId,
+      reviewer_id: reviewerId,
       reviewee_id: user.id,
       rating,
       comment: comment || null,

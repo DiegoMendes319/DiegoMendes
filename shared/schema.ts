@@ -31,7 +31,7 @@ export const users = pgTable("users", {
 
 export const reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().defaultRandom(),
-  reviewer_id: uuid("reviewer_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  reviewer_id: text("reviewer_id").notNull(), // Allow flexible IDs (UUID or temp IDs)
   reviewee_id: uuid("reviewee_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   comment: text("comment"),
@@ -73,17 +73,17 @@ export const updateUserSchema = createInsertSchema(users).omit({
   auth_user_id: true,
 }).partial();
 
-export const insertReviewSchema = createInsertSchema(reviews).omit({
-  id: true,
-  created_at: true,
-  updated_at: true,
-}).extend({
+export const insertReviewSchema = z.object({
+  reviewer_id: z.string().min(1, "Reviewer ID is required"), // Allow any string ID
+  reviewee_id: z.string().min(1, "Reviewee ID is required"), // Allow any string ID
   rating: z.number().int().min(1).max(5),
+  comment: z.string().max(500, "Comentário muito longo").optional().nullable(),
+  service_type: z.string().min(1, "Service type is required"),
   work_quality: z.number().int().min(1).max(5),
   punctuality: z.number().int().min(1).max(5),
   communication: z.number().int().min(1).max(5),
   value_for_money: z.number().int().min(1).max(5),
-  comment: z.string().max(500, "Comentário muito longo").optional(),
+  would_recommend: z.boolean(),
 });
 
 export const updateReviewSchema = createInsertSchema(reviews).omit({

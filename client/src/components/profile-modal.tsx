@@ -162,7 +162,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
             <ReviewsDisplay 
               userId={user.id} 
               user={user}
-              showAddReview={currentUser?.id !== user.id}
+              showAddReview={true}
               onAddReview={() => setShowReviewModal(true)}
             />
           </div>
