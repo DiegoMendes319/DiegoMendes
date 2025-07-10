@@ -29,7 +29,7 @@ export default function Navbar() {
                 </div>
               </div>
               <span className="text-xl font-bold text-gray-900">
-                Doméstica Angola
+                Casa Rápida
               </span>
             </Link>
           </div>

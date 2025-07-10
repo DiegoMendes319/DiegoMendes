@@ -35,7 +35,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    const sampleUsers = [
+    // Remove sample data - use only real registrations
+    const sampleUsers: any[] = [
       {
         id: "1",
         first_name: "Maria",
@@ -194,12 +195,13 @@ export class MemStorage implements IStorage {
       }
     ];
 
-    sampleUsers.forEach(user => {
-      this.users.set(user.id, user as User);
-      if (user.email) {
-        this.usersByEmail.set(user.email, user as User);
-      }
-    });
+    // Comment out sample data initialization - only real users
+    // sampleUsers.forEach(user => {
+    //   this.users.set(user.id, user as User);
+    //   if (user.email) {
+    //     this.usersByEmail.set(user.email, user as User);
+    //   }
+    // });
   }
 
   async getUser(id: string): Promise<User | undefined> {

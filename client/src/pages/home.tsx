@@ -93,17 +93,16 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden">
-        <div className="hero-pattern absolute inset-0"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
               Encontre os Melhores
               <span className="text-[var(--angola-red)]"> Diaristas</span>
-              <br />em Angola
+              <br />da Região
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Encontre os melhores diaristas em Angola, conectando famílias com profissionais domésticos qualificados em todo o país — seguro, fiável e próximo de si.
+              Conectamos famílias com profissionais domésticos qualificados na sua região — seguro, fiável e próximo de si.
             </p>
             
             {/* Geolocation Prompt */}

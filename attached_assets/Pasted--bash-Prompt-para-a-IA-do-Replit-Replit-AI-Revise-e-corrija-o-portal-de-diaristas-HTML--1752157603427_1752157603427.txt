@@ -1,0 +1,48 @@
+```bash
+# Prompt para a IA do Replit:
+
+/* Replit AI:  
+Revise e corrija o portal de diaristas (HTML, CSS, JS puros + Supabase) para resolver estes pontos:
+
+1. **Header duplicado**  
+   - Remova a segunda instância do cabeçalho em todas as páginas; deve haver apenas um único header.
+
+2. **Nome do site**  
+   - Substitua “Domestika Angola” por um nome neutro, sem referência direta a “Angola”. Escolha um nome curto e memorável em Português de Portugal, evocando “serviços domésticos” ou “apoio rápido”.
+
+3. **Background do banner inicial**  
+   - Retire qualquer imagem de fundo; restaure o layout original sem background.
+
+4. **Container de localização**  
+   - A opção “Procurar manualmente” deve ficar **dentro** do mesmo container que “Permitir localização automática”. Ajuste CSS/HTML para que ambos os botões estejam agrupados.
+
+5. **Filtragem de bairros**  
+   - Mantenha apenas um único campo de bairro:  
+     - Caso exista lista oficial, permita dropdown;  
+     - Caso contrário, ou se o utilizador preferir, tenha um único campo de texto livre para inserir manualmente.
+
+6. **Listagem de diaristas reais**  
+   - Elimine quaisquer perfis de exemplo.  
+   - Na homepage e filtros, busque em tempo real somente os registos **reais** da tabela `users` no Supabase.
+
+7. **Bug do redirecionamento pós-registo**  
+   - Corrija o fluxo de registo (email/senha, Google, nome+senha) para que:  
+     a) Crie de facto o registo na tabela `users`;  
+     b) Não redirecione para perfis falsos (ex. “Lúcia Mendes”);  
+     c) Envie mensagem de sucesso **apenas** após confirmação efetiva de inserção na base de dados;  
+     d) Redirecione o novo utilizador para o seu próprio dashboard.
+
+8. **Exibição de redes sociais**  
+   - No dashboard e na página pública de cada perfil, mostre os campos de redes sociais (Facebook, Instagram, TikTok) **inseridos** pelo utilizador.
+
+9. **Resumo e requisitar credenciais**  
+   - Após concluir todas as correções, gere um **relatório passo‑a‑passo** indicando como cada um dos itens acima foi resolvido.  
+   - Solicite ao utilizador as variáveis de ambiente necessárias para uma **conexão real** com o Supabase:  
+     • `DATABASE_URL`  
+     • `SUPABASE_URL`  
+     • `SUPABASE_ANON_KEY`  
+     • (opcionalmente) `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` para OAuth  
+
+Use Português de Portugal em todos os textos de interface e documentação.  
+*/  
+```

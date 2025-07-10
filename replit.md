@@ -1,18 +1,19 @@
-# Doméstica Angola - Portal de Diaristas
+# Casa Rápida - Portal de Diaristas
 
 ## Overview
 
-Doméstica Angola is a full-stack web application designed to connect families with qualified domestic workers in Angola. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences.
+Casa Rápida is a full-stack web application designed to connect families with qualified domestic workers. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences.
 
 ## Recent Updates (Janeiro 2025)
 
-✓ **Complete Footer Pages Implementation**: All footer pages now exist with real content (Sobre Nós, Como Funciona, Ajuda, Termos de Serviço, Política de Privacidade, Segurança)
-✓ **Portuguese (Portugal) Localization**: All interface text updated to use Portuguese from Portugal terminology
-✓ **Google OAuth Integration**: Proper Supabase OAuth implementation with setup instructions
-✓ **Three Authentication Methods**: Email/Password, Google OAuth, and Simple Name/Password login
-✓ **Enhanced Error Handling**: Proper authentication error messages and validation
-✓ **Navbar Enhancement**: Modern responsive navbar with Angola colors and mobile support
-✓ **Removed Cookie Policy**: As requested, completely removed cookie policy references
+✓ **Site Rebranding**: Changed from "Doméstica Angola" to "Casa Rápida" with neutral, region-agnostic branding
+✓ **Background Cleanup**: Removed hero section background patterns for cleaner layout
+✓ **Sample Data Removal**: Eliminated all sample/fake user profiles - only real database registrations shown
+✓ **Authentication Flow Fixes**: Improved registration success verification and proper database entry creation
+✓ **Social Media Integration**: Added dedicated social media tab in user profiles with Facebook, Instagram, TikTok links
+✓ **Location Input Enhancement**: Manual neighborhood input option alongside dropdown selection
+✓ **Portuguese (Portugal) Localization**: Complete interface using Portuguese from Portugal terminology
+✓ **User Interface Improvements**: House+broom logo design and consolidated location search buttons
 
 ## User Preferences
 

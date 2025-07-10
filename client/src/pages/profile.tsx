@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +41,17 @@ export default function Profile() {
     instagram_url: '',
     tiktok_url: ''
   });
+
+  // Initialize social media values when user data loads
+  React.useEffect(() => {
+    if (user) {
+      setSocialMedia({
+        facebook_url: user.facebook_url || '',
+        instagram_url: user.instagram_url || '',
+        tiktok_url: user.tiktok_url || ''
+      });
+    }
+  }, [user]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -48,7 +60,7 @@ export default function Profile() {
     queryKey: ['/api/users'],
   });
   
-  // For now, get the last created user as the "logged in" user
+  // For now, get the last created user as the "logged in" user (simulate authentication)
   const userId = allUsers && allUsers.length > 0 ? allUsers[allUsers.length - 1].id : null;
 
   const { data: user, isLoading } = useQuery({

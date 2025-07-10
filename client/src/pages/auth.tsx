@@ -232,7 +232,7 @@ export default function Auth() {
       if (authMode === 'register') {
         toast({
           title: "Registo realizado com sucesso!",
-          description: "Bem-vindo ao Doméstica Angola!",
+          description: "Bem-vindo ao Casa Rápida!",
         });
         setLocation("/profile");
       }
