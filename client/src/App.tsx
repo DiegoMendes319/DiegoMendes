@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import Auth from "@/pages/auth";
+import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import Footer from "@/components/footer";
@@ -24,6 +25,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/auth" component={Auth} />
+          <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/profile" component={Profile} />
           <Route path="/about" component={About} />
           <Route path="/how-it-works" component={HowItWorks} />
