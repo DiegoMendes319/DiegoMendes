@@ -200,7 +200,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
                   >
                     <Phone className="h-4 w-4 mr-2" />
-                    Entrar em Contato
+                    Entrar em Contacto
                   </Button>
                 </div>
                 

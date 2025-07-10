@@ -106,8 +106,8 @@ export default function Home() {
             
             {/* Geolocation Prompt - Fixed responsive container */}
             {showGeolocationPrompt && (
-              <div className="w-full max-w-lg mx-auto mb-8 px-4">
-                <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700 shadow-lg">
+              <div className="w-full max-w-2xl mx-auto mb-8 px-4">
+                <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700 shadow-lg overflow-hidden">
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-center justify-center mb-4">
                       <MapPin className="h-6 w-6 md:h-8 md:w-8 text-[var(--angola-red)]" />
@@ -118,21 +118,21 @@ export default function Home() {
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 text-center">
                       Escolha a forma de encontrar diaristas próximos de si
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-full">
                       <Button 
                         onClick={handleGeolocationRequest} 
-                        className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-sm md:text-base py-2 md:py-3 px-3 md:px-4 whitespace-nowrap"
+                        className="flex-1 min-w-0 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-sm md:text-base py-2 md:py-3 px-2 md:px-4"
                       >
                         <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <span className="truncate">Permitir localização automática</span>
+                        <span className="truncate text-center flex-1">Permitir localização automática</span>
                       </Button>
                       <Button 
                         variant="outline" 
                         onClick={handleManualSearch} 
-                        className="flex-1 border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)] hover:text-white dark:border-[var(--angola-red)] dark:text-[var(--angola-red)] text-sm md:text-base py-2 md:py-3 px-3 md:px-4 whitespace-nowrap"
+                        className="flex-1 min-w-0 border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)] hover:text-white dark:border-[var(--angola-red)] dark:text-[var(--angola-red)] text-sm md:text-base py-2 md:py-3 px-2 md:px-4"
                       >
                         <Search className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <span className="truncate">Procurar manualmente</span>
+                        <span className="truncate text-center flex-1">Procurar manualmente</span>
                       </Button>
                     </div>
                   </CardContent>

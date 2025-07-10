@@ -70,7 +70,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--angola-red)]">Contato</h3>
+            <h3 className="text-lg font-semibold text-[var(--angola-red)]">Contacto</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 text-[var(--angola-red)] mt-0.5" />
@@ -85,7 +85,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-[var(--angola-red)]" />
-                <span className="text-sm text-gray-400">contato@domestica.ao</span>
+                <span className="text-sm text-gray-400">contacto@jikulumessu.ao</span>
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-400">
-            © {new Date().getFullYear()} Doméstica Angola. Todos os direitos reservados.
+            © {new Date().getFullYear()} Jikulumessu. Todos os direitos reservados.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <span className="text-sm text-gray-400">

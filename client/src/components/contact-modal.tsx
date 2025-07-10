@@ -15,8 +15,8 @@ export default function ContactModal({ user, isOpen, onClose }: ContactModalProp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-900">
-            Informações de Contato
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Informações de Contacto
           </DialogTitle>
         </DialogHeader>
         
@@ -40,7 +40,7 @@ export default function ContactModal({ user, isOpen, onClose }: ContactModalProp
             <div className="flex items-center p-4 bg-gray-50 rounded-lg">
               <Mail className="h-5 w-5 text-[var(--angola-red)] mr-3" />
               <div>
-                <p className="font-medium text-gray-900">Email</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">E-mail</p>
                 <p className="text-sm text-gray-600">{user.email}</p>
               </div>
             </div>
@@ -57,7 +57,7 @@ export default function ContactModal({ user, isOpen, onClose }: ContactModalProp
               <Button asChild variant="outline" className="flex-1">
                 <a href={`mailto:${user.email}`}>
                   <Mail className="h-4 w-4 mr-2" />
-                  Email
+                  E-mail
                 </a>
               </Button>
             </div>
