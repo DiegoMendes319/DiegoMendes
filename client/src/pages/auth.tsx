@@ -275,9 +275,14 @@ export default function Auth() {
       // Handle registration
       const userData: InsertUser = {
         ...formData,
-        date_of_birth: formData.date_of_birth || '',
-        availability: formData.availability || '',
-        services: formData.services || [],
+        date_of_birth: formData.date_of_birth || '1990-01-01',
+        availability: formData.availability || 'Segunda a Sexta, 8h-17h',
+        services: formData.services || ['limpeza'],
+        contract_type: formData.contract_type || 'diarista',
+        phone: formData.phone || '900000000',
+        province: formData.province || 'Luanda',
+        municipality: formData.municipality || 'Luanda',
+        neighborhood: formData.neighborhood || 'Centro'
       } as InsertUser;
 
       authMutation.mutate(userData);
