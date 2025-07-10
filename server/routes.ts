@@ -155,6 +155,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Supabase configuration endpoint
+  app.get("/api/config/supabase", (req, res) => {
+    res.json({
+      url: process.env.SUPABASE_URL,
+      key: process.env.SUPABASE_ANON_KEY
+    });
+  });
+
   // Get all users or search with filters
   app.get("/api/users", async (req, res) => {
     try {

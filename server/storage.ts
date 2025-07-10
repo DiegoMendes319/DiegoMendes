@@ -646,4 +646,5 @@ class DatabaseStorage implements IStorage {
 // Initialize storage - using in-memory storage with sample data for now
 // TODO: Switch to DatabaseStorage when DATABASE_URL is properly configured
 // Use in-memory storage for now since database connection is failing
-export const storage = new MemStorage();
+// Use database storage when DATABASE_URL is available, otherwise use memory storage
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

@@ -32,6 +32,7 @@ export default function Auth() {
   const [agreeAge, setAgreeAge] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const { toast } = useToast();
+  const supabaseAuth = useSupabaseAuth();
 
   const validateAge = (dateOfBirth: string) => {
     const birthDate = new Date(dateOfBirth);
@@ -157,14 +158,15 @@ export default function Auth() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const response = await apiRequest('POST', '/api/auth/login', data);
-      return response.json();
+      // Use Supabase auth for login
+      const result = await supabaseAuth.signIn(data.email, data.password);
+      return result;
     },
     onSuccess: (data) => {
       console.log('Login successful:', data);
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vindo de volta, ${data.user.name}!`,
+        description: `Bem-vindo de volta!`,
       });
       
       setTimeout(() => {
@@ -183,8 +185,9 @@ export default function Auth() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: InsertUser) => {
-      const response = await apiRequest('POST', '/api/auth/register', data);
-      return response.json();
+      // Use Supabase auth for registration
+      const result = await supabaseAuth.signUp(data.email || '', data.password || '', data);
+      return result;
     },
     onSuccess: (data) => {
       console.log('Registration successful:', data);
@@ -251,11 +254,31 @@ export default function Auth() {
   });
 
   const handleGoogleAuth = async () => {
-    toast({
-      title: "Google Auth indisponível",
-      description: "Por favor, use email/palavra-passe ou registo simples",
-      variant: "destructive",
-    });
+    try {
+      const result = await supabaseAuth.signInWithGoogle();
+      console.log('Google auth result:', result);
+      
+      if (result.error) {
+        toast({
+          title: "Erro na autenticação",
+          description: result.error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Autenticação bem-sucedida!",
+          description: "A redireccionar para o seu perfil...",
+        });
+        setTimeout(() => setLocation("/profile"), 1000);
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      toast({
+        title: "Erro na autenticação",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
