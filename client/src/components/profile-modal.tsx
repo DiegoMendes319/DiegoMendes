@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, Facebook, Instagram, Music, ExternalLink } from "lucide-react";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
@@ -153,103 +152,31 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
               </div>
             </div>
           )}
-          
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="details">Detalhes</TabsTrigger>
-              <TabsTrigger value="reviews">Avaliações</TabsTrigger>
-              <TabsTrigger value="contact">Contacto</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="details" className="mt-6">
-              <div className="space-y-6">
-                <div>
-                  <h5 className="font-semibold text-gray-900 mb-3">Serviços Oferecidos</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {user.services.map((service) => (
-                      <span key={service} className="service-tag px-3 py-1 text-sm font-medium rounded-full">
-                        {service}
-                      </span>
-                    ))}
-                  </div>
-                </div>
 
-                {user.about_me && (
-                  <div>
-                    <h5 className="font-semibold text-gray-900 mb-3">Sobre Mim</h5>
-                    <p className="text-gray-700 leading-relaxed">{user.about_me}</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="reviews" className="mt-6">
-              <ReviewsDisplay 
-                userId={user.id}
-                user={user}
-                showAddReview={currentUser?.id !== user.id}
-                onAddReview={() => setShowReviewModal(true)}
-              />
-            </TabsContent>
-            
-            <TabsContent value="contact" className="mt-6">
-              <div className="space-y-6">
-                <div className="text-center">
-                  <Button 
-                    onClick={onContact}
-                    className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Entrar em Contacto
-                  </Button>
-                </div>
-                
-                {(user.facebook_url || user.instagram_url || user.tiktok_url) && (
-                  <div>
-                    <h5 className="font-semibold text-gray-900 mb-3">Redes Sociais</h5>
-                    <div className="flex flex-wrap gap-3">
-                      {user.facebook_url && (
-                        <a 
-                          href={user.facebook_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                        >
-                          <Facebook className="h-4 w-4" />
-                          Facebook
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                      {user.instagram_url && (
-                        <a 
-                          href={user.instagram_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition-colors"
-                        >
-                          <Instagram className="h-4 w-4" />
-                          Instagram
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                      {user.tiktok_url && (
-                        <a 
-                          href={user.tiktok_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <Music className="h-4 w-4" />
-                          TikTok
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+          {/* Reviews Section - Always visible */}
+          <div>
+            <h5 className="font-semibold text-gray-900 mb-3 flex items-center">
+              <Star className="h-5 w-5 mr-2 text-[var(--angola-red)]" />
+              Avaliações
+            </h5>
+            <ReviewsDisplay 
+              userId={user.id} 
+              user={user}
+              showAddReview={currentUser?.id !== user.id}
+              onAddReview={() => setShowReviewModal(true)}
+            />
+          </div>
+
+          {/* Contact Button - Always visible at bottom */}
+          <div className="flex justify-center pt-4 border-t">
+            <Button 
+              onClick={onContact}
+              className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white px-8 py-3 text-lg font-semibold rounded-lg"
+            >
+              <Phone className="h-5 w-5 mr-2" />
+              Entrar em Contato
+            </Button>
+          </div>
         </div>
         
         <ReviewModal
