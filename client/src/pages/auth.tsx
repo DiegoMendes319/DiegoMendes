@@ -51,7 +51,7 @@ export default function Auth() {
     if (authMode === 'login') {
       // Login validation
       if (authMethod === 'email' && !formData.email?.trim()) {
-        newErrors.email = 'Email é obrigatório';
+        newErrors.email = 'E-mail é obrigatório';
       }
       if (authMethod === 'simple') {
         if (!formData.first_name?.trim()) {

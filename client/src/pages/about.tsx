@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Link href="/">
@@ -13,15 +13,15 @@ export default function About() {
               Voltar ao Início
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Sobre Nós</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Sobre Jikulumessu</h1>
           <div className="w-24 h-1 bg-angola-red rounded-full"></div>
         </div>
 
         <div className="space-y-8">
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">A Nossa Missão</h2>
-            <p className="text-gray-600 leading-relaxed">
-              A Doméstica Angola foi criada para revolucionar a forma como as famílias angolanas encontram 
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              O Jikulumessu foi criado para revolucionar a forma como as famílias angolanas encontram 
               profissionais de serviços domésticos qualificados. A nossa missão é conectar pessoas que precisam 
               de ajuda nas tarefas domésticas com profissionais experientes e de confiança, promovendo 
               oportunidades de emprego digno e melhorando a qualidade de vida de ambas as partes.

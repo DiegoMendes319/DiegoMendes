@@ -11,6 +11,9 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Dark/Light Mode Toggle**: Implemented theme switching functionality visible in header for all screen sizes  
 ✓ **Full Responsiveness**: Enhanced mobile-first responsive design across all components and sections
 ✓ **Improved Search UX**: Made search and filter sections fully responsive with proper spacing and layout
+✓ **Fixed Container Responsiveness**: Resolved geolocation prompt overflow issues and improved mobile layout
+✓ **Enhanced Icon Design**: Updated to represent black person with "abre o olho" gesture using finger pointing to eye
+✓ **Portuguese Language Consistency**: Ensured proper Portuguese from Portugal across all interface elements
 ✓ **Header Duplication Fix**: Removed duplicate navbar appearing on home page
 ✓ **Fake Data Elimination**: Completely removed all sample/fake user profiles - only real registered users displayed
 ✓ **Custom Favicon Creation**: Added "abre o olho" symbol favicon with custom SVG design

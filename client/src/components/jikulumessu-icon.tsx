@@ -19,71 +19,99 @@ export default function JikulumessuIcon({ className = "", size = 'md' }: Jikulum
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Face outline - circular */}
+        {/* Face outline - representing black person */}
         <circle
           cx="20"
           cy="20"
-          r="18"
-          stroke="currentColor"
-          strokeWidth="2"
-          fill="var(--angola-red)"
-          className="text-gray-800 dark:text-gray-200"
+          r="17"
+          fill="#8B4513"
+          stroke="#654321"
+          strokeWidth="1"
         />
         
-        {/* Eye (representing "opening the eye") */}
+        {/* Hair/forehead texture */}
+        <circle
+          cx="20"
+          cy="15"
+          r="15"
+          fill="#5D4037"
+          clipPath="url(#topHead)"
+        />
+        
+        {/* Define clip path for hair */}
+        <defs>
+          <clipPath id="topHead">
+            <rect x="5" y="5" width="30" height="15" />
+          </clipPath>
+        </defs>
+        
+        {/* Left eye */}
+        <ellipse
+          cx="15"
+          cy="18"
+          rx="3"
+          ry="2"
+          fill="white"
+        />
+        
+        {/* Right eye (being "opened" by finger) */}
+        <ellipse
+          cx="25"
+          cy="18"
+          rx="4"
+          ry="3"
+          fill="white"
+        />
+        
+        {/* Eye pupils */}
+        <circle cx="15" cy="18" r="1.5" fill="black" />
+        <circle cx="25" cy="18" r="2" fill="black" />
+        
+        {/* Eye highlights */}
+        <circle cx="15.5" cy="17.5" r="0.5" fill="white" />
+        <circle cx="25.5" cy="17.5" r="0.7" fill="white" />
+        
+        {/* Nose */}
         <ellipse
           cx="20"
-          cy="18"
-          rx="12"
-          ry="6"
-          fill="white"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          className="text-gray-800 dark:text-gray-200"
+          cy="22"
+          rx="1.5"
+          ry="2"
+          fill="#7D4A2F"
         />
         
-        {/* Iris */}
-        <circle
-          cx="20"
-          cy="18"
-          r="4"
-          fill="var(--angola-black)"
-        />
-        
-        {/* Pupil */}
-        <circle
-          cx="20"
-          cy="18"
-          r="2"
-          fill="black"
-        />
-        
-        {/* Highlight in eye (alert/awareness) */}
-        <circle
-          cx="21"
-          cy="17"
-          r="0.8"
-          fill="white"
-        />
-        
-        {/* Eyebrow (showing alertness) */}
+        {/* Mouth */}
         <path
-          d="M10 12 Q15 10 20 10 Q25 10 30 12"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
+          d="M17 26 Q20 28 23 26"
+          stroke="#654321"
+          strokeWidth="1"
           fill="none"
-          className="text-gray-800 dark:text-gray-200"
         />
         
-        {/* Small mouth (neutral but alert expression) */}
+        {/* Index finger pointing to eye - "abre o olho" gesture */}
         <path
-          d="M16 28 Q20 30 24 28"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          fill="none"
-          className="text-gray-800 dark:text-gray-200"
+          d="M30 15 L32 18 L31 19 L29 16 Z"
+          fill="#8B4513"
+          stroke="#654321"
+          strokeWidth="0.5"
+        />
+        
+        {/* Fingertip */}
+        <circle
+          cx="30"
+          cy="15"
+          r="1"
+          fill="#A0522D"
+        />
+        
+        {/* Hand/wrist part */}
+        <rect
+          x="28"
+          y="16"
+          width="2"
+          height="4"
+          fill="#8B4513"
+          rx="1"
         />
       </svg>
     </div>

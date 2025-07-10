@@ -104,31 +104,40 @@ export default function Home() {
               Conectamos famílias com profissionais domésticos qualificados na sua região — seguro, fiável e próximo de si.
             </p>
             
-            {/* Geolocation Prompt */}
+            {/* Geolocation Prompt - Fixed responsive container */}
             {showGeolocationPrompt && (
-              <Card className="max-w-md mx-auto mb-8 bg-yellow-50 border-yellow-200">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <MapPin className="h-8 w-8 text-[var(--angola-red)]" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Como pretende procurar?
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Escolha a forma de encontrar diaristas próximos de si
-                  </p>
-                  <div className="flex gap-2">
-                    <Button onClick={handleGeolocationRequest} className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      Permitir localização automática
-                    </Button>
-                    <Button variant="outline" onClick={handleManualSearch} className="flex-1">
-                      <Search className="h-4 w-4 mr-2" />
-                      Procurar manualmente
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="w-full max-w-lg mx-auto mb-8 px-4">
+                <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700 shadow-lg">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center justify-center mb-4">
+                      <MapPin className="h-6 w-6 md:h-8 md:w-8 text-[var(--angola-red)]" />
+                    </div>
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+                      Como pretende procurar?
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 text-center">
+                      Escolha a forma de encontrar diaristas próximos de si
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                      <Button 
+                        onClick={handleGeolocationRequest} 
+                        className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-sm md:text-base py-2 md:py-3 px-3 md:px-4 whitespace-nowrap"
+                      >
+                        <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">Permitir localização automática</span>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleManualSearch} 
+                        className="flex-1 border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)] hover:text-white dark:border-[var(--angola-red)] dark:text-[var(--angola-red)] text-sm md:text-base py-2 md:py-3 px-3 md:px-4 whitespace-nowrap"
+                      >
+                        <Search className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">Procurar manualmente</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </div>
         </div>
