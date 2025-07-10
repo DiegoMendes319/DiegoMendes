@@ -25,6 +25,7 @@ export interface IStorage {
   
   // Authentication methods
   authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null>;
+  authenticateUserByName(firstName: string, lastName: string, password: string): Promise<{ user: User; sessionToken: string } | null>;
   createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }>;
   validateSession(sessionToken: string): Promise<User | null>;
   logout(sessionToken: string): Promise<boolean>;
@@ -232,6 +233,39 @@ export class MemStorage implements IStorage {
   // Authentication methods
   async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
     const user = this.usersByEmail.get(email.toLowerCase());
+    
+    if (!user || !user.password) {
+      return null;
+    }
+
+    const isValidPassword = await this.verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      return null;
+    }
+
+    // Create session
+    const sessionToken = this.generateSessionToken();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    
+    this.sessions.set(sessionToken, {
+      userId: user.id,
+      expiresAt
+    });
+
+    // Clean up expired sessions
+    this.cleanupExpiredSessions();
+
+    return { user, sessionToken };
+  }
+
+  // Simple authentication by name + password
+  async authenticateUserByName(firstName: string, lastName: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
+    // Find user by first and last name
+    const allUsers = Array.from(this.users.values());
+    const user = allUsers.find(u => 
+      u.first_name?.toLowerCase() === firstName.toLowerCase() && 
+      u.last_name?.toLowerCase() === lastName.toLowerCase()
+    );
     
     if (!user || !user.password) {
       return null;
@@ -530,6 +564,32 @@ class DatabaseStorage implements IStorage {
       return { user, sessionToken };
     } catch (error) {
       console.error("Error authenticating user:", error);
+      return null;
+    }
+  }
+
+  async authenticateUserByName(firstName: string, lastName: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
+    if (!this.db) return null;
+    try {
+      // Find user by first and last name
+      const result = await this.db.select().from(users).where(
+        and(
+          eq(users.first_name, firstName),
+          eq(users.last_name, lastName)
+        )
+      );
+      
+      const user = result[0];
+      if (!user || !user.password) return null;
+      
+      const bcrypt = await import('bcrypt');
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) return null;
+      
+      const sessionToken = crypto.randomUUID();
+      return { user, sessionToken };
+    } catch (error) {
+      console.error("Error authenticating user by name:", error);
       return null;
     }
   }

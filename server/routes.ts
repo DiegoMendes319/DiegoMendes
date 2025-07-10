@@ -65,22 +65,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Nome e palavra-passe são obrigatórios" });
       }
 
-      // Find user by name combination
-      const allUsers = await storage.getAllUsers();
-      const user = allUsers.find(u => 
-        u.first_name?.toLowerCase() === first_name.toLowerCase() && 
-        u.last_name?.toLowerCase() === last_name.toLowerCase()
-      );
-
-      if (!user) {
-        return res.status(401).json({ error: "Utilizador não encontrado" });
-      }
-
-      // Verify password using email login flow
-      const result = await storage.authenticateUser(user.email || `${first_name.toLowerCase()}.${last_name.toLowerCase()}@temp.com`, password);
+      // Use the new direct authentication method
+      const result = await storage.authenticateUserByName(first_name, last_name, password);
       
       if (!result) {
-        return res.status(401).json({ error: "Palavra-passe incorrecta" });
+        return res.status(401).json({ error: "Nome ou palavra-passe incorrectos" });
       }
 
       // Set session cookie

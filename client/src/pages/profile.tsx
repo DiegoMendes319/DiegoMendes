@@ -204,11 +204,11 @@ export default function Profile() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Check file size (max 50MB - muito mais generoso)
+    if (file.size > 50 * 1024 * 1024) {
       toast({
         title: "Ficheiro muito grande",
-        description: "A imagem deve ter no máximo 5MB",
+        description: "A imagem deve ter no máximo 50MB",
         variant: "destructive",
       });
       return;
@@ -224,24 +224,60 @@ export default function Profile() {
       return;
     }
 
-    // Convert to base64 for now (later we'll upload to Supabase Storage)
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64String = e.target?.result as string;
+    // Compress and convert image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions (max 800x800 to reduce size)
+      const maxSize = 800;
+      let { width, height } = img;
       
-      // Update form data with the image
+      if (width > height) {
+        if (width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        }
+      } else {
+        if (height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
+      }
+      
+      // Set canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress image
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // Convert to base64 with compression (0.8 quality)
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      
+      // Update form data with the compressed image
       setFormData(prev => ({
         ...prev,
-        profile_url: base64String
+        profile_url: compressedBase64
       }));
 
       toast({
         title: "Imagem carregada",
-        description: "A imagem foi adicionada ao perfil. Clique em 'Guardar' para actualizar.",
+        description: "A imagem foi optimizada e adicionada ao perfil. Clique em 'Guardar' para actualizar.",
       });
     };
     
-    reader.readAsDataURL(file);
+    img.onerror = () => {
+      toast({
+        title: "Erro ao carregar imagem",
+        description: "Não foi possível processar a imagem. Tente outra.",
+        variant: "destructive",
+      });
+    };
+    
+    // Start loading the image
+    img.src = URL.createObjectURL(file);
   };
 
   const handleServiceToggle = (service: string) => {
