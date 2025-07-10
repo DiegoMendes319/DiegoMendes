@@ -6,14 +6,15 @@ Casa Rápida is a full-stack web application designed to connect families with q
 
 ## Recent Updates (Janeiro 2025)
 
-✓ **Site Rebranding**: Changed from "Doméstica Angola" to "Casa Rápida" with neutral, region-agnostic branding
-✓ **Background Cleanup**: Removed hero section background patterns for cleaner layout
-✓ **Sample Data Removal**: Eliminated all sample/fake user profiles - only real database registrations shown
-✓ **Authentication Flow Fixes**: Improved registration success verification and proper database entry creation
+✓ **Complete Rebranding**: Changed from "Casa Rápida" to "Jikulumessu" across all components and pages
+✓ **Header Duplication Fix**: Removed duplicate navbar appearing on home page
+✓ **Fake Data Elimination**: Completely removed all sample/fake user profiles - only real registered users displayed
+✓ **Custom Favicon Creation**: Added "abre o olho" symbol favicon with custom SVG design
+✓ **Supabase SQL Script**: Created complete database setup script for Supabase SQL Editor
+✓ **Authentication Improvements**: Enhanced session management with proper cookie handling
 ✓ **Social Media Integration**: Added dedicated social media tab in user profiles with Facebook, Instagram, TikTok links
 ✓ **Location Input Enhancement**: Manual neighborhood input option alongside dropdown selection
 ✓ **Portuguese (Portugal) Localization**: Complete interface using Portuguese from Portugal terminology
-✓ **User Interface Improvements**: House+broom logo design and consolidated location search buttons
 
 ## User Preferences
 
