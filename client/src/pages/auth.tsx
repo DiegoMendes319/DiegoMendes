@@ -230,23 +230,19 @@ export default function Auth() {
             password: data.password
           });
         } else if (authMethod === 'simple') {
-          // Simple login by name (find user by name and authenticate with password)
-          const response = await apiRequest('GET', '/api/users');
-          const users = await response.json();
-          
-          const user = users.find((u: any) => 
-            u.first_name.toLowerCase() === data.first_name!.toLowerCase() &&
-            u.last_name.toLowerCase() === data.last_name!.toLowerCase()
-          );
-
-          if (!user || !user.email) {
-            throw new Error('Utilizador não encontrado');
-          }
-
-          return loginMutation.mutateAsync({
-            email: user.email,
+          // Use simple login endpoint
+          const response = await apiRequest('POST', '/api/auth/simple-login', {
+            first_name: data.first_name!,
+            last_name: data.last_name!,
             password: data.password!
           });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro no login simples');
+          }
+          
+          return response.json();
         }
         throw new Error('Método de login inválido');
       }
@@ -291,7 +287,7 @@ export default function Auth() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -301,24 +297,59 @@ export default function Auth() {
       return;
     }
 
-    if (authMode === 'login') {
-      // Handle login
-      authMutation.mutate(formData as InsertUser);
-    } else {
-      // Handle registration
-      const userData: InsertUser = {
-        ...formData,
-        date_of_birth: formData.date_of_birth || '1990-01-01',
-        availability: formData.availability || 'Segunda a Sexta, 8h-17h',
-        services: formData.services || ['limpeza'],
-        contract_type: formData.contract_type || 'diarista',
-        phone: formData.phone || '900000000',
-        province: formData.province || 'Luanda',
-        municipality: formData.municipality || 'Luanda',
-        neighborhood: formData.neighborhood || 'Centro'
-      } as InsertUser;
+    try {
+      if (authMode === 'login') {
+        // Handle login
+        authMutation.mutate(formData as InsertUser);
+      } else {
+        // Handle registration
+        if (authMethod === 'simple') {
+          // Use simple registration endpoint
+          const simpleData = {
+            first_name: formData.first_name!,
+            last_name: formData.last_name!,
+            password: formData.password!
+          };
+          
+          const response = await apiRequest('POST', '/api/auth/simple-register', simpleData);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro no registo simples');
+          }
+          
+          const result = await response.json();
+          toast({
+            title: "Registo realizado com sucesso!",
+            description: `Bem-vindo ${result.user?.name || 'ao Jikulumessu'}!`,
+          });
+          
+          setTimeout(() => {
+            window.location.href = "/profile";
+          }, 1500);
+        } else {
+          // Full registration
+          const userData: InsertUser = {
+            ...formData,
+            date_of_birth: formData.date_of_birth || '1990-01-01',
+            availability: formData.availability || 'Segunda a Sexta, 8h-17h',
+            services: formData.services || ['limpeza'],
+            contract_type: formData.contract_type || 'diarista',
+            phone: formData.phone || '900000000',
+            province: formData.province || 'Luanda',
+            municipality: formData.municipality || 'Luanda',
+            neighborhood: formData.neighborhood || 'Centro'
+          } as InsertUser;
 
-      authMutation.mutate(userData);
+          authMutation.mutate(userData);
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Erro na autenticação",
+        description: error.message || "Erro inesperado. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 

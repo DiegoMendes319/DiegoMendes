@@ -56,6 +56,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple login endpoint (name + password)
+  app.post("/api/auth/simple-login", async (req, res) => {
+    try {
+      const { first_name, last_name, password } = req.body;
+      
+      if (!first_name || !last_name || !password) {
+        return res.status(400).json({ error: "Nome e palavra-passe são obrigatórios" });
+      }
+
+      // Find user by name combination
+      const allUsers = await storage.getAllUsers();
+      const user = allUsers.find(u => 
+        u.first_name?.toLowerCase() === first_name.toLowerCase() && 
+        u.last_name?.toLowerCase() === last_name.toLowerCase()
+      );
+
+      if (!user) {
+        return res.status(401).json({ error: "Utilizador não encontrado" });
+      }
+
+      // Verify password using email login flow
+      const result = await storage.authenticateUser(user.email || `${first_name.toLowerCase()}.${last_name.toLowerCase()}@temp.com`, password);
+      
+      if (!result) {
+        return res.status(401).json({ error: "Palavra-passe incorrecta" });
+      }
+
+      // Set session cookie
+      res.cookie('session_token', result.sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+
+      res.json({
+        message: "Login simples realizado com sucesso",
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          first_name: result.user.first_name,
+          last_name: result.user.last_name
+        },
+        sessionToken: result.sessionToken
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Erro interno do servidor" 
+      });
+    }
+  });
+
+  // Simple register endpoint (name + password + basic info)
+  app.post("/api/auth/simple-register", async (req, res) => {
+    try {
+      const { first_name, last_name, password } = req.body;
+      
+      if (!first_name || !last_name || !password) {
+        return res.status(400).json({ error: "Nome e palavra-passe são obrigatórios" });
+      }
+
+      // Create temporary email for simple registration
+      const tempEmail = `${first_name.toLowerCase()}.${last_name.toLowerCase()}@temp.com`;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(tempEmail);
+      if (existingUser) {
+        return res.status(409).json({ error: "Utilizador já existe" });
+      }
+
+      // Create user with minimal required data
+      const userData = {
+        first_name,
+        last_name,
+        email: tempEmail,
+        password,
+        phone: "900000000", // Default phone
+        date_of_birth: "1990-01-01", // Default birth date
+        province: "Luanda", // Default province
+        municipality: "Luanda", // Default municipality
+        neighborhood: "Centro", // Default neighborhood
+        contract_type: "diarista", // Default contract type
+        services: ["limpeza"], // Default service
+        availability: "Disponível" // Default availability
+      };
+
+      const result = await storage.createUserWithAuth(userData);
+
+      // Set session cookie
+      res.cookie('session_token', result.sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+
+      res.status(201).json({
+        message: "Registo simples realizado com sucesso",
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          first_name: result.user.first_name,
+          last_name: result.user.last_name
+        },
+        sessionToken: result.sessionToken
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Erro interno do servidor" 
+      });
+    }
+  });
+
   app.post("/api/auth/register", async (req, res) => {
     try {
       const userData = req.body;
