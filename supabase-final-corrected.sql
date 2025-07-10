@@ -1,5 +1,5 @@
--- Script SQL atualizado para configurar o Supabase (Janeiro 2025)
--- Execute este script no SQL Editor do Supabase
+-- Script SQL FINAL CORRIGIDO para configurar o Supabase (Janeiro 2025)
+-- Execute este script completo no SQL Editor do Supabase
 
 -- 1. Criar extensões necessárias
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    email TEXT UNIQUE, -- Opcional para registros simples
+    email TEXT UNIQUE,
     phone TEXT NOT NULL,
     date_of_birth TIMESTAMP WITH TIME ZONE,
     province TEXT NOT NULL,
@@ -20,14 +20,13 @@ CREATE TABLE IF NOT EXISTS public.users (
     services TEXT[] NOT NULL DEFAULT ARRAY['limpeza'],
     availability TEXT NOT NULL DEFAULT 'Segunda a Sexta, 8h-17h',
     about_me TEXT,
-    profile_url TEXT, -- Para imagens em base64 ou URLs
+    profile_url TEXT,
     facebook_url TEXT,
     instagram_url TEXT,
     tiktok_url TEXT,
-    password TEXT, -- Para autenticação simples (opcional)
+    password TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-    auth_user_id UUID UNIQUE, -- Para integração com Supabase auth
-    -- Campos de rating
+    auth_user_id UUID UNIQUE,
     average_rating REAL DEFAULT 0,
     total_reviews INTEGER DEFAULT 0
 );
@@ -53,33 +52,26 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
--- 5. Políticas de segurança para users
-DROP POLICY IF EXISTS "Users can view all profiles" ON public.users;
+-- 5. Políticas de segurança para users (permissivas para desenvolvimento)
 CREATE POLICY "Users can view all profiles" ON public.users
     FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
 CREATE POLICY "Users can insert their own profile" ON public.users
     FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" ON public.users
     FOR UPDATE USING (true);
 
--- 6. Políticas de segurança para reviews
-DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON public.reviews;
+-- 6. Políticas de segurança para reviews (permissivas para desenvolvimento)
 CREATE POLICY "Reviews are viewable by everyone" ON public.reviews
     FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Authenticated users can create reviews" ON public.reviews;
 CREATE POLICY "Authenticated users can create reviews" ON public.reviews
     FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Users can update their own reviews" ON public.reviews;
 CREATE POLICY "Users can update their own reviews" ON public.reviews
     FOR UPDATE USING (true);
 
-DROP POLICY IF EXISTS "Users can delete their own reviews" ON public.reviews;
 CREATE POLICY "Users can delete their own reviews" ON public.reviews
     FOR DELETE USING (true);
 
@@ -130,52 +122,22 @@ CREATE TRIGGER update_user_rating_on_review_change
     FOR EACH ROW
     EXECUTE FUNCTION update_user_rating_trigger();
 
--- 10. Função para criar perfil automaticamente quando user se registra (opcional)
--- Esta função será ativada apenas se você usar autenticação do Supabase
--- Para o sistema atual de autenticação simples, esta função não é necessária
+-- 10. Função para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER 
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
 
--- CREATE OR REPLACE FUNCTION public.handle_new_user()
--- RETURNS TRIGGER 
--- LANGUAGE plpgsql
--- SECURITY DEFINER
--- AS $$
--- BEGIN
---     INSERT INTO public.users (
---         auth_user_id, 
---         email, 
---         first_name, 
---         last_name, 
---         phone, 
---         province, 
---         municipality, 
---         neighborhood, 
---         contract_type, 
---         services, 
---         availability
---     )
---     VALUES (
---         NEW.id,
---         NEW.email,
---         COALESCE(NEW.raw_user_meta_data->>'first_name', 'Nome'),
---         COALESCE(NEW.raw_user_meta_data->>'last_name', 'Sobrenome'),
---         COALESCE(NEW.raw_user_meta_data->>'phone', '900000000'),
---         COALESCE(NEW.raw_user_meta_data->>'province', 'Luanda'),
---         COALESCE(NEW.raw_user_meta_data->>'municipality', 'Luanda'),
---         COALESCE(NEW.raw_user_meta_data->>'neighborhood', 'Centro'),
---         COALESCE(NEW.raw_user_meta_data->>'contract_type', 'diarista'),
---         COALESCE(ARRAY[NEW.raw_user_meta_data->>'services'], ARRAY['limpeza']),
---         COALESCE(NEW.raw_user_meta_data->>'availability', 'Segunda a Sexta, 8h-17h')
---     );
---     RETURN NEW;
--- END;
--- $$;
-
--- 11. Trigger para criar perfil automaticamente (opcional)
--- DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
--- CREATE TRIGGER on_auth_user_created
---     AFTER INSERT ON auth.users
---     FOR EACH ROW
---     EXECUTE FUNCTION public.handle_new_user();
+-- 11. Trigger para atualizar updated_at na tabela reviews
+CREATE TRIGGER update_reviews_updated_at 
+    BEFORE UPDATE ON public.reviews 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- 12. Índices para performance
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
@@ -187,32 +149,15 @@ CREATE INDEX IF NOT EXISTS idx_users_contract_type ON public.users(contract_type
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewee_id ON public.reviews(reviewee_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewer_id ON public.reviews(reviewer_id);
 
--- 13. Função para atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER 
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$;
-
--- 14. Trigger para atualizar updated_at na tabela reviews
-CREATE TRIGGER update_reviews_updated_at 
-    BEFORE UPDATE ON public.reviews 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
-
--- 15. Verificar se tudo foi criado
+-- 13. Verificar se tudo foi criado
 SELECT 
-    'Tables created:' as info,
+    'Tables created successfully:' as info,
     array_agg(table_name) as tables
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
 AND table_name IN ('users', 'reviews');
 
--- 16. Mostrar estrutura das tabelas criadas
+-- 14. Mostrar estrutura das tabelas criadas
 SELECT 
     table_name,
     column_name,
