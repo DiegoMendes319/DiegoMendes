@@ -302,26 +302,26 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
+            className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10 dark:text-[var(--angola-red)] dark:hover:bg-[var(--angola-red)]/20"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar ao Início
           </Button>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg dark:bg-gray-800 dark:border-gray-700 transition-colors">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-[var(--angola-red)] mb-2">
               {authMode === 'login' ? 'Entrar na Conta' : 'Registar Conta'}
             </CardTitle>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {authMode === 'login' 
                 ? 'Escolha uma das três formas de entrar:'
                 : 'Registe-se para conectar com famílias'
@@ -351,16 +351,16 @@ export default function Auth() {
 
             {/* Auth Method Selection */}
             <Tabs value={authMethod} onValueChange={(value) => switchAuthMethod(value as AuthMethod)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="email" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-3 dark:bg-gray-700 dark:border-gray-600">
+                <TabsTrigger value="email" className="flex items-center gap-2 dark:data-[state=active]:bg-gray-600 dark:text-gray-300">
                   <Mail className="h-4 w-4" />
                   E-mail
                 </TabsTrigger>
-                <TabsTrigger value="google" className="flex items-center gap-2">
+                <TabsTrigger value="google" className="flex items-center gap-2 dark:data-[state=active]:bg-gray-600 dark:text-gray-300">
                   <FaGoogle className="h-4 w-4" />
                   Google
                 </TabsTrigger>
-                <TabsTrigger value="simple" className="flex items-center gap-2">
+                <TabsTrigger value="simple" className="flex items-center gap-2 dark:data-[state=active]:bg-gray-600 dark:text-gray-300">
                   <User className="h-4 w-4" />
                   Simples
                 </TabsTrigger>
@@ -371,20 +371,20 @@ export default function Auth() {
                 <TabsContent value="email" className="space-y-4">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="email">E-mail</Label>
+                      <Label htmlFor="email" className="dark:text-gray-200">E-mail</Label>
                       <Input
                         id="email"
                         type="email"
                         value={formData.email || ""}
                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                         placeholder="seu@email.com"
-                        className={errors.email ? 'border-red-500' : ''}
+                        className={`dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.email ? 'border-red-500' : ''}`}
                       />
                       {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
 
                     <div>
-                      <Label htmlFor="password">Palavra-passe</Label>
+                      <Label htmlFor="password" className="dark:text-gray-200">Palavra-passe</Label>
                       <div className="relative">
                         <Input
                           id="password"
@@ -392,7 +392,7 @@ export default function Auth() {
                           value={formData.password || ""}
                           onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                           placeholder="Digite a sua palavra-passe"
-                          className={errors.password ? 'border-red-500' : ''}
+                          className={`dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.password ? 'border-red-500' : ''}`}
                         />
                         <Button
                           type="button"
@@ -421,7 +421,7 @@ export default function Auth() {
                       <FaGoogle className="h-4 w-4 mr-2" />
                       {authMode === 'login' ? 'Entrar' : 'Registar'} com Google
                     </Button>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                       {authMode === 'login' 
                         ? 'Aceda à sua conta usando a sua conta Google'
                         : 'Após conectar com Google, completará o seu perfil'
@@ -434,24 +434,24 @@ export default function Auth() {
                 <TabsContent value="simple" className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="first_name">Primeiro Nome</Label>
+                      <Label htmlFor="first_name" className="dark:text-gray-200">Primeiro Nome</Label>
                       <Input
                         id="first_name"
                         value={formData.first_name || ""}
                         onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                         placeholder="João"
-                        className={errors.first_name ? 'border-red-500' : ''}
+                        className={`dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.first_name ? 'border-red-500' : ''}`}
                       />
                       {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="last_name">Último Nome</Label>
+                      <Label htmlFor="last_name" className="dark:text-gray-200">Último Nome</Label>
                       <Input
                         id="last_name"
                         value={formData.last_name || ""}
                         onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                         placeholder="Silva"
-                        className={errors.last_name ? 'border-red-500' : ''}
+                        className={`dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.last_name ? 'border-red-500' : ''}`}
                       />
                       {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>}
                     </div>
