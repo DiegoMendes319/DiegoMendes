@@ -17,6 +17,7 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Header Duplication Fix**: Removed duplicate navbar appearing on home page
 ✓ **Fake Data Elimination**: Completely removed all sample/fake user profiles - only real registered users displayed
 ✓ **Custom Favicon Creation**: Added "abre o olho" symbol favicon with custom SVG design
+✓ **Icon Update (Janeiro 2025)**: Substituído ícone genérico amarelo por design baseado na imagem fornecida pelo utilizador, com fundo vermelho suave (em vez de azul) mantendo o conceito "abre o olho"
 ✓ **Supabase SQL Script**: Created complete database setup script for Supabase SQL Editor
 ✓ **Authentication Improvements**: Enhanced session management with proper cookie handling
 ✓ **Social Media Integration**: Added dedicated social media tab in user profiles with Facebook, Instagram, TikTok links
