@@ -160,6 +160,10 @@ export default function Auth() {
     mutationFn: async (data: { email: string; password: string }) => {
       // Use our local API for login
       const response = await apiRequest('POST', '/api/auth/login', data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro no login');
+      }
       return response.json();
     },
     onSuccess: (data) => {
@@ -169,9 +173,10 @@ export default function Auth() {
         description: `Bem-vindo de volta, ${data.user?.name || ''}!`,
       });
       
+      // Force page reload to update auth state, then redirect
       setTimeout(() => {
-        setLocation("/profile");
-      }, 1000);
+        window.location.href = "/profile";
+      }, 1500);
     },
     onError: (error) => {
       console.error('Login error:', error);
@@ -187,6 +192,10 @@ export default function Auth() {
     mutationFn: async (data: InsertUser) => {
       // Use our local API for registration instead of Supabase
       const response = await apiRequest('POST', '/api/auth/register', data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro no registo');
+      }
       return response.json();
     },
     onSuccess: (data) => {
@@ -196,9 +205,10 @@ export default function Auth() {
         description: `Bem-vindo ${data.user?.name || 'ao Jikulumessu'}!`,
       });
       
+      // Force page reload to update auth state, then redirect
       setTimeout(() => {
-        setLocation("/profile");
-      }, 1000);
+        window.location.href = "/profile";
+      }, 1500);
     },
     onError: (error) => {
       console.error('Registration error:', error);

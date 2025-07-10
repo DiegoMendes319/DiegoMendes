@@ -1,6 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { apiRequest } from '@/lib/queryClient';
 
 export interface AuthUser {
   id: string;
@@ -10,34 +9,86 @@ export interface AuthUser {
   last_name: string;
 }
 
-export function useAuth() {
-  const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
+interface AuthContextType {
+  user: AuthUser | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<any>;
+  register: (userData: any) => Promise<any>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+}
 
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['/api/auth/me'],
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/auth/logout', {});
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.clear();
-      setLocation('/auth');
-    },
-  });
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const isAuthenticated = !!user && !error;
-
-  return {
-    user: user as AuthUser | null,
-    isLoading,
-    isAuthenticated,
-    logout: () => logoutMutation.mutate(),
-    isLoggingOut: logoutMutation.isPending,
+  const refreshUser = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/auth/me');
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error) {
+      console.log('Not authenticated or session expired');
+      setUser(null);
+    }
   };
+
+  useEffect(() => {
+    refreshUser().finally(() => setLoading(false));
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const response = await apiRequest('POST', '/api/auth/login', { email, password });
+    const result = await response.json();
+    
+    if (result.user) {
+      setUser(result.user);
+    }
+    
+    return result;
+  };
+
+  const register = async (userData: any) => {
+    const response = await apiRequest('POST', '/api/auth/register', userData);
+    const result = await response.json();
+    
+    if (result.user) {
+      setUser(result.user);
+    }
+    
+    return result;
+  };
+
+  const logout = async () => {
+    try {
+      await apiRequest('POST', '/api/auth/logout', {});
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      refreshUser
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

@@ -8,7 +8,7 @@ import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
 import { useAuth } from "@/hooks/use-auth";
-import type { User } from "@/types/user";
+import type { User } from "@shared/schema";
 
 interface ProfileModalProps {
   user: User;

@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase-client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import LocationSelector from "@/components/location-selector";
 import { 
   User, 
   Phone, 
@@ -20,62 +28,159 @@ import {
   Home,
   Briefcase,
   Clock,
-  DollarSign
+  DollarSign,
+  Save,
+  Trash2,
+  Camera,
+  Facebook,
+  Instagram
 } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
+
+const serviceOptions = [
+  { value: "limpeza", label: "Limpeza Doméstica" },
+  { value: "cozinha", label: "Cozinhar" },
+  { value: "passadoria", label: "Passar Roupa" },
+  { value: "jardinagem", label: "Jardinagem" },
+  { value: "cuidado_criancas", label: "Cuidado de Crianças" },
+  { value: "cuidado_idosos", label: "Cuidado de Idosos" },
+  { value: "compras", label: "Fazer Compras" },
+  { value: "organizacao", label: "Organização" }
+];
+
+const contractTypes = [
+  { value: "diarista", label: "Diarista" },
+  { value: "mensalista", label: "Mensalista" },
+  { value: "fixo", label: "Contrato Fixo" },
+  { value: "temporario", label: "Temporário" }
+];
 
 export default function Profile() {
   const [, setLocation] = useLocation();
-  const { user, loading, signOut } = useSupabaseAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+  const { user, loading, logout, refreshUser } = useAuth();
+  const [editMode, setEditMode] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Form state for editing
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    date_of_birth: '',
+    province: '',
+    municipality: '',
+    neighborhood: '',
+    address_complement: '',
+    contract_type: '',
+    services: [] as string[],
+    availability: '',
+    about_me: '',
+    facebook_url: '',
+    instagram_url: '',
+    tiktok_url: ''
+  });
 
   useEffect(() => {
     if (!loading && !user) {
       setLocation("/auth");
       return;
     }
-
-    if (user) {
-      fetchProfile();
-    }
   }, [user, loading, setLocation]);
 
-  const fetchProfile = async () => {
-    try {
-      setProfileLoading(true);
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
+  // Fetch user profile data
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['/api/users', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const response = await apiRequest('GET', `/api/users/${user.id}`);
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar o perfil.",
-          variant: "destructive",
-        });
-        return;
+  // Update form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        date_of_birth: profile.date_of_birth ? profile.date_of_birth.split('T')[0] : '',
+        province: profile.province || '',
+        municipality: profile.municipality || '',
+        neighborhood: profile.neighborhood || '',
+        address_complement: profile.address_complement || '',
+        contract_type: profile.contract_type || '',
+        services: profile.services || [],
+        availability: profile.availability || '',
+        about_me: profile.about_me || '',
+        facebook_url: profile.facebook_url || '',
+        instagram_url: profile.instagram_url || '',
+        tiktok_url: profile.tiktok_url || ''
+      });
+    }
+  }, [profile]);
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('PUT', `/api/users/${user?.id}`, data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao actualizar perfil');
       }
-
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+      return response.json();
+    },
+    onSuccess: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível carregar o perfil.",
+        title: "Perfil actualizado!",
+        description: "As suas informações foram guardadas com sucesso.",
+      });
+      setEditMode(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/users', user?.id] });
+      refreshUser();
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao actualizar",
+        description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setProfileLoading(false);
-    }
-  };
+    },
+  });
+
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('DELETE', `/api/users/${user?.id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao eliminar conta');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Conta eliminada",
+        description: "A sua conta foi eliminada com sucesso.",
+      });
+      logout();
+      setLocation("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao eliminar conta",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await logout();
       toast({
         title: "Logout realizado",
         description: "Até à próxima!",
@@ -83,12 +188,29 @@ export default function Profile() {
       setLocation("/");
     } catch (error) {
       console.error('Error signing out:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível fazer logout.",
-        variant: "destructive",
-      });
     }
+  };
+
+  const handleSaveProfile = () => {
+    updateProfileMutation.mutate(formData);
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccountMutation.mutate();
+    setDeleteDialogOpen(false);
+  };
+
+  const handleServiceToggle = (service: string) => {
+    setFormData(prev => ({
+      ...prev,
+      services: prev.services.includes(service)
+        ? prev.services.filter(s => s !== service)
+        : [...prev.services, service]
+    }));
+  };
+
+  const handleLocationChange = (location: { province?: string; municipality?: string; neighborhood?: string }) => {
+    setFormData(prev => ({ ...prev, ...location }));
   };
 
   if (loading || profileLoading) {
@@ -123,29 +245,64 @@ export default function Profile() {
             <Home className="h-4 w-4 mr-2" />
             Página Inicial
           </Button>
-          <Button
-            variant="outline"
-            onClick={handleSignOut}
-            className="text-red-600 border-red-200 hover:bg-red-50"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setEditMode(!editMode)}
+              className="text-[var(--angola-red)] border-[var(--angola-red)]"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              {editMode ? 'Cancelar' : 'Editar Perfil'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
 
         {/* Profile Header */}
         <Card className="mb-6 shadow-lg">
           <CardHeader>
             <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-2xl bg-[var(--angola-red)] text-white">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-20 w-20">
+                  <AvatarFallback className="text-2xl bg-[var(--angola-red)] text-white">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                {editMode && (
+                  <Button
+                    size="sm"
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <div className="flex-1">
-                <CardTitle className="text-2xl text-[var(--angola-red)]">
-                  {profile ? `${profile.first_name} ${profile.last_name}` : user.email}
-                </CardTitle>
+                {editMode ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      value={formData.first_name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                      placeholder="Primeiro nome"
+                    />
+                    <Input
+                      value={formData.last_name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                      placeholder="Último nome"
+                    />
+                  </div>
+                ) : (
+                  <CardTitle className="text-2xl text-[var(--angola-red)]">
+                    {profile ? `${profile.first_name} ${profile.last_name}` : user.email}
+                  </CardTitle>
+                )}
                 <p className="text-gray-600 dark:text-gray-300 flex items-center mt-1">
                   <Mail className="h-4 w-4 mr-2" />
                   {user.email}
@@ -158,148 +315,335 @@ export default function Profile() {
                   </div>
                 )}
               </div>
-              <Button className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
-                <Edit className="h-4 w-4 mr-2" />
-                Editar Perfil
-              </Button>
+              {editMode && (
+                <Button 
+                  onClick={handleSaveProfile}
+                  disabled={updateProfileMutation.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Guardar
+                </Button>
+              )}
             </div>
           </CardHeader>
         </Card>
 
         {/* Profile Content */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Left Column - Basic Info */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Informações Básicas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {profile?.phone && (
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{profile.phone}</span>
-                  </div>
-                )}
-                {profile?.date_of_birth && (
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{new Date(profile.date_of_birth).toLocaleDateString('pt-PT')}</span>
-                  </div>
-                )}
-                {(profile?.province || profile?.municipality || profile?.neighborhood) && (
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{[profile?.neighborhood, profile?.municipality, profile?.province].filter(Boolean).join(', ')}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="details">Detalhes</TabsTrigger>
+            <TabsTrigger value="services">Serviços</TabsTrigger>
+            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
+          </TabsList>
 
-            {/* Services */}
-            {profile?.services && (
+          <TabsContent value="details" className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <User className="h-5 w-5 mr-2" />
+                    Informações Pessoais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editMode ? (
+                    <>
+                      <div>
+                        <Label>Telefone</Label>
+                        <Input
+                          value={formData.phone}
+                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="9XX XXX XXX"
+                        />
+                      </div>
+                      <div>
+                        <Label>Data de Nascimento</Label>
+                        <Input
+                          type="date"
+                          value={formData.date_of_birth}
+                          onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label>Localização</Label>
+                        <LocationSelector
+                          onLocationChange={handleLocationChange}
+                          defaultValues={{
+                            province: formData.province,
+                            municipality: formData.municipality,
+                            neighborhood: formData.neighborhood
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Complemento de Endereço</Label>
+                        <Input
+                          value={formData.address_complement}
+                          onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
+                          placeholder="Apartamento, Bloco, etc."
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {profile?.phone && (
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{profile.phone}</span>
+                        </div>
+                      )}
+                      {profile?.date_of_birth && (
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{new Date(profile.date_of_birth).toLocaleDateString('pt-PT')}</span>
+                        </div>
+                      )}
+                      {(profile?.province || profile?.municipality || profile?.neighborhood) && (
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{[profile?.neighborhood, profile?.municipality, profile?.province].filter(Boolean).join(', ')}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Briefcase className="h-5 w-5 mr-2" />
-                    Serviços
+                    Informações Profissionais
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.services.map((service: string, index: number) => (
-                      <Badge key={index} variant="secondary">
-                        {service}
-                      </Badge>
-                    ))}
-                  </div>
+                <CardContent className="space-y-4">
+                  {editMode ? (
+                    <>
+                      <div>
+                        <Label>Tipo de Contrato</Label>
+                        <Select value={formData.contract_type} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {contractTypes.map(type => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Disponibilidade</Label>
+                        <Textarea
+                          value={formData.availability}
+                          onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
+                          placeholder="Ex: Segunda a Sexta, 8h-17h"
+                        />
+                      </div>
+                      <div>
+                        <Label>Sobre Mim</Label>
+                        <Textarea
+                          value={formData.about_me}
+                          onChange={(e) => setFormData(prev => ({ ...prev, about_me: e.target.value }))}
+                          placeholder="Conte-nos um pouco sobre você..."
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {profile?.contract_type && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Tipo de Contrato</label>
+                          <p className="capitalize">{profile.contract_type}</p>
+                        </div>
+                      )}
+                      {profile?.availability && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Disponibilidade</label>
+                          <p>{profile.availability}</p>
+                        </div>
+                      )}
+                      {profile?.about_me && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Sobre Mim</label>
+                          <p className="text-gray-700 dark:text-gray-300">{profile.about_me}</p>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </CardContent>
               </Card>
-            )}
-          </div>
+            </div>
+          </TabsContent>
 
-          {/* Right Column - Professional Info */}
-          <div className="md:col-span-2 space-y-4">
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="details">Detalhes</TabsTrigger>
-                <TabsTrigger value="availability">Disponibilidade</TabsTrigger>
-                <TabsTrigger value="reviews">Avaliações</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="details" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Informações Profissionais</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {profile?.contract_type && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">Tipo de Contrato</label>
-                        <p className="capitalize">{profile.contract_type}</p>
+          <TabsContent value="services">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Briefcase className="h-5 w-5 mr-2" />
+                  Serviços Oferecidos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {editMode ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {serviceOptions.map(service => (
+                      <div key={service.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={service.value}
+                          checked={formData.services.includes(service.value)}
+                          onCheckedChange={() => handleServiceToggle(service.value)}
+                        />
+                        <Label htmlFor={service.value} className="text-sm">
+                          {service.label}
+                        </Label>
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {profile?.services?.length > 0 ? (
+                      profile.services.map((service: string, index: number) => {
+                        const serviceLabel = serviceOptions.find(opt => opt.value === service)?.label || service;
+                        return (
+                          <Badge key={index} variant="secondary">
+                            {serviceLabel}
+                          </Badge>
+                        );
+                      })
+                    ) : (
+                      <p className="text-gray-500">Nenhum serviço especificado</p>
                     )}
-                    {profile?.hourly_rate && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">Tarifa por Hora</label>
-                        <p className="flex items-center">
-                          <DollarSign className="h-4 w-4 mr-1" />
-                          {profile.hourly_rate.toLocaleString('pt-PT')} AOA
-                        </p>
-                      </div>
-                    )}
-                    {profile?.about_me && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">Sobre Mim</label>
-                        <p className="text-gray-700 dark:text-gray-300">{profile.about_me}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <TabsContent value="availability">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Clock className="h-5 w-5 mr-2" />
-                      Disponibilidade
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {profile?.availability || 'Disponibilidade não especificada'}
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="reviews">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Star className="h-5 w-5 mr-2" />
-                      Avaliações
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">
-                        {profile?.review_count > 0 
-                          ? `${profile.review_count} avaliação${profile.review_count > 1 ? 'ões' : ''}`
-                          : 'Ainda não tem avaliações'
-                        }
-                      </p>
+          <TabsContent value="social">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <User className="h-5 w-5 mr-2" />
+                  Redes Sociais
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {editMode ? (
+                  <>
+                    <div>
+                      <Label className="flex items-center">
+                        <Facebook className="h-4 w-4 mr-2 text-blue-600" />
+                        Facebook
+                      </Label>
+                      <Input
+                        value={formData.facebook_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
+                        placeholder="https://facebook.com/seu-perfil"
+                      />
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+                    <div>
+                      <Label className="flex items-center">
+                        <Instagram className="h-4 w-4 mr-2 text-pink-600" />
+                        Instagram
+                      </Label>
+                      <Input
+                        value={formData.instagram_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, instagram_url: e.target.value }))}
+                        placeholder="https://instagram.com/seu-perfil"
+                      />
+                    </div>
+                    <div>
+                      <Label className="flex items-center">
+                        <FaTiktok className="h-4 w-4 mr-2" />
+                        TikTok
+                      </Label>
+                      <Input
+                        value={formData.tiktok_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, tiktok_url: e.target.value }))}
+                        placeholder="https://tiktok.com/@seu-perfil"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    {profile?.facebook_url && (
+                      <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline">
+                        <Facebook className="h-4 w-4 mr-2" />
+                        Facebook
+                      </a>
+                    )}
+                    {profile?.instagram_url && (
+                      <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-pink-600 hover:underline">
+                        <Instagram className="h-4 w-4 mr-2" />
+                        Instagram
+                      </a>
+                    )}
+                    {profile?.tiktok_url && (
+                      <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="flex items-center hover:underline">
+                        <FaTiktok className="h-4 w-4 mr-2" />
+                        TikTok
+                      </a>
+                    )}
+                    {!profile?.facebook_url && !profile?.instagram_url && !profile?.tiktok_url && (
+                      <p className="text-gray-500">Nenhuma rede social adicionada</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Zona Perigosa</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium text-red-600 mb-2">Eliminar Conta</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Esta acção é irreversível. Todos os seus dados serão permanentemente eliminados.
+                    </p>
+                    <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Eliminar Conta
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Tem a certeza?</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <p>Esta acção não pode ser desfeita. Isto irá eliminar permanentemente a sua conta e todos os dados associados.</p>
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                              Cancelar
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              onClick={handleDeleteAccount}
+                              disabled={deleteAccountMutation.isPending}
+                            >
+                              {deleteAccountMutation.isPending ? 'A eliminar...' : 'Sim, eliminar'}
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
