@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import type { User as UserType, UpdateUserData } from "@/types/user";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Profile() {
   const [, setLocation] = useLocation();
@@ -41,6 +42,31 @@ export default function Profile() {
     instagram_url: '',
     tiktok_url: ''
   });
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Use authentication hook
+  const { user: authUser, isAuthenticated, logout } = useAuth();
+  
+  const { data: user, isLoading } = useQuery({
+    queryKey: [`/api/users/${authUser?.id}`],
+    enabled: !!authUser?.id,
+    queryFn: async () => {
+      if (!authUser?.id) return null;
+      const response = await fetch(`/api/users/${authUser.id}`);
+      if (!response.ok) {
+        throw new Error('Utilizador não encontrado');
+      }
+      return response.json();
+    }
+  });
+
+  // Redirect to auth if not authenticated
+  React.useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      setLocation('/auth');
+    }
+  }, [isAuthenticated, isLoading, setLocation]);
 
   // Initialize social media values when user data loads
   React.useEffect(() => {
@@ -52,34 +78,10 @@ export default function Profile() {
       });
     }
   }, [user]);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Get the latest user ID from the users list (most recent registration)
-  const { data: allUsers } = useQuery({
-    queryKey: ['/api/users'],
-  });
-  
-  // For now, get the last created user as the "logged in" user (simulate authentication)
-  const userId = allUsers && allUsers.length > 0 ? allUsers[allUsers.length - 1].id : null;
-
-  const { data: user, isLoading } = useQuery({
-    queryKey: [`/api/users/${userId}`],
-    enabled: !!userId,
-    queryFn: async () => {
-      if (!userId) return null;
-      const response = await fetch(`/api/users/${userId}`);
-      if (!response.ok) {
-        // If specific user not found, return the last user from the list
-        return allUsers && allUsers.length > 0 ? allUsers[allUsers.length - 1] : null;
-      }
-      return response.json();
-    }
-  });
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: UpdateUserData) => {
-      const response = await apiRequest('PUT', `/api/users/${userId}`, data);
+      const response = await apiRequest('PUT', `/api/users/${authUser?.id}`, data);
       return response.json();
     },
     onSuccess: () => {
@@ -87,7 +89,7 @@ export default function Profile() {
         title: "Perfil actualizado com sucesso!",
         description: "As suas informações foram guardadas.",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${authUser?.id}`] });
       setIsEditing(false);
     },
     onError: (error) => {

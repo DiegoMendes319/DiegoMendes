@@ -155,167 +155,107 @@ export default function Auth() {
     setFormData(prev => ({ ...prev, ...location }));
   };
 
-  const authMutation = useMutation({
-    mutationFn: async (data: InsertUser) => {
-      if (authMode === 'login') {
-        if (authMethod === 'email') {
-          // Email/Password login with Supabase
-          const { data: authData, error } = await supabaseAuth.signInWithPassword({
-            email: data.email!,
-            password: data.password!
-          });
-
-          if (error) {
-            throw new Error(error.message || 'Erro no login');
-          }
-
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "A redirecionar para o seu perfil...",
-          });
-          setLocation("/profile");
-          return authData;
-        } else if (authMethod === 'simple') {
-          // Simple name/password login - check against users table
-          const response = await apiRequest('GET', '/api/users');
-          const users = await response.json();
-          
-          const user = users.find((u: any) => 
-            u.first_name.toLowerCase() === data.first_name!.toLowerCase() &&
-            u.last_name.toLowerCase() === data.last_name!.toLowerCase() &&
-            u.password === data.password
-          );
-
-          if (!user) {
-            throw new Error('Utilizador não encontrado ou palavra-passe incorreta');
-          }
-
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "A redirecionar para o seu perfil...",
-          });
-          setLocation("/profile");
-          return user;
-        }
-        return;
-      }
-
-      // Registration
-      if (authMethod === 'email') {
-        // Create Supabase auth user first
-        const { data: authData, error } = await supabaseAuth.signUp({
-          email: data.email!,
-          password: data.password!,
-          options: {
-            data: {
-              first_name: data.first_name,
-              last_name: data.last_name
-            }
-          }
-        });
-
-        if (error) {
-          throw new Error(error.message || 'Erro no registo');
-        }
-
-        // Then create user profile
-        const userData = { ...data, auth_user_id: authData.user?.id };
-        const response = await apiRequest('POST', '/api/users', userData);
-        return response.json();
-      } else {
-        // Simple registration or Google registration
-        const response = await apiRequest('POST', '/api/users', data);
-        return response.json();
-      }
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const response = await apiRequest('POST', '/api/auth/login', data);
+      return response.json();
     },
-    onSuccess: () => {
-      if (authMode === 'register') {
-        toast({
-          title: "Registo realizado com sucesso!",
-          description: "Bem-vindo ao Casa Rápida!",
-        });
+    onSuccess: (data) => {
+      console.log('Login successful:', data);
+      toast({
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo de volta, ${data.user.name}!`,
+      });
+      
+      setTimeout(() => {
         setLocation("/profile");
-      }
+      }, 1000);
     },
     onError: (error) => {
+      console.error('Login error:', error);
       toast({
-        title: "Erro na autenticação",
+        title: "Erro no login",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const handleGoogleAuth = async () => {
-    try {
+  const registerMutation = useMutation({
+    mutationFn: async (data: InsertUser) => {
+      const response = await apiRequest('POST', '/api/auth/register', data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log('Registration successful:', data);
       toast({
-        title: "A conectar com Google...",
-        description: "A redirecionar para autenticação Google",
-      });
-
-      const { data, error } = await supabaseAuth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth`
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data?.user) {
-        toast({
-          title: "Autenticação Google bem-sucedida!",
-          description: "A redirecionar para o seu perfil...",
-        });
-        
-        // Create user profile if registering
-        if (authMode === 'register') {
-          const userData: InsertUser = {
-            first_name: data.user.user_metadata?.name?.split(' ')[0] || 'Utilizador',
-            last_name: data.user.user_metadata?.name?.split(' ').slice(1).join(' ') || 'Google',
-            email: data.user.email,
-            phone: formData.phone || '',
-            date_of_birth: formData.date_of_birth || new Date('2000-01-01'),
-            province: formData.province || '',
-            municipality: formData.municipality || '',
-            neighborhood: formData.neighborhood || '',
-            address_complement: formData.address_complement,
-            contract_type: formData.contract_type || '',
-            services: formData.services || [],
-            availability: formData.availability || '',
-            about_me: formData.about_me,
-            profile_url: data.user.user_metadata?.picture,
-            facebook_url: formData.facebook_url,
-            instagram_url: formData.instagram_url,
-            tiktok_url: formData.tiktok_url,
-            password: null, // OAuth users don't have passwords
-            auth_user_id: data.user.id
-          };
-
-          const response = await apiRequest('POST', '/api/users', userData);
-          const userProfile = await response.json();
-          
-          toast({
-            title: "Perfil criado com sucesso!",
-            description: "Bem-vindo ao Doméstica Angola!",
-          });
-        }
-        
-        setLocation("/profile");
-      }
-    } catch (error: any) {
-      console.error('Google Auth Error:', error);
-      toast({
-        title: "Erro na autenticação Google",
-        description: error.message || "Verifique a configuração do OAuth",
-        variant: "destructive",
+        title: "Registo realizado com sucesso!",
+        description: "A sua conta foi criada e está agora autenticado.",
       });
       
-      // Show setup instructions in console for development
-      console.log(SETUP_INSTRUCTIONS);
-    }
+      setTimeout(() => {
+        setLocation("/profile");
+      }, 1000);
+    },
+    onError: (error) => {
+      console.error('Registration error:', error);
+      toast({
+        title: "Erro no registo",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const authMutation = useMutation({
+    mutationFn: async (data: InsertUser) => {
+      if (authMode === 'login') {
+        if (authMethod === 'email' && data.email && data.password) {
+          // Use our authentication endpoint
+          return loginMutation.mutateAsync({
+            email: data.email,
+            password: data.password
+          });
+        } else if (authMethod === 'simple') {
+          // Simple login by name (find user by name and authenticate with password)
+          const response = await apiRequest('GET', '/api/users');
+          const users = await response.json();
+          
+          const user = users.find((u: any) => 
+            u.first_name.toLowerCase() === data.first_name!.toLowerCase() &&
+            u.last_name.toLowerCase() === data.last_name!.toLowerCase()
+          );
+
+          if (!user || !user.email) {
+            throw new Error('Utilizador não encontrado');
+          }
+
+          return loginMutation.mutateAsync({
+            email: user.email,
+            password: data.password!
+          });
+        }
+        throw new Error('Método de login inválido');
+      }
+
+      // Registration mode
+      return registerMutation.mutateAsync(data);
+    },
+    onSuccess: () => {
+      // Success is handled by individual mutations
+    },
+    onError: (error) => {
+      // Errors are handled by individual mutations
+      console.error('Auth error:', error);
+    },
+  });
+
+  const handleGoogleAuth = async () => {
+    toast({
+      title: "Google Auth indisponível",
+      description: "Por favor, use email/palavra-passe ou registo simples",
+      variant: "destructive",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

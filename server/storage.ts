@@ -2,6 +2,8 @@ import { users, type User, type InsertUser, type UpdateUser } from "@shared/sche
 import { eq, and, ilike, or, sql } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -20,17 +22,25 @@ export interface IStorage {
     contract_type?: string;
   }): Promise<User[]>;
   getAllUsers(): Promise<User[]>;
+  
+  // Authentication methods
+  authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null>;
+  createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }>;
+  validateSession(sessionToken: string): Promise<User | null>;
+  logout(sessionToken: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private usersByEmail: Map<string, User>;
   private usersByAuthId: Map<string, User>;
+  private sessions: Map<string, { userId: string; expiresAt: Date }>;
 
   constructor() {
     this.users = new Map();
     this.usersByEmail = new Map();
     this.usersByAuthId = new Map();
+    this.sessions = new Map();
     this.initializeSampleData();
   }
 
@@ -350,6 +360,148 @@ export class MemStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return Array.from(this.users.values());
+  }
+
+  // Hash password helper
+  private async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 12);
+  }
+
+  // Verify password helper
+  private async verifyPassword(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
+  }
+
+  // Generate session token
+  private generateSessionToken(): string {
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  // Authentication methods
+  async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
+    const user = this.usersByEmail.get(email.toLowerCase());
+    
+    if (!user || !user.password) {
+      return null;
+    }
+
+    const isValidPassword = await this.verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      return null;
+    }
+
+    // Create session
+    const sessionToken = this.generateSessionToken();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    
+    this.sessions.set(sessionToken, {
+      userId: user.id,
+      expiresAt
+    });
+
+    // Clean up expired sessions
+    this.cleanupExpiredSessions();
+
+    return { user, sessionToken };
+  }
+
+  async createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }> {
+    // Check if email already exists
+    if (userData.email && this.usersByEmail.has(userData.email.toLowerCase())) {
+      throw new Error('Email já está em uso');
+    }
+
+    // Hash password if provided
+    let hashedPassword: string | null = null;
+    if (userData.password) {
+      hashedPassword = await this.hashPassword(userData.password);
+    }
+
+    const userId = crypto.randomUUID();
+    const now = new Date();
+
+    // Calculate age
+    const birthDate = new Date(userData.date_of_birth);
+    const age = now.getFullYear() - birthDate.getFullYear();
+    const monthDiff = now.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
+      // Subtract 1 if birthday hasn't occurred this year
+    }
+
+    const user: User = {
+      id: userId,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      email: userData.email || null,
+      phone: userData.phone,
+      date_of_birth: birthDate,
+      province: userData.province,
+      municipality: userData.municipality,
+      neighborhood: userData.neighborhood,
+      address_complement: userData.address_complement || null,
+      contract_type: userData.contract_type,
+      services: userData.services || [],
+      availability: userData.availability,
+      about_me: userData.about_me || null,
+      profile_url: userData.profile_url || null,
+      facebook_url: userData.facebook_url || null,
+      instagram_url: userData.instagram_url || null,
+      tiktok_url: userData.tiktok_url || null,
+      password: hashedPassword,
+      created_at: now,
+      auth_user_id: userData.auth_user_id || null,
+      // Computed fields
+      name: `${userData.first_name} ${userData.last_name}`,
+      age: age
+    };
+
+    // Store user
+    this.users.set(userId, user);
+    if (user.email) {
+      this.usersByEmail.set(user.email.toLowerCase(), user);
+    }
+    if (user.auth_user_id) {
+      this.usersByAuthId.set(user.auth_user_id, user);
+    }
+
+    // Create session
+    const sessionToken = this.generateSessionToken();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    
+    this.sessions.set(sessionToken, {
+      userId: user.id,
+      expiresAt
+    });
+
+    return { user, sessionToken };
+  }
+
+  async validateSession(sessionToken: string): Promise<User | null> {
+    const session = this.sessions.get(sessionToken);
+    
+    if (!session) {
+      return null;
+    }
+
+    if (session.expiresAt < new Date()) {
+      this.sessions.delete(sessionToken);
+      return null;
+    }
+
+    return this.users.get(session.userId) || null;
+  }
+
+  async logout(sessionToken: string): Promise<boolean> {
+    return this.sessions.delete(sessionToken);
+  }
+
+  private cleanupExpiredSessions(): void {
+    const now = new Date();
+    for (const [token, session] of this.sessions.entries()) {
+      if (session.expiresAt < now) {
+        this.sessions.delete(token);
+      }
+    }
   }
 }
 
