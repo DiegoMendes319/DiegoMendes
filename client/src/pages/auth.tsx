@@ -14,6 +14,7 @@ import LocationSelector from "@/components/location-selector";
 import { UserPlus, LogIn, Home, Mail, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
+import { supabaseAuth, SETUP_INSTRUCTIONS } from "@/lib/supabase-auth";
 import type { InsertUser } from "@shared/schema";
 
 type AuthMethod = 'email' | 'google' | 'simple';
@@ -62,7 +63,7 @@ export default function Auth() {
       }
       // Password always required for login (except Google)
       if (authMethod !== 'google' && !formData.password?.trim()) {
-        newErrors.password = 'Senha é obrigatória';
+        newErrors.password = 'Palavra-passe é obrigatória';
       }
     } else {
       // Registration validation
@@ -99,7 +100,7 @@ export default function Auth() {
 
       // Password validation (for email and simple methods)
       if (authMethod !== 'google' && !formData.password?.trim()) {
-        newErrors.password = 'Senha é obrigatória';
+        newErrors.password = 'Palavra-passe é obrigatória';
       }
 
       // Location validation
@@ -130,10 +131,10 @@ export default function Auth() {
 
       // Checkbox validations
       if (!agreeAge) {
-        newErrors.agreeAge = 'Você deve confirmar que tem 18 anos ou mais';
+        newErrors.agreeAge = 'Deve confirmar que tem 18 anos ou mais';
       }
       if (!agreeTerms) {
-        newErrors.agreeTerms = 'Você deve concordar com os termos e políticas';
+        newErrors.agreeTerms = 'Deve concordar com os termos e políticas';
       }
     }
 
@@ -157,22 +158,79 @@ export default function Auth() {
   const authMutation = useMutation({
     mutationFn: async (data: InsertUser) => {
       if (authMode === 'login') {
-        // Mock login - in real app, this would use Supabase auth
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Redirecionando para seu perfil...",
-        });
-        setLocation("/profile");
-        return;
+        if (authMethod === 'email') {
+          // Email/Password login with Supabase
+          const { data: authData, error } = await supabaseAuth.signInWithPassword({
+            email: data.email!,
+            password: data.password!
+          });
+
+          if (error) {
+            throw new Error(error.message || 'Erro no login');
+          }
+
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "A redirecionar para o seu perfil...",
+          });
+          setLocation("/profile");
+          return authData;
+        } else if (authMethod === 'simple') {
+          // Simple name/password login - check against users table
+          const response = await apiRequest('GET', '/api/users');
+          const users = await response.json();
+          
+          const user = users.find((u: any) => 
+            u.first_name.toLowerCase() === data.first_name!.toLowerCase() &&
+            u.last_name.toLowerCase() === data.last_name!.toLowerCase() &&
+            u.password === data.password
+          );
+
+          if (!user) {
+            throw new Error('Utilizador não encontrado ou palavra-passe incorreta');
+          }
+
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "A redirecionar para o seu perfil...",
+          });
+          setLocation("/profile");
+          return user;
+        }
       }
 
-      const response = await apiRequest('POST', '/api/users', data);
-      return response.json();
+      // Registration
+      if (authMethod === 'email') {
+        // Create Supabase auth user first
+        const { data: authData, error } = await supabaseAuth.signUp({
+          email: data.email!,
+          password: data.password!,
+          options: {
+            data: {
+              first_name: data.first_name,
+              last_name: data.last_name
+            }
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Erro no registo');
+        }
+
+        // Then create user profile
+        const userData = { ...data, auth_user_id: authData.user?.id };
+        const response = await apiRequest('POST', '/api/users', userData);
+        return response.json();
+      } else {
+        // Simple registration or Google registration
+        const response = await apiRequest('POST', '/api/users', data);
+        return response.json();
+      }
     },
     onSuccess: () => {
       if (authMode === 'register') {
         toast({
-          title: "Cadastro realizado com sucesso!",
+          title: "Registo realizado com sucesso!",
           description: "Bem-vindo ao Doméstica Angola!",
         });
         setLocation("/profile");
@@ -189,30 +247,73 @@ export default function Auth() {
 
   const handleGoogleAuth = async () => {
     try {
-      // Mock Google OAuth - in real app, this would use Supabase OAuth
       toast({
-        title: "Conectando com Google...",
-        description: "Redirecionando para autenticação Google",
+        title: "A conectar com Google...",
+        description: "A redirecionar para autenticação Google",
       });
-      
-      // Simulate OAuth flow
-      setTimeout(() => {
-        if (authMode === 'login') {
-          setLocation("/profile");
-        } else {
-          // For registration, we'd need to collect additional info
+
+      const { data, error } = await supabaseAuth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth`
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.user) {
+        toast({
+          title: "Autenticação Google bem-sucedida!",
+          description: "A redirecionar para o seu perfil...",
+        });
+        
+        // Create user profile if registering
+        if (authMode === 'register') {
+          const userData: InsertUser = {
+            first_name: data.user.user_metadata?.name?.split(' ')[0] || 'Utilizador',
+            last_name: data.user.user_metadata?.name?.split(' ').slice(1).join(' ') || 'Google',
+            email: data.user.email,
+            phone: formData.phone || '',
+            date_of_birth: formData.date_of_birth || new Date('2000-01-01'),
+            province: formData.province || '',
+            municipality: formData.municipality || '',
+            neighborhood: formData.neighborhood || '',
+            address_complement: formData.address_complement,
+            contract_type: formData.contract_type || '',
+            services: formData.services || [],
+            availability: formData.availability || '',
+            about_me: formData.about_me,
+            profile_url: data.user.user_metadata?.picture,
+            facebook_url: formData.facebook_url,
+            instagram_url: formData.instagram_url,
+            tiktok_url: formData.tiktok_url,
+            password: null, // OAuth users don't have passwords
+            auth_user_id: data.user.id
+          };
+
+          const response = await apiRequest('POST', '/api/users', userData);
+          const userProfile = await response.json();
+          
           toast({
-            title: "Conta Google conectada!",
-            description: "Complete seu perfil com as informações adicionais",
+            title: "Perfil criado com sucesso!",
+            description: "Bem-vindo ao Doméstica Angola!",
           });
         }
-      }, 1500);
-    } catch (error) {
+        
+        setLocation("/profile");
+      }
+    } catch (error: any) {
+      console.error('Google Auth Error:', error);
       toast({
         title: "Erro na autenticação Google",
-        description: "Tente novamente mais tarde",
+        description: error.message || "Verifique a configuração do OAuth",
         variant: "destructive",
       });
+      
+      // Show setup instructions in console for development
+      console.log(SETUP_INSTRUCTIONS);
     }
   };
 
@@ -277,12 +378,12 @@ export default function Auth() {
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-[var(--angola-red)] mb-2">
-              {authMode === 'login' ? 'Entrar na Conta' : 'Criar Conta'}
+              {authMode === 'login' ? 'Entrar na Conta' : 'Registar Conta'}
             </CardTitle>
             <p className="text-gray-600">
               {authMode === 'login' 
                 ? 'Escolha uma das três formas de entrar:'
-                : 'Cadastre-se para conectar com famílias'
+                : 'Registe-se para conectar com famílias'
               }
             </p>
           </CardHeader>
@@ -303,7 +404,7 @@ export default function Auth() {
                 className={authMode === 'register' ? 'bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90' : ''}
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                Cadastrar
+                Registar
               </Button>
             </div>
 
@@ -342,14 +443,14 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label htmlFor="password">Senha</Label>
+                      <Label htmlFor="password">Palavra-passe</Label>
                       <div className="relative">
                         <Input
                           id="password"
                           type={showPassword ? "text" : "password"}
                           value={formData.password || ""}
                           onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                          placeholder="Digite sua senha"
+                          placeholder="Digite a sua palavra-passe"
                           className={errors.password ? 'border-red-500' : ''}
                         />
                         <Button

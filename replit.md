@@ -4,6 +4,16 @@
 
 Doméstica Angola is a full-stack web application designed to connect families with qualified domestic workers in Angola. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences.
 
+## Recent Updates (Janeiro 2025)
+
+✓ **Complete Footer Pages Implementation**: All footer pages now exist with real content (Sobre Nós, Como Funciona, Ajuda, Termos de Serviço, Política de Privacidade, Segurança)
+✓ **Portuguese (Portugal) Localization**: All interface text updated to use Portuguese from Portugal terminology
+✓ **Google OAuth Integration**: Proper Supabase OAuth implementation with setup instructions
+✓ **Three Authentication Methods**: Email/Password, Google OAuth, and Simple Name/Password login
+✓ **Enhanced Error Handling**: Proper authentication error messages and validation
+✓ **Navbar Enhancement**: Modern responsive navbar with Angola colors and mobile support
+✓ **Removed Cookie Policy**: As requested, completely removed cookie policy references
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

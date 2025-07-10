@@ -58,15 +58,15 @@ export default function Profile() {
     },
     onSuccess: () => {
       toast({
-        title: "Perfil atualizado com sucesso!",
-        description: "Suas informações foram salvas.",
+        title: "Perfil actualizado com sucesso!",
+        description: "As suas informações foram guardadas.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}`] });
       setIsEditing(false);
     },
     onError: (error) => {
       toast({
-        title: "Erro ao atualizar perfil",
+        title: "Erro ao actualizar perfil",
         description: error.message,
         variant: "destructive",
       });
@@ -89,7 +89,7 @@ export default function Profile() {
     },
     onError: (error) => {
       toast({
-        title: "Erro ao fazer upload da foto",
+        title: "Erro ao carregar a fotografia",
         description: error.message,
         variant: "destructive",
       });

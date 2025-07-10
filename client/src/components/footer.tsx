@@ -36,16 +36,16 @@ export default function Footer() {
               <Link href="/" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Início
               </Link>
-              <Link href="/sobre" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/about" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Sobre Nós
               </Link>
-              <Link href="/como-funciona" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/how-it-works" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Como Funciona
               </Link>
-              <Link href="/cadastrar" className="text-gray-400 hover:text-white transition-colors text-sm">
-                Cadastrar-se
+              <Link href="/auth" className="text-gray-400 hover:text-white transition-colors text-sm">
+                Registar-se
               </Link>
-              <Link href="/ajuda" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/help" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Ajuda
               </Link>
             </nav>
@@ -55,16 +55,13 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[var(--angola-red)]">Legal</h3>
             <nav className="flex flex-col space-y-2">
-              <Link href="/termos" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Termos de Serviço
               </Link>
-              <Link href="/privacidade" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Política de Privacidade
               </Link>
-              <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors text-sm">
-                Política de Cookies
-              </Link>
-              <Link href="/seguranca" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/security" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Segurança
               </Link>
             </nav>
