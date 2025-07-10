@@ -8,7 +8,7 @@ export const users = pgTable("users", {
   last_name: text("last_name").notNull(),
   email: text("email").unique(), // Made optional for users without email
   phone: text("phone").notNull(),
-  date_of_birth: timestamp("date_of_birth").notNull(), // For age validation ≥18
+  date_of_birth: timestamp("date_of_birth"), // For age validation ≥18
   province: text("province").notNull(),
   municipality: text("municipality").notNull(),
   neighborhood: text("neighborhood").notNull(),
@@ -51,8 +51,9 @@ export const insertUserSchema = createInsertSchema(users).omit({
   auth_user_id: true,
 }).extend({
   // Add client-side validation for age ≥18
-  date_of_birth: z.string().refine(
+  date_of_birth: z.string().optional().refine(
     (date) => {
+      if (!date) return true; // Allow empty dates
       const birthDate = new Date(date);
       const age = new Date().getFullYear() - birthDate.getFullYear();
       return age >= 18;

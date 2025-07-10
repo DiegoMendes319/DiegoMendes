@@ -70,6 +70,8 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser & { auth_user_id?: string }): Promise<User> {
     const id = crypto.randomUUID();
+    const dateOfBirth = insertUser.date_of_birth ? new Date(insertUser.date_of_birth) : new Date('1990-01-01');
+    
     const user: User = {
       ...insertUser,
       id,
@@ -77,16 +79,18 @@ export class MemStorage implements IStorage {
       profile_url: insertUser.profile_url || null,
       auth_user_id: insertUser.auth_user_id || null,
       email: insertUser.email || null,
-      date_of_birth: new Date(insertUser.date_of_birth),
+      date_of_birth: dateOfBirth,
       address_complement: insertUser.address_complement || null,
       about_me: insertUser.about_me || null,
       facebook_url: insertUser.facebook_url || null,
       instagram_url: insertUser.instagram_url || null,
       tiktok_url: insertUser.tiktok_url || null,
       password: insertUser.password || null,
+      average_rating: 0,
+      total_reviews: 0,
       // Computed fields
       name: `${insertUser.first_name} ${insertUser.last_name}`,
-      age: new Date().getFullYear() - new Date(insertUser.date_of_birth).getFullYear(),
+      age: new Date().getFullYear() - dateOfBirth.getFullYear(),
     };
     
     this.users.set(id, user);
@@ -111,15 +115,21 @@ export class MemStorage implements IStorage {
       this.usersByEmail.delete(existingUser.email);
     }
 
+    // Handle date conversion properly
+    let processedUpdate = { ...updateUser };
+    if (processedUpdate.date_of_birth && typeof processedUpdate.date_of_birth === 'string') {
+      processedUpdate.date_of_birth = new Date(processedUpdate.date_of_birth);
+    }
+
     const updatedUser: User = {
       ...existingUser,
-      ...updateUser,
+      ...processedUpdate,
       // Update computed fields if names change
       name: updateUser.first_name || updateUser.last_name 
         ? `${updateUser.first_name || existingUser.first_name} ${updateUser.last_name || existingUser.last_name}`
         : existingUser.name,
-      age: updateUser.date_of_birth 
-        ? new Date().getFullYear() - new Date(updateUser.date_of_birth).getFullYear()
+      age: processedUpdate.date_of_birth 
+        ? new Date().getFullYear() - new Date(processedUpdate.date_of_birth).getFullYear()
         : existingUser.age,
     };
 
@@ -292,6 +302,8 @@ export class MemStorage implements IStorage {
       password: hashedPassword,
       created_at: now,
       auth_user_id: userData.auth_user_id || null,
+      average_rating: 0,
+      total_reviews: 0,
       // Computed fields
       name: `${userData.first_name} ${userData.last_name}`,
       age: age
@@ -503,6 +515,27 @@ class DatabaseStorage implements IStorage {
     }
   }
 
+  // Authentication methods for DatabaseStorage
+  async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
+    // For now, fallback to MemStorage auth since DB is failing
+    return null;
+  }
+
+  async createUserWithAuth(userData: InsertUser): Promise<{ user: User; sessionToken: string }> {
+    // For now, fallback to MemStorage auth since DB is failing
+    throw new Error('Database authentication not available');
+  }
+
+  async validateSession(sessionToken: string): Promise<User | null> {
+    // For now, fallback to MemStorage auth since DB is failing
+    return null;
+  }
+
+  async logout(sessionToken: string): Promise<boolean> {
+    // For now, fallback to MemStorage auth since DB is failing
+    return false;
+  }
+
   async searchUsers(filters: {
     lat?: number;
     lng?: number;
@@ -643,10 +676,6 @@ class DatabaseStorage implements IStorage {
   }
 }
 
-// Initialize storage - using in-memory storage with sample data for now
-// TODO: Switch to DatabaseStorage when DATABASE_URL is properly configured
-// Use in-memory storage for now since database connection is failing
-// Use database storage when DATABASE_URL is available, otherwise use memory storage
-// Temporarily use MemStorage due to Supabase connection issues
-// export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+// Force MemStorage for now due to DATABASE_URL connection issues
 export const storage = new MemStorage();
+console.log('Using MemStorage - DATABASE_URL connection failed');

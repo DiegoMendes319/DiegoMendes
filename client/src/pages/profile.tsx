@@ -276,12 +276,30 @@ export default function Profile() {
                   </AvatarFallback>
                 </Avatar>
                 {editMode && (
-                  <Button
-                    size="sm"
-                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-                  >
-                    <Camera className="h-4 w-4" />
-                  </Button>
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="profile-image-upload"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          toast({
+                            title: "Upload de imagem",
+                            description: "Funcionalidade será implementada em breve",
+                          });
+                        }
+                      }}
+                    />
+                    <Button
+                      size="sm"
+                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                      onClick={() => document.getElementById('profile-image-upload')?.click()}
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
               </div>
               <div className="flex-1">

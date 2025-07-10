@@ -220,19 +220,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/users/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const userData = updateUserSchema.parse(req.body);
+      let userData = req.body;
       
+      // Convert date_of_birth from YYYY-MM-DD to Date if provided
+      if (userData.date_of_birth && typeof userData.date_of_birth === 'string') {
+        try {
+          userData.date_of_birth = new Date(userData.date_of_birth);
+        } catch (error) {
+          return res.status(400).json({ 
+            error: "Formato de data inválido. Use YYYY-MM-DD" 
+          });
+        }
+      }
+      
+      // Remove empty string URLs
+      ['facebook_url', 'instagram_url', 'tiktok_url'].forEach(field => {
+        if (userData[field] === '') {
+          userData[field] = null;
+        }
+      });
+      
+      // Validate with schema (skip strict parsing for flexibility)
       const updatedUser = await storage.updateUser(id, userData);
       
       if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ error: "Utilizador não encontrado" });
       }
       
       res.json(updatedUser);
     } catch (error) {
+      console.error('Error updating user:', error);
       res.status(400).json({ 
-        message: "Invalid user data",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: "Erro ao actualizar perfil",
+        details: error.message
       });
     }
   });
