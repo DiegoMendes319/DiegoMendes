@@ -1,12 +1,16 @@
-# Casa Rápida - Portal de Diaristas
+# Jikulumessu - Portal de Diaristas
 
 ## Overview
 
-Casa Rápida is a full-stack web application designed to connect families with qualified domestic workers. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences.
+Jikulumessu is a full-stack web application designed to connect families with qualified domestic workers in Angola. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences. "Jikulumessu" means "open your eyes" or "stay alert" in Angolan languages, representing awareness and vigilance in choosing domestic services.
 
 ## Recent Updates (Janeiro 2025)
 
 ✓ **Complete Rebranding**: Changed from "Casa Rápida" to "Jikulumessu" across all components and pages
+✓ **Custom "Abre o Olho" Icon**: Created personalized icon representing awareness/alertness as per brand meaning
+✓ **Dark/Light Mode Toggle**: Implemented theme switching functionality visible in header for all screen sizes  
+✓ **Full Responsiveness**: Enhanced mobile-first responsive design across all components and sections
+✓ **Improved Search UX**: Made search and filter sections fully responsive with proper spacing and layout
 ✓ **Header Duplication Fix**: Removed duplicate navbar appearing on home page
 ✓ **Fake Data Elimination**: Completely removed all sample/fake user profiles - only real registered users displayed
 ✓ **Custom Favicon Creation**: Added "abre o olho" symbol favicon with custom SVG design

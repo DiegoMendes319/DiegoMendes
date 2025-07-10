@@ -89,18 +89,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       
       {/* Hero Section */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+      <section className="bg-white dark:bg-gray-900 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 lg:py-20">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 leading-tight">
               Encontre os Melhores
               <span className="text-[var(--angola-red)]"> Diaristas</span>
               <br />da Região
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               Conectamos famílias com profissionais domésticos qualificados na sua região — seguro, fiável e próximo de si.
             </p>
             
@@ -135,27 +135,27 @@ export default function Home() {
       </section>
 
       {/* Search & Filter Section */}
-      <section className="bg-white border-t border-gray-200 py-8">
+      <section className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-6 md:py-8 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="p-6 bg-gray-50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center gap-2">
-              <Filter className="h-6 w-6 text-[var(--angola-red)]" />
-              Filtrar Diaristas
+          <Card className="p-4 md:p-6 bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center flex items-center justify-center gap-2 flex-wrap">
+              <Filter className="h-5 w-5 md:h-6 md:w-6 text-[var(--angola-red)]" />
+              <span>Filtrar Diaristas</span>
             </h2>
             
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               <LocationSelector onLocationChange={handleLocationChange} />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Tipo de Serviço
                   </label>
                   <Select onValueChange={handleServiceFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                       <SelectValue placeholder="Todos os serviços" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
                       <SelectItem value="todos">Todos os serviços</SelectItem>
                       <SelectItem value="limpeza">Limpeza Geral</SelectItem>
                       <SelectItem value="cozinha">Cozinha</SelectItem>
@@ -167,14 +167,14 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Tipo de Contrato
                   </label>
                   <Select onValueChange={handleContractFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                       <SelectValue placeholder="Todos os contratos" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
                       <SelectItem value="todos">Todos os contratos</SelectItem>
                       <SelectItem value="diarista">Diarista</SelectItem>
                       <SelectItem value="mensal">Mensal</SelectItem>
@@ -186,7 +186,7 @@ export default function Home() {
               </div>
               
               <div className="text-center">
-                <Button onClick={() => refetch()} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
+                <Button onClick={() => refetch()} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 w-full sm:w-auto px-6 py-3 text-sm md:text-base">
                   <Search className="h-4 w-4 mr-2" />
                   Buscar Diaristas
                 </Button>
@@ -197,14 +197,14 @@ export default function Home() {
       </section>
 
       {/* Results Section */}
-      <section className="py-12">
+      <section className="py-8 md:py-12 bg-gray-50 dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <Users className="h-8 w-8 text-[var(--angola-red)]" />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <Users className="h-6 w-6 md:h-8 md:w-8 text-[var(--angola-red)]" />
               Diaristas Disponíveis
             </h2>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
               <span>{users?.length || 0} profissionais encontrados</span>
             </div>
           </div>
@@ -229,11 +229,11 @@ export default function Home() {
 
           {!isLoading && users?.length === 0 && (
             <div className="text-center py-12">
-              <HomeIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <HomeIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Nenhum profissional encontrado
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Tente ajustar seus filtros ou expandir a área de busca.
               </p>
             </div>

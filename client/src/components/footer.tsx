@@ -1,16 +1,17 @@
 import { Link } from "wouter";
 import { Home, Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import JikulumessuIcon from "./jikulumessu-icon";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12">
+    <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Home className="h-6 w-6 text-[var(--angola-red)]" />
-              <span className="text-xl font-bold">Doméstica Angola</span>
+              <JikulumessuIcon size="md" className="text-[var(--angola-red)]" />
+              <span className="text-xl font-bold">Jikulumessu</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Conectamos famílias angolanas com profissionais qualificados para serviços domésticos.

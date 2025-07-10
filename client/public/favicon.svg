@@ -1,21 +1,22 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Face circle -->
-  <circle cx="16" cy="16" r="14" fill="#f4f4f4" stroke="#374151" stroke-width="2"/>
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Face outline - circular -->
+  <circle cx="20" cy="20" r="18" stroke="#333" stroke-width="2" fill="#ce1126"/>
   
-  <!-- Eyes -->
-  <circle cx="12" cy="12" r="2" fill="#374151"/>
-  <circle cx="20" cy="12" r="2" fill="#374151"/>
+  <!-- Eye (representing "opening the eye") -->
+  <ellipse cx="20" cy="18" rx="12" ry="6" fill="white" stroke="#333" stroke-width="1.5"/>
   
-  <!-- Nose -->
-  <ellipse cx="16" cy="16" rx="1" ry="1.5" fill="#374151"/>
+  <!-- Iris -->
+  <circle cx="20" cy="18" r="4" fill="#000"/>
   
-  <!-- Mouth -->
-  <path d="M12 20 Q16 24 20 20" stroke="#374151" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Pupil -->
+  <circle cx="20" cy="18" r="2" fill="black"/>
   
-  <!-- Finger pulling lower eyelid - "abre o olho" gesture -->
-  <path d="M22 20 Q24 18 25 16" stroke="#dc2626" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <circle cx="25" cy="16" r="1.5" fill="#dc2626"/>
+  <!-- Highlight in eye (alert/awareness) -->
+  <circle cx="21" cy="17" r="0.8" fill="white"/>
   
-  <!-- Lower eyelid being pulled -->
-  <path d="M20 14 Q22 16 24 16" stroke="#374151" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Eyebrow (showing alertness) -->
+  <path d="M10 12 Q15 10 20 10 Q25 10 30 12" stroke="#333" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Small mouth (neutral but alert expression) -->
+  <path d="M16 28 Q20 30 24 28" stroke="#333" stroke-width="1.5" stroke-linecap="round" fill="none"/>
 </svg>
