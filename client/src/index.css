@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(0, 74%, 42%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Angola Colors */
+  --angola-red: hsl(347, 83%, 47%);
+  --angola-black: hsl(0, 0%, 12%);
+  --angola-yellow: hsl(51, 100%, 50%);
+  --angola-yellow-dark: hsl(51, 100%, 45%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(347, 83%, 47%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .angola-red {
+    color: var(--angola-red);
+  }
+  
+  .bg-angola-red {
+    background-color: var(--angola-red);
+  }
+  
+  .angola-black {
+    color: var(--angola-black);
+  }
+  
+  .bg-angola-black {
+    background-color: var(--angola-black);
+  }
+  
+  .angola-yellow {
+    color: var(--angola-yellow);
+  }
+  
+  .bg-angola-yellow {
+    background-color: var(--angola-yellow);
+  }
+  
+  .border-angola-red {
+    border-color: var(--angola-red);
+  }
+  
+  .border-angola-yellow {
+    border-color: var(--angola-yellow);
+  }
+  
+  .hover\:bg-angola-red:hover {
+    background-color: var(--angola-red);
+  }
+  
+  .hover\:text-angola-red:hover {
+    color: var(--angola-red);
+  }
+  
+  .service-tag {
+    background: linear-gradient(135deg, var(--angola-yellow) 0%, var(--angola-yellow-dark) 100%);
+    color: var(--angola-black);
+  }
+  
+  .angola-gradient {
+    background: linear-gradient(135deg, var(--angola-red) 0%, var(--angola-black) 50%, var(--angola-yellow) 100%);
+  }
+  
+  .hero-pattern {
+    background-image: radial-gradient(circle at 1px 1px, var(--angola-red) 1px, transparent 0);
+    background-size: 20px 20px;
+    opacity: 0.1;
+  }
+  
+  .profile-card {
+    transition: all 0.3s ease;
+  }
+  
+  .profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .modal-overlay {
+    backdrop-filter: blur(4px);
+  }
+  
+  .cascading-select {
+    transition: all 0.3s ease;
+  }
+  
+  .cascading-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, #f0f0f0 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease-in-out infinite;
+  }
+  
+  @keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
