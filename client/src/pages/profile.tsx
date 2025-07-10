@@ -43,12 +43,26 @@ export default function Profile() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Mock user ID for demonstration - in real app, this would come from auth context
-  const userId = "mock-user-id";
+  // Get the latest user ID from the users list (most recent registration)
+  const { data: allUsers } = useQuery({
+    queryKey: ['/api/users'],
+  });
+  
+  // For now, get the last created user as the "logged in" user
+  const userId = allUsers && allUsers.length > 0 ? allUsers[allUsers.length - 1].id : null;
 
   const { data: user, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
     enabled: !!userId,
+    queryFn: async () => {
+      if (!userId) return null;
+      const response = await fetch(`/api/users/${userId}`);
+      if (!response.ok) {
+        // If specific user not found, return the last user from the list
+        return allUsers && allUsers.length > 0 ? allUsers[allUsers.length - 1] : null;
+      }
+      return response.json();
+    }
   });
 
   const updateProfileMutation = useMutation({

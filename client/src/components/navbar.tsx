@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Home, LogIn } from "lucide-react";
+import { Menu, X, User, Home, LogIn, House } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -22,8 +22,11 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="flex items-center justify-center w-8 h-8 bg-angola-red rounded-full">
-                <span className="text-white font-bold text-sm">D</span>
+              <div className="flex items-center justify-center w-10 h-10 bg-[var(--angola-red)] rounded-full relative">
+                <House className="w-5 h-5 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[var(--angola-yellow)] rounded-full flex items-center justify-center">
+                  <div className="w-1 h-2 bg-[var(--angola-red)] rounded-sm transform rotate-45"></div>
+                </div>
               </div>
               <span className="text-xl font-bold text-gray-900">
                 Doméstica Angola

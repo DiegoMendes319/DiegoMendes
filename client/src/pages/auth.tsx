@@ -197,6 +197,7 @@ export default function Auth() {
           setLocation("/profile");
           return user;
         }
+        return;
       }
 
       // Registration
@@ -478,12 +479,12 @@ export default function Auth() {
                       disabled={authMutation.isPending}
                     >
                       <FaGoogle className="h-4 w-4 mr-2" />
-                      {authMode === 'login' ? 'Entrar' : 'Cadastrar'} com Google
+                      {authMode === 'login' ? 'Entrar' : 'Registar'} com Google
                     </Button>
                     <p className="text-sm text-gray-600 mt-2">
                       {authMode === 'login' 
-                        ? 'Acesse sua conta usando sua conta Google'
-                        : 'Após conectar com Google, você completará seu perfil'
+                        ? 'Aceda à sua conta usando a sua conta Google'
+                        : 'Após conectar com Google, completará o seu perfil'
                       }
                     </p>
                   </div>
@@ -518,7 +519,7 @@ export default function Auth() {
 
                   {authMode === 'login' && (
                     <div>
-                      <Label htmlFor="simple_password">Senha</Label>
+                      <Label htmlFor="simple_password">Palavra-passe</Label>
                       <div className="relative">
                         <Input
                           id="simple_password"
@@ -579,7 +580,7 @@ export default function Auth() {
                     {/* Password for Simple Method */}
                     {authMethod === 'simple' && (
                       <div>
-                        <Label htmlFor="reg_password">Senha</Label>
+                        <Label htmlFor="reg_password">Palavra-passe</Label>
                         <div className="relative">
                           <Input
                             id="reg_password"

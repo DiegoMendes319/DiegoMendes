@@ -103,8 +103,7 @@ export default function Home() {
               <br />em Angola
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Conectando famílias com profissionais domésticos qualificados em todo o país. 
-              Seguro, confiável e próximo de você.
+              Encontre os melhores diaristas em Angola, conectando famílias com profissionais domésticos qualificados em todo o país — seguro, fiável e próximo de si.
             </p>
             
             {/* Geolocation Prompt */}
@@ -115,19 +114,19 @@ export default function Home() {
                     <MapPin className="h-8 w-8 text-[var(--angola-red)]" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Permitir Localização?
+                    Como pretende procurar?
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Encontre diaristas próximos a você automaticamente
+                    Escolha a forma de encontrar diaristas próximos de si
                   </p>
                   <div className="flex gap-2">
                     <Button onClick={handleGeolocationRequest} className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90">
-                      <Check className="h-4 w-4 mr-2" />
-                      Permitir
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Permitir localização automática
                     </Button>
                     <Button variant="outline" onClick={handleManualSearch} className="flex-1">
                       <Search className="h-4 w-4 mr-2" />
-                      Buscar Manual
+                      Procurar manualmente
                     </Button>
                   </div>
                 </CardContent>
