@@ -20,23 +20,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const initAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+        // Listen for auth changes
+        const { data: { subscription } } = await supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            setSession(session);
+            setUser(session?.user ?? null);
+            setLoading(false);
+          }
+        );
 
-    return () => subscription.unsubscribe()
+        return subscription;
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setLoading(false);
+        return null;
+      }
+    };
+
+    let subscription: any = null;
+    initAuth().then(sub => {
+      subscription = sub;
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, [])
 
   const signUp = async (email: string, password: string, userData?: any) => {
@@ -45,39 +63,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         options: {
-          data: userData,
+          data: {
+            first_name: userData?.first_name || 'Nome',
+            last_name: userData?.last_name || 'Sobrenome',
+            ...userData,
+          },
         },
       })
 
       if (error) throw error
 
-      // If user is created, also create profile record
+      // Wait a bit for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Update the profile with additional data if provided
       if (data.user && userData) {
         const { error: profileError } = await supabase
           .from('users')
-          .insert([
-            {
-              id: data.user.id,
-              email: data.user.email,
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-              phone: userData.phone,
-              date_of_birth: userData.date_of_birth,
-              province: userData.province,
-              municipality: userData.municipality,
-              neighborhood: userData.neighborhood,
-              address_complement: userData.address_complement,
-              contract_type: userData.contract_type,
-              services: userData.services,
-              availability: userData.availability,
-              about_me: userData.about_me,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-          ])
+          .update({
+            phone: userData.phone,
+            date_of_birth: userData.date_of_birth,
+            province: userData.province,
+            municipality: userData.municipality,
+            neighborhood: userData.neighborhood,
+            address_complement: userData.address_complement,
+            contract_type: userData.contract_type,
+            services: userData.services,
+            availability: userData.availability,
+            about_me: userData.about_me,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', data.user.id)
 
         if (profileError) {
-          console.error('Error creating profile:', profileError)
+          console.error('Error updating profile:', profileError)
         }
       }
 

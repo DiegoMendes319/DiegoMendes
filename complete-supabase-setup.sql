@@ -1,252 +1,184 @@
--- Complete Supabase SQL Setup for Jikulumessu Platform
--- Execute this entire script in your Supabase SQL Editor
+-- Script SQL completo para configurar o Supabase (versão corrigida)
+-- Execute este script no SQL Editor do Supabase
 
--- First, create the main users table with comprehensive profile information
-create table public.users (
-  id uuid default gen_random_uuid() primary key,
-  first_name text not null,
-  last_name text not null,
-  email text unique,
-  phone text not null,
-  date_of_birth date not null,
-  province text not null,
-  municipality text not null,
-  neighborhood text not null,
-  address_complement text,
-  contract_type text not null check (contract_type in ('diarista', 'mensalista', 'ambos')),
-  services text[] not null,
-  availability text not null,
-  about_me text,
-  profile_url text,
-  facebook_url text,
-  instagram_url text,
-  tiktok_url text,
-  password_hash text,
-  auth_user_id uuid references auth.users on delete cascade,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- 1. Criar extensões necessárias
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 2. Criar tabela users (compatível com auth.users do Supabase)
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone TEXT,
+    date_of_birth DATE,
+    province TEXT,
+    municipality TEXT,
+    neighborhood TEXT,
+    address_complement TEXT,
+    contract_type TEXT DEFAULT 'diarista',
+    services TEXT[] DEFAULT ARRAY['limpeza'],
+    availability TEXT DEFAULT 'Segunda a Sexta, 8h-17h',
+    hourly_rate DECIMAL(10,2),
+    about_me TEXT,
+    profile_image TEXT,
+    rating DECIMAL(3,2) DEFAULT 0.0,
+    review_count INTEGER DEFAULT 0,
+    facebook_url TEXT,
+    instagram_url TEXT,
+    tiktok_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create auth_users table to match our authentication system
-create table public.auth_users (
-  id uuid default gen_random_uuid() primary key,
-  email text unique not null,
-  password_hash text not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- 3. Criar tabela reviews
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    reviewer_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    quality_rating INTEGER CHECK (quality_rating >= 1 AND quality_rating <= 5),
+    punctuality_rating INTEGER CHECK (punctuality_rating >= 1 AND punctuality_rating <= 5),
+    communication_rating INTEGER CHECK (communication_rating >= 1 AND communication_rating <= 5),
+    value_rating INTEGER CHECK (value_rating >= 1 AND value_rating <= 5),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create sessions table for session management
-create table public.auth_sessions (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid references public.users(id) on delete cascade not null,
-  session_token text unique not null,
-  expires_at timestamp with time zone not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+-- 4. Habilitar Row Level Security
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
--- Create indexes for performance optimization
-create index users_email_idx on public.users (email);
-create index users_province_idx on public.users (province);
-create index users_municipality_idx on public.users (municipality);
-create index users_neighborhood_idx on public.users (neighborhood);
-create index users_contract_type_idx on public.users (contract_type);
-create index users_services_idx on public.users using gin (services);
-create index users_auth_user_id_idx on public.users (auth_user_id);
+-- 5. Políticas de segurança para users
+DROP POLICY IF EXISTS "Users can view all profiles" ON public.users;
+CREATE POLICY "Users can view all profiles" ON public.users
+    FOR SELECT USING (true);
 
-create index auth_users_email_idx on public.auth_users (email);
-create index auth_sessions_token_idx on public.auth_sessions (session_token);
-create index auth_sessions_user_id_idx on public.auth_sessions (user_id);
-create index auth_sessions_expires_at_idx on public.auth_sessions (expires_at);
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
+CREATE POLICY "Users can insert their own profile" ON public.users
+    FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Enable Row Level Security (RLS)
-alter table public.users enable row level security;
-alter table public.auth_users enable row level security;
-alter table public.auth_sessions enable row level security;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
+CREATE POLICY "Users can update their own profile" ON public.users
+    FOR UPDATE USING (auth.uid() = id);
 
--- RLS Policies for users table
-create policy "Users are viewable by everyone" on public.users
-  for select using (true);
+-- 6. Políticas de segurança para reviews
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON public.reviews;
+CREATE POLICY "Reviews are viewable by everyone" ON public.reviews
+    FOR SELECT USING (true);
 
-create policy "Users can insert their own profile" on public.users
-  for insert with check (auth.uid() = auth_user_id or auth_user_id is null);
+DROP POLICY IF EXISTS "Authenticated users can create reviews" ON public.reviews;
+CREATE POLICY "Authenticated users can create reviews" ON public.reviews
+    FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
 
-create policy "Users can update their own profile" on public.users
-  for update using (auth.uid() = auth_user_id);
+DROP POLICY IF EXISTS "Users can update their own reviews" ON public.reviews;
+CREATE POLICY "Users can update their own reviews" ON public.reviews
+    FOR UPDATE USING (auth.uid() = reviewer_id);
 
-create policy "Users can delete their own profile" on public.users
-  for delete using (auth.uid() = auth_user_id);
+DROP POLICY IF EXISTS "Users can delete their own reviews" ON public.reviews;
+CREATE POLICY "Users can delete their own reviews" ON public.reviews
+    FOR DELETE USING (auth.uid() = reviewer_id);
 
--- RLS Policies for auth_users table
-create policy "Auth users can view their own data" on public.auth_users
-  for select using (auth.uid()::text = id::text);
-
-create policy "Auth users can insert their own data" on public.auth_users
-  for insert with check (true);
-
-create policy "Auth users can update their own data" on public.auth_users
-  for update using (auth.uid()::text = id::text);
-
--- RLS Policies for auth_sessions table
-create policy "Users can view their own sessions" on public.auth_sessions
-  for select using (user_id in (select id from public.users where auth_user_id = auth.uid()));
-
-create policy "Users can insert their own sessions" on public.auth_sessions
-  for insert with check (user_id in (select id from public.users where auth_user_id = auth.uid()));
-
-create policy "Users can delete their own sessions" on public.auth_sessions
-  for delete using (user_id in (select id from public.users where auth_user_id = auth.uid()));
-
--- Function to automatically update updated_at timestamp
-create or replace function public.handle_updated_at()
-returns trigger
-language plpgsql
-as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
+-- 7. Função para calcular rating automaticamente
+CREATE OR REPLACE FUNCTION calculate_user_rating(user_uuid UUID)
+RETURNS VOID 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    UPDATE public.users 
+    SET 
+        rating = COALESCE((
+            SELECT AVG(rating)::DECIMAL(3,2)
+            FROM public.reviews 
+            WHERE user_id = user_uuid
+        ), 0.0),
+        review_count = (
+            SELECT COUNT(*)::INTEGER
+            FROM public.reviews 
+            WHERE user_id = user_uuid
+        )
+    WHERE id = user_uuid;
+END;
 $$;
 
--- Create triggers for updating timestamps
-create trigger handle_users_updated_at
-  before update on public.users
-  for each row execute procedure public.handle_updated_at();
-
-create trigger handle_auth_users_updated_at
-  before update on public.auth_users
-  for each row execute procedure public.handle_updated_at();
-
--- Function to clean up expired sessions
-create or replace function public.cleanup_expired_sessions()
-returns void
-language plpgsql
-security definer
-as $$
-begin
-  delete from public.auth_sessions where expires_at < now();
-end;
+-- 8. Trigger para atualizar rating automaticamente
+CREATE OR REPLACE FUNCTION update_user_rating_trigger()
+RETURNS TRIGGER 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        PERFORM calculate_user_rating(OLD.user_id);
+        RETURN OLD;
+    ELSE
+        PERFORM calculate_user_rating(NEW.user_id);
+        RETURN NEW;
+    END IF;
+END;
 $$;
 
--- Function to handle user registration with Supabase Auth integration
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  -- Only create profile if it doesn't exist and metadata is present
-  if not exists (select 1 from public.users where auth_user_id = new.id) and
-     new.raw_user_meta_data is not null then
-    insert into public.users (
-      auth_user_id,
-      first_name,
-      last_name,
-      email,
-      phone,
-      date_of_birth,
-      province,
-      municipality,
-      neighborhood,
-      address_complement,
-      contract_type,
-      services,
-      availability,
-      about_me,
-      profile_url,
-      facebook_url,
-      instagram_url,
-      tiktok_url
-    )
-    values (
-      new.id,
-      coalesce(new.raw_user_meta_data->>'first_name', 'Utilizador'),
-      coalesce(new.raw_user_meta_data->>'last_name', 'Novo'),
-      new.email,
-      coalesce(new.raw_user_meta_data->>'phone', ''),
-      coalesce((new.raw_user_meta_data->>'date_of_birth')::date, current_date - interval '18 years'),
-      coalesce(new.raw_user_meta_data->>'province', 'Luanda'),
-      coalesce(new.raw_user_meta_data->>'municipality', 'Luanda'),
-      coalesce(new.raw_user_meta_data->>'neighborhood', 'Centro'),
-      new.raw_user_meta_data->>'address_complement',
-      coalesce(new.raw_user_meta_data->>'contract_type', 'diarista'),
-      coalesce(
-        string_to_array(new.raw_user_meta_data->>'services', ','),
-        array['limpeza']
-      ),
-      coalesce(new.raw_user_meta_data->>'availability', 'Disponível'),
-      new.raw_user_meta_data->>'about_me',
-      new.raw_user_meta_data->>'profile_url',
-      new.raw_user_meta_data->>'facebook_url',
-      new.raw_user_meta_data->>'instagram_url',
-      new.raw_user_meta_data->>'tiktok_url'
+-- 9. Criar trigger
+DROP TRIGGER IF EXISTS update_user_rating_on_review_change ON public.reviews;
+CREATE TRIGGER update_user_rating_on_review_change
+    AFTER INSERT OR UPDATE OR DELETE ON public.reviews
+    FOR EACH ROW
+    EXECUTE FUNCTION update_user_rating_trigger();
+
+-- 10. Função para criar perfil automaticamente quando user se registra
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    INSERT INTO public.users (id, email, first_name, last_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'first_name', 'Nome'),
+        COALESCE(NEW.raw_user_meta_data->>'last_name', 'Sobrenome')
     );
-  end if;
-  return new;
-end;
+    RETURN NEW;
+END;
 $$;
 
--- Create trigger for automatic profile creation on Supabase auth user creation
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+-- 11. Trigger para criar perfil automaticamente
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_new_user();
 
--- Function to search users with filters
-create or replace function public.search_users(
-  search_province text default null,
-  search_municipality text default null,
-  search_neighborhood text default null,
-  search_service text default null,
-  search_contract_type text default null
-)
-returns setof public.users
-language plpgsql
-security definer
-as $$
-begin
-  return query
-  select *
-  from public.users
-  where (search_province is null or province ilike '%' || search_province || '%')
-    and (search_municipality is null or municipality ilike '%' || search_municipality || '%')
-    and (search_neighborhood is null or neighborhood ilike '%' || search_neighborhood || '%')
-    and (search_service is null or search_service = any(services))
-    and (search_contract_type is null or contract_type = search_contract_type)
-  order by created_at desc;
-end;
-$$;
+-- 12. Índices para performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_users_province ON public.users(province);
+CREATE INDEX IF NOT EXISTS idx_users_municipality ON public.users(municipality);
+CREATE INDEX IF NOT EXISTS idx_users_neighborhood ON public.users(neighborhood);
+CREATE INDEX IF NOT EXISTS idx_users_services ON public.users USING GIN(services);
+CREATE INDEX IF NOT EXISTS idx_users_contract_type ON public.users(contract_type);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON public.reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewer_id ON public.reviews(reviewer_id);
 
--- Sample data insertion (for testing purposes)
-insert into public.users (
-  first_name, last_name, email, phone, date_of_birth,
-  province, municipality, neighborhood,
-  contract_type, services, availability, about_me
-) values 
-(
-  'Maria', 'Silva', 'maria.silva@example.com', '+244 912 345 678', '1985-03-15',
-  'Luanda', 'Luanda', 'Miramar',
-  'ambos', array['limpeza', 'cozinha'], 'Segunda a Sexta, 8h-17h',
-  'Profissional experiente com 10 anos de experiência em serviços domésticos.'
-),
-(
-  'Ana', 'Santos', 'ana.santos@example.com', '+244 923 456 789', '1990-07-22',
-  'Luanda', 'Viana', 'Zango',
-  'diarista', array['limpeza', 'lavanderia'], 'Fins de semana disponível',
-  'Especialista em limpeza profunda e organização de espaços.'
-),
-(
-  'João', 'Pereira', 'joao.pereira@example.com', '+244 934 567 890', '1988-11-05',
-  'Benguela', 'Benguela', 'Centro',
-  'mensalista', array['jardinagem', 'limpeza'], 'Disponível período integral',
-  'Experiente em manutenção de jardins e limpeza geral.'
-);
+-- 13. Verificar se tudo foi criado
+SELECT 
+    'Tables created:' as info,
+    array_agg(table_name) as tables
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name IN ('users', 'reviews');
 
--- Grant necessary permissions
-grant usage on schema public to anon, authenticated;
-grant all on all tables in schema public to anon, authenticated;
-grant all on all sequences in schema public to anon, authenticated;
-grant all on all functions in schema public to anon, authenticated;
-
--- Create periodic cleanup job (runs every hour to clean expired sessions)
--- Note: This requires the pg_cron extension to be enabled in Supabase
--- select cron.schedule('cleanup-expired-sessions', '0 * * * *', 'select public.cleanup_expired_sessions();');
+-- 14. Inserir dados de exemplo (opcional - comentado para não conflitar)
+/*
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at)
+VALUES (
+    uuid_generate_v4(),
+    'exemplo@email.com',
+    crypt('123456', gen_salt('bf')),
+    NOW(),
+    NOW(),
+    NOW()
+) ON CONFLICT (email) DO NOTHING;
+*/

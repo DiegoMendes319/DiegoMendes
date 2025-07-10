@@ -10,11 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import LocationSelector from "@/components/location-selector";
 import { UserPlus, LogIn, Home, Mail, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
-import { supabaseAuth, SETUP_INSTRUCTIONS } from "@/lib/supabase-auth";
 import type { InsertUser } from "@shared/schema";
 
 type AuthMethod = 'email' | 'google' | 'simple';
