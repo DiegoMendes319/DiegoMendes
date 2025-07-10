@@ -23,13 +23,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initAuth = async () => {
       try {
         // Get initial session
-        const { data: { session } } = await supabase.auth.getSession();
+        const sessionResult = await supabase.auth.getSession();
+        const session = sessionResult?.data?.session || null;
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
         // Listen for auth changes
-        const { data: { subscription } } = await supabase.auth.onAuthStateChange(
+        const authResult = await supabase.auth.onAuthStateChange(
           async (event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         );
 
+        const subscription = authResult?.data?.subscription || null;
         return subscription;
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -48,10 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let subscription: any = null;
     initAuth().then(sub => {
       subscription = sub;
+    }).catch(error => {
+      console.error('Failed to initialize auth:', error);
+      setLoading(false);
     });
 
     return () => {
-      if (subscription) {
+      if (subscription && typeof subscription.unsubscribe === 'function') {
         subscription.unsubscribe();
       }
     };
