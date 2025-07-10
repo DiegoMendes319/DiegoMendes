@@ -158,15 +158,15 @@ export default function Auth() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      // Use Supabase auth for login
-      const result = await supabaseAuth.signIn(data.email, data.password);
-      return result;
+      // Use our local API for login
+      const response = await apiRequest('POST', '/api/auth/login', data);
+      return response.json();
     },
     onSuccess: (data) => {
       console.log('Login successful:', data);
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vindo de volta!`,
+        description: `Bem-vindo de volta, ${data.user?.name || ''}!`,
       });
       
       setTimeout(() => {
@@ -177,7 +177,7 @@ export default function Auth() {
       console.error('Login error:', error);
       toast({
         title: "Erro no login",
-        description: error.message,
+        description: error.message || "Email ou palavra-passe incorretos.",
         variant: "destructive",
       });
     },
@@ -185,15 +185,15 @@ export default function Auth() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: InsertUser) => {
-      // Use Supabase auth for registration
-      const result = await supabaseAuth.signUp(data.email || '', data.password || '', data);
-      return result;
+      // Use our local API for registration instead of Supabase
+      const response = await apiRequest('POST', '/api/auth/register', data);
+      return response.json();
     },
     onSuccess: (data) => {
       console.log('Registration successful:', data);
       toast({
         title: "Registo realizado com sucesso!",
-        description: "A sua conta foi criada e está agora autenticado.",
+        description: `Bem-vindo ${data.user?.name || 'ao Jikulumessu'}!`,
       });
       
       setTimeout(() => {
@@ -204,7 +204,7 @@ export default function Auth() {
       console.error('Registration error:', error);
       toast({
         title: "Erro no registo",
-        description: error.message,
+        description: error.message || "Erro ao criar conta. Tente novamente.",
         variant: "destructive",
       });
     },
@@ -214,7 +214,7 @@ export default function Auth() {
     mutationFn: async (data: InsertUser) => {
       if (authMode === 'login') {
         if (authMethod === 'email' && data.email && data.password) {
-          // Use our authentication endpoint
+          // Use our local authentication endpoint
           return loginMutation.mutateAsync({
             email: data.email,
             password: data.password
