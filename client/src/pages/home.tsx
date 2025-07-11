@@ -6,7 +6,7 @@ import LocationSelector from "@/components/location-selector";
 import SkeletonLoader from "@/components/skeleton-loader";
 import ProfileModal from "@/components/profile-modal";
 import ContactModal from "@/components/contact-modal";
-import OnboardingTutorial from "@/components/onboarding-tutorial";
+import TutorialOverlay from "@/components/tutorial-overlay";
 import { useOnboarding } from "@/hooks/use-onboarding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,7 +147,7 @@ export default function Home() {
       </section>
 
       {/* Search & Filter Section */}
-      <section className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-6 md:py-8 transition-colors">
+      <section className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-6 md:py-8 transition-colors" data-tutorial="search-filters">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="p-4 md:p-6 bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center flex items-center justify-center gap-2 flex-wrap">
@@ -230,11 +230,12 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {users?.map((user) => (
-                <ProfileCard
-                  key={user.id}
-                  user={user}
-                  onClick={() => handleProfileClick(user)}
-                />
+                <div key={user.id} data-tutorial="profile-card">
+                  <ProfileCard
+                    user={user}
+                    onClick={() => handleProfileClick(user)}
+                  />
+                </div>
               ))}
             </div>
           )}
@@ -271,8 +272,8 @@ export default function Home() {
         />
       )}
 
-      {/* Onboarding Tutorial */}
-      <OnboardingTutorial
+      {/* Tutorial Overlay */}
+      <TutorialOverlay
         isOpen={showOnboarding}
         onClose={closeOnboarding}
         onComplete={completeOnboarding}

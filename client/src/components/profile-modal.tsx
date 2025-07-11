@@ -173,6 +173,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
             <Button 
               onClick={onContact}
               className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white px-8 py-3 text-lg font-semibold rounded-lg"
+              data-tutorial="contact-btn"
             >
               <Phone className="h-5 w-5 mr-2" />
               Entrar em Contato

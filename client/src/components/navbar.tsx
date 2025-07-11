@@ -47,6 +47,7 @@ export default function Navbar() {
             <Link 
               href="/auth" 
               className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
+              data-tutorial="auth-link"
             >
               <LogIn className="w-4 h-4 inline mr-2" />
               Entrar
