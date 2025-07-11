@@ -104,7 +104,7 @@ export default function Home() {
               <br />na sua Região
             </h1>
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Conectamos pessoas com prestadores de serviços domésticos na sua região — uma plataforma de intermediação próxima de si.
+              Conectamos pessoas com prestadores de serviços na sua região — uma plataforma de intermediação próxima de si.
             </p>
             
             {/* Geolocation Prompt - Fixed responsive container */}
