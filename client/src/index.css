@@ -91,6 +91,7 @@
 .tutorial-tooltip {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 2px solid #DC2626;
+  border-radius: 0.75rem; /* 12px - matches rounded-xl */
 }
 
 @keyframes arrowBounceUp {

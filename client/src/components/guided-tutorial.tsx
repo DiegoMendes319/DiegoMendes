@@ -346,7 +346,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
         className="fixed z-[60] pointer-events-auto w-[calc(100vw-2rem)] max-w-sm mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
         style={getTooltipPosition()}
       >
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200 max-h-[80vh] overflow-y-auto">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-[var(--angola-red)] max-h-[80vh] overflow-y-auto">
           <div className="p-4 sm:p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
