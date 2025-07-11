@@ -287,6 +287,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tutorial endpoints
+  app.post("/api/tutorial/start", async (req, res) => {
+    try {
+      const user = storage.addTutorialUser();
+      res.json({ success: true, user });
+    } catch (error) {
+      console.error("Error starting tutorial:", error);
+      res.status(500).json({ error: "Erro ao iniciar tutorial" });
+    }
+  });
+
+  app.post("/api/tutorial/end", async (req, res) => {
+    try {
+      storage.removeTutorialUser();
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error ending tutorial:", error);
+      res.status(500).json({ error: "Erro ao terminar tutorial" });
+    }
+  });
+
   // Get user by ID
   app.get("/api/users/:id", async (req, res) => {
     try {

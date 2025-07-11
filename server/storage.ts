@@ -54,71 +54,59 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Add a few sample users for tutorial demonstration
-    const sampleUsers = [
-      {
-        id: "tutorial-user-1",
-        auth_user_id: "tutorial-auth-1",
-        email: "maria.silva@example.com",
-        first_name: "Maria",
-        last_name: "Silva",
-        phone: "+244 912 345 678",
-        date_of_birth: "1985-03-15",
-        province: "Luanda",
-        municipality: "Maianga",
-        neighborhood: "Alvalade",
-        services: ["limpeza", "cozinha"],
-        contract_type: "mensal",
-        availability: "Seg-Sex: 8h-17h",
-        bio: "Experiência de 5 anos em limpeza doméstica e cozinha.",
-        profile_image: null,
-        facebook_url: "https://facebook.com/maria.silva",
-        instagram_url: null,
-        tiktok_url: null,
-        rating: 4.5,
-        review_count: 8,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: "tutorial-user-2",
-        auth_user_id: "tutorial-auth-2",
-        email: "joao.pedro@example.com",
-        first_name: "João",
-        last_name: "Pedro",
-        phone: "+244 923 456 789",
-        date_of_birth: "1990-07-22",
-        province: "Luanda",
-        municipality: "Ingombota",
-        neighborhood: "Cidade Alta",
-        services: ["jardinagem", "limpeza"],
-        contract_type: "diarista",
-        availability: "Fins de semana",
-        bio: "Especialista em jardinagem e manutenção de exteriores.",
-        profile_image: null,
-        facebook_url: null,
-        instagram_url: "https://instagram.com/joao.pedro",
-        tiktok_url: null,
-        rating: 4.8,
-        review_count: 12,
-        created_at: new Date(),
-        updated_at: new Date()
-      }
-    ];
+    // No sample data - only real registered users
+    console.log("MemStorage initialized with empty data");
+  }
 
-    // Add sample users to storage
-    sampleUsers.forEach(userData => {
-      const user = {
-        ...userData,
-        name: `${userData.first_name} ${userData.last_name}`,
-        age: Math.floor((Date.now() - new Date(userData.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-      };
-      this.users.set(user.id, user);
-      this.usersByEmail.set(user.email, user);
-      this.usersByAuthId.set(user.auth_user_id, user);
-    });
+  // Tutorial-specific methods
+  addTutorialUser(): User {
+    const tutorialUser = {
+      id: "tutorial-temp-user",
+      auth_user_id: "tutorial-temp-auth",
+      email: "tutorial@example.com",
+      first_name: "Maria",
+      last_name: "Silva",
+      phone: "+244 912 345 678",
+      date_of_birth: new Date("1985-03-15"),
+      province: "Luanda",
+      municipality: "Maianga",
+      neighborhood: "Alvalade",
+      services: ["limpeza", "cozinha"],
+      contract_type: "mensal",
+      availability: "Seg-Sex: 8h-17h",
+      bio: "Experiência de 5 anos em limpeza doméstica e cozinha.",
+      profile_image: null,
+      profile_url: null,
+      facebook_url: "https://facebook.com/maria.silva",
+      instagram_url: null,
+      tiktok_url: null,
+      address_complement: null,
+      about_me: null,
+      password: null,
+      rating: 4.5,
+      review_count: 8,
+      average_rating: 4.5,
+      total_reviews: 8,
+      created_at: new Date(),
+      updated_at: new Date(),
+      name: "Maria Silva",
+      age: Math.floor((Date.now() - new Date("1985-03-15").getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+    };
+
+    this.users.set(tutorialUser.id, tutorialUser);
+    this.usersByEmail.set(tutorialUser.email, tutorialUser);
+    this.usersByAuthId.set(tutorialUser.auth_user_id, tutorialUser);
     
-    console.log("MemStorage initialized with sample data for tutorial");
+    return tutorialUser;
+  }
+
+  removeTutorialUser(): void {
+    const tutorialUser = this.users.get("tutorial-temp-user");
+    if (tutorialUser) {
+      this.users.delete("tutorial-temp-user");
+      this.usersByEmail.delete(tutorialUser.email);
+      this.usersByAuthId.delete(tutorialUser.auth_user_id);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {

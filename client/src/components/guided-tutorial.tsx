@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { X, ArrowDown, ArrowUp, ArrowLeft, ArrowRight } from "lucide-react";
+import { X, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 import JikulumessuIcon from "./jikulumessu-icon";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface TutorialStep {
   id: string;
@@ -10,12 +12,7 @@ interface TutorialStep {
   description: string;
   target: string;
   arrow: 'up' | 'down' | 'left' | 'right';
-  position: {
-    top?: string;
-    bottom?: string;
-    left?: string;
-    right?: string;
-  };
+  position: 'top' | 'bottom' | 'left' | 'right';
   action?: () => void;
 }
 
@@ -26,8 +23,24 @@ interface GuidedTutorialProps {
 }
 
 export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTutorialProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(-1); // -1 for introduction
   const [isAnimating, setIsAnimating] = useState(false);
+  const [tutorialStarted, setTutorialStarted] = useState(false);
+  const queryClient = useQueryClient();
+
+  const startTutorialMutation = useMutation({
+    mutationFn: () => apiRequest("/api/tutorial/start", "POST"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    }
+  });
+
+  const endTutorialMutation = useMutation({
+    mutationFn: () => apiRequest("/api/tutorial/end", "POST"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    }
+  });
 
   const steps: TutorialStep[] = [
     {
@@ -36,7 +49,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       description: "Aqui pode procurar prestadores por localização, tipo de serviço e contrato.",
       target: '[data-tutorial="search-filters"]',
       arrow: 'down',
-      position: { top: '10px', left: '50%', transform: 'translateX(-50%)' }
+      position: 'top'
     },
     {
       id: "profiles",
@@ -44,7 +57,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       description: "Clique em qualquer perfil para ver mais detalhes, avaliações e informações.",
       target: '[data-tutorial="profile-card"]',
       arrow: 'up',
-      position: { bottom: '10px', left: '50%', transform: 'translateX(-50%)' }
+      position: 'bottom'
     },
     {
       id: "contact",
@@ -52,9 +65,8 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       description: "Use este botão para ver todas as formas de contacto direto.",
       target: '[data-tutorial="contact-btn"]',
       arrow: 'left',
-      position: { right: '10px', top: '50%', transform: 'translateY(-50%)' },
+      position: 'right',
       action: () => {
-        // Simula clique no primeiro perfil para mostrar o modal
         setTimeout(() => {
           const firstProfile = document.querySelector('[data-tutorial="profile-card"]') as HTMLElement;
           if (firstProfile) {
@@ -69,11 +81,9 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       description: "Clique aqui para se registar e criar o seu próprio perfil profissional.",
       target: '[data-tutorial="auth-link"]',
       arrow: 'down',
-      position: { top: '10px', right: '20px' }
+      position: 'top'
     }
   ];
-
-  const currentStepData = steps[currentStep];
 
   const scrollToElement = (selector: string) => {
     const element = document.querySelector(selector) as HTMLElement;
@@ -125,56 +135,121 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     }
   };
 
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setIsAnimating(true);
+      
+      setTimeout(() => {
+        const prevStepIndex = currentStep - 1;
+        const prevStepData = steps[prevStepIndex];
+        
+        // Scroll to previous element
+        scrollToElement(prevStepData.target);
+        
+        // Highlight previous element
+        setTimeout(() => {
+          highlightElement(prevStepData.target);
+          setCurrentStep(prevStepIndex);
+          setIsAnimating(false);
+        }, 500);
+      }, 300);
+    } else if (currentStep === 0) {
+      // Go back to introduction
+      setCurrentStep(-1);
+      document.querySelectorAll('.tutorial-highlight').forEach(el => {
+        el.classList.remove('tutorial-highlight');
+      });
+    }
+  };
+
+  const skipTutorial = () => {
+    handleComplete();
+  };
+
+  const startTutorial = () => {
+    setTutorialStarted(true);
+    startTutorialMutation.mutate();
+    
+    setTimeout(() => {
+      setCurrentStep(0);
+      const firstStep = steps[0];
+      scrollToElement(firstStep.target);
+      
+      setTimeout(() => {
+        highlightElement(firstStep.target);
+      }, 500);
+    }, 500);
+  };
+
   const handleComplete = () => {
     // Remove all highlights
     document.querySelectorAll('.tutorial-highlight').forEach(el => {
       el.classList.remove('tutorial-highlight');
     });
     
+    // End tutorial and clean up
+    endTutorialMutation.mutate();
     onComplete();
     onClose();
   };
 
   const getTooltipPosition = () => {
-    const element = document.querySelector(currentStepData.target) as HTMLElement;
-    if (!element) return currentStepData.position;
+    if (currentStep === -1) {
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        position: 'fixed' as const
+      };
+    }
+
+    const stepData = steps[currentStep];
+    const element = document.querySelector(stepData.target) as HTMLElement;
+    if (!element) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' as const };
     
     const rect = element.getBoundingClientRect();
     const scrollY = window.pageYOffset;
     const scrollX = window.pageXOffset;
     
-    switch (currentStepData.arrow) {
-      case 'down':
+    switch (stepData.position) {
+      case 'top':
         return {
-          top: `${rect.top + scrollY - 120}px`,
+          top: `${rect.top + scrollY - 140}px`,
           left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
+          position: 'absolute' as const
         };
-      case 'up':
+      case 'bottom':
         return {
           top: `${rect.bottom + scrollY + 20}px`,
           left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
+          position: 'absolute' as const
         };
       case 'left':
         return {
           top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.right + scrollX + 20}px`,
-          transform: 'translateY(-50%)'
+          left: `${rect.left + scrollX - 340}px`,
+          transform: 'translateY(-50%)',
+          position: 'absolute' as const
         };
       case 'right':
         return {
           top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.left + scrollX - 320}px`,
-          transform: 'translateY(-50%)'
+          left: `${rect.right + scrollX + 20}px`,
+          transform: 'translateY(-50%)',
+          position: 'absolute' as const
         };
       default:
-        return currentStepData.position;
+        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' as const };
     }
   };
 
   const getArrowIcon = () => {
-    switch (currentStepData.arrow) {
+    if (currentStep === -1) return null;
+    
+    const stepData = steps[currentStep];
+    switch (stepData.arrow) {
       case 'up': return <ArrowUp className="w-6 h-6 text-angola-red animate-bounce" />;
       case 'down': return <ArrowDown className="w-6 h-6 text-angola-red animate-bounce" />;
       case 'left': return <ArrowLeft className="w-6 h-6 text-angola-red animate-bounce" />;
@@ -183,14 +258,16 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
   };
 
   useEffect(() => {
-    if (isOpen) {
-      // Start tutorial
-      setTimeout(() => {
-        scrollToElement(currentStepData.target);
+    if (isOpen && currentStep >= 0) {
+      const stepData = steps[currentStep];
+      if (stepData) {
         setTimeout(() => {
-          highlightElement(currentStepData.target);
-        }, 500);
-      }, 300);
+          scrollToElement(stepData.target);
+          setTimeout(() => {
+            highlightElement(stepData.target);
+          }, 500);
+        }, 300);
+      }
     }
     
     return () => {
@@ -199,71 +276,151 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
         el.classList.remove('tutorial-highlight');
       });
     };
-  }, [isOpen, currentStepData]);
+  }, [isOpen, currentStep]);
 
   if (!isOpen) return null;
 
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/40 z-50 pointer-events-none" />
+      <div className="fixed inset-0 bg-black/50 z-50 pointer-events-none" />
       
-      {/* Tutorial Tooltip */}
+      {/* Tutorial Card */}
       <div
-        className="fixed z-[60] pointer-events-auto"
+        className="fixed z-[60] pointer-events-auto max-w-sm w-full mx-4 sm:mx-0 sm:w-96"
         style={getTooltipPosition()}
       >
-        <Card className="w-80 shadow-2xl border-2 border-angola-yellow bg-white">
-          <CardContent className="p-5">
+        <Card className="shadow-2xl border-2 border-angola-yellow bg-white">
+          <CardContent className="p-4 sm:p-6">
+            {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <JikulumessuIcon size="sm" />
-                <span className="text-sm font-medium text-gray-500">
-                  Jiku explica ({currentStep + 1}/{steps.length})
+                <span className="text-xs sm:text-sm font-medium text-gray-500">
+                  {currentStep === -1 ? 'Olá!' : `Passo ${currentStep + 1}/${steps.length}`}
                 </span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={skipTutorial}
+                className="text-gray-400 hover:text-gray-600 p-1"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
             
-            <div className="text-center mb-4">
-              <h3 className="font-bold text-lg text-gray-800 mb-2">
-                {currentStepData.title}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {currentStepData.description}
-              </p>
-            </div>
+            {/* Introduction */}
+            {currentStep === -1 && (
+              <div className="text-center space-y-4">
+                <div className="text-2xl sm:text-3xl mb-2">👋</div>
+                <h3 className="font-bold text-lg sm:text-xl text-gray-800">
+                  Olá! Sou o Jiku
+                </h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                  Bem-vindo ao <strong>Jikulumessu</strong>! 
+                  <br />
+                  Em angolano, "Jikulumessu" significa <em>"abre o olho"</em> ou <em>"fica atento"</em>.
+                </p>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                  Vou mostrar-lhe como funciona o nosso site para encontrar prestadores de serviços domésticos em Angola.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                  <Button
+                    onClick={startTutorial}
+                    className="bg-angola-red hover:bg-angola-red/90 text-white flex-1"
+                    disabled={startTutorialMutation.isPending}
+                  >
+                    {startTutorialMutation.isPending ? 'A iniciar...' : 'Começar Tour'}
+                  </Button>
+                  <Button
+                    onClick={skipTutorial}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Saltar
+                  </Button>
+                </div>
+              </div>
+            )}
             
-            <div className="flex justify-center mb-4">
-              {getArrowIcon()}
-            </div>
-            
-            <div className="text-center">
-              {currentStep === steps.length - 1 ? (
-                <Button
-                  onClick={handleComplete}
-                  className="bg-angola-red hover:bg-angola-red/90 text-white px-6 py-2"
-                  disabled={isAnimating}
-                >
-                  Concluir Tutorial
-                </Button>
-              ) : (
-                <Button
-                  onClick={nextStep}
-                  className="bg-angola-red hover:bg-angola-red/90 text-white px-6 py-2"
-                  disabled={isAnimating}
-                >
-                  {isAnimating ? 'Movendo...' : 'OK, Próximo'}
-                </Button>
-              )}
-            </div>
+            {/* Tutorial Steps */}
+            {currentStep >= 0 && (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="font-bold text-lg sm:text-xl text-gray-800 mb-2">
+                    {steps[currentStep].title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                    {steps[currentStep].description}
+                  </p>
+                </div>
+                
+                {/* Arrow */}
+                <div className="flex justify-center">
+                  {getArrowIcon()}
+                </div>
+                
+                {/* Navigation */}
+                <div className="flex justify-between items-center pt-4">
+                  <Button
+                    onClick={prevStep}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    disabled={isAnimating}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Anterior</span>
+                  </Button>
+                  
+                  <div className="flex gap-1">
+                    {steps.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full transition-colors ${
+                          index === currentStep ? 'bg-angola-red' : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={skipTutorial}
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      disabled={isAnimating}
+                    >
+                      <SkipForward className="w-4 h-4" />
+                      <span className="hidden sm:inline">Saltar</span>
+                    </Button>
+                    
+                    {currentStep === steps.length - 1 ? (
+                      <Button
+                        onClick={handleComplete}
+                        className="bg-angola-red hover:bg-angola-red/90 text-white flex items-center gap-1"
+                        disabled={isAnimating}
+                      >
+                        <span className="hidden sm:inline">Concluir</span>
+                        <span className="sm:hidden">Fim</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={nextStep}
+                        className="bg-angola-red hover:bg-angola-red/90 text-white flex items-center gap-1"
+                        disabled={isAnimating}
+                      >
+                        <span className="hidden sm:inline">Próximo</span>
+                        <span className="sm:hidden">OK</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
