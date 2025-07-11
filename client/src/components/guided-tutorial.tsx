@@ -28,6 +28,8 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
   const [tutorialStarted, setTutorialStarted] = useState(false);
   const queryClient = useQueryClient();
 
+  console.log('GuidedTutorial render - isOpen:', isOpen, 'currentStep:', currentStep);
+
   // Removed tutorial profile creation/deletion mutations as they're no longer needed
 
   const steps: TutorialStep[] = [
@@ -300,7 +302,10 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     };
   }, [isOpen, currentStep]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('Tutorial not open, returning null');
+    return null;
+  }
 
   return (
     <>
