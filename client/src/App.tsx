@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import Auth from "@/pages/auth";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
+import AdminPanel from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
@@ -37,6 +38,7 @@ function Router() {
           <Route path="/terms" component={Terms} />
           <Route path="/privacy" component={Privacy} />
           <Route path="/security" component={Security} />
+          <Route path="/admin" component={AdminPanel} />
           <Route component={NotFound} />
         </Switch>
       </main>

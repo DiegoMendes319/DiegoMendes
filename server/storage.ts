@@ -823,11 +823,9 @@ class DatabaseStorage implements IStorage {
   }
 }
 
-// Force MemStorage for now since DATABASE_URL connection is failing
-// Will switch to DatabaseStorage once Supabase connection is properly configured  
+// Currently using MemStorage until Supabase DATABASE_URL is properly configured
+// To activate Supabase storage, ensure DATABASE_URL is correct and uncomment the line below
 export const storage = new MemStorage();
-
-console.log('Using MemStorage - Supabase connection will be configured later');
-
-// For testing Supabase connection (uncomment when DATABASE_URL is working)
 // export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+
+console.log('Using MemStorage - dados temporários (até configurar Supabase correctamente)');
