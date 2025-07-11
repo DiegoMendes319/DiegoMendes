@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tutorial highlight animation */
+.tutorial-highlight {
+  position: relative;
+  z-index: 51;
+  animation: tutorialPulse 2s ease-in-out infinite;
+}
+
+.tutorial-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: transparent;
+  border: 3px solid #DC2626;
+  border-radius: 8px;
+  animation: tutorialGlow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tutorialPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes tutorialGlow {
+  0%, 100% { 
+    border-color: #DC2626;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+  }
+  50% { 
+    border-color: #EF4444;
+    box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+  }
+}
+
 /* Onboarding Tutorial Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

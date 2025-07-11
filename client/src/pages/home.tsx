@@ -6,7 +6,7 @@ import LocationSelector from "@/components/location-selector";
 import SkeletonLoader from "@/components/skeleton-loader";
 import ProfileModal from "@/components/profile-modal";
 import ContactModal from "@/components/contact-modal";
-import TutorialOverlay from "@/components/tutorial-overlay";
+import GuidedTutorial from "@/components/guided-tutorial";
 import { useOnboarding } from "@/hooks/use-onboarding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -272,8 +272,8 @@ export default function Home() {
         />
       )}
 
-      {/* Tutorial Overlay */}
-      <TutorialOverlay
+      {/* Guided Tutorial */}
+      <GuidedTutorial
         isOpen={showOnboarding}
         onClose={closeOnboarding}
         onComplete={completeOnboarding}
