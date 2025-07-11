@@ -146,10 +146,10 @@ export default function Security() {
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Passwords Seguras</h3>
+                  <h3 className="font-semibold text-gray-800 mb-2">Palavras-passe Seguras</h3>
                   <p className="text-gray-600">
-                    Use passwords fortes com pelo menos 8 caracteres, incluindo letras maiúsculas, 
-                    minúsculas, números e símbolos. Nunca partilhe a sua password com terceiros.
+                    Use palavras-passe fortes com pelo menos 8 caracteres, incluindo letras maiúsculas, 
+                    minúsculas, números e símbolos. Nunca partilhe a sua palavra-passe com terceiros.
                   </p>
                 </div>
                 <div>

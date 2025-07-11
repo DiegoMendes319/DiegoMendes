@@ -41,6 +41,9 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Complete Text Neutralization**: Updated all platform text to position as neutral intermediary, not family-focused service
 ✓ **Phone Number Formatting**: Added automatic +244 prefix and three-digit grouping for Angola phone numbers
 ✓ **Comprehensive Policy Updates**: Updated privacy policy and terms of service to reflect intermediary role and data non-collection
+✓ **Footer Corrections**: Updated footer description to reflect intermediary role instead of family-focused service
+✓ **Portuguese Portugal Consistency**: Corrected "ônibus" to "autocarro" and "senha" to "palavra-passe" throughout the platform
+✓ **Complete Terminology Update**: Changed all references from "famílias/profissionais" to "pessoas/prestadores de serviços" across all pages
 
 ## User Preferences
 

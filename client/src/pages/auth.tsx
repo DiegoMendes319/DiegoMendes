@@ -738,10 +738,10 @@ export default function Auth() {
                         id="address_complement"
                         value={formData.address_complement || ""}
                         onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
-                        placeholder="Ex: Rua 12, Casa 34, próximo ao mercado, ponto de ônibus da escola"
+                        placeholder="Ex: Rua 12, Casa 34, próximo ao mercado, paragem de autocarro da escola"
                       />
                       <p className="text-sm text-gray-600 mt-1">
-                        Inclua informações como rua, número, referência, ponto de ônibus, etc.
+                        Inclua informações como rua, número, referência, paragem de autocarro, etc.
                       </p>
                     </div>
 

@@ -13,19 +13,19 @@ export default function Help() {
   const faqs = [
     {
       question: "Como posso registar-me na plataforma?",
-      answer: "Pode registar-se de três formas: através do email e senha, usando a sua conta Google, ou através do registo simples com nome e senha. Clique em 'Entrar' no menu superior e escolha a opção que prefere."
+      answer: "Pode registar-se de três formas: através do email e palavra-passe, usando a sua conta Google, ou através do registo simples com nome e palavra-passe. Clique em 'Entrar' no menu superior e escolha a opção que prefere."
     },
     {
-      question: "É gratuito usar a Doméstica Angola?",
-      answer: "Sim, o registo e utilização básica da plataforma são totalmente gratuitos tanto para famílias como para profissionais domésticos."
+      question: "É gratuito usar o Jikulumessu?",
+      answer: "Sim, o registo e utilização básica da plataforma são totalmente gratuitos tanto para pessoas como para prestadores de serviços domésticos."
     },
     {
-      question: "Como posso encontrar profissionais na minha área?",
+      question: "Como posso encontrar prestadores de serviços na minha área?",
       answer: "Use os filtros de localização para seleccionar a sua província, município e bairro. Também pode filtrar por tipo de serviço e tipo de contrato para encontrar exactamente o que procura."
     },
     {
-      question: "Como contacto um profissional?",
-      answer: "Clique no perfil do profissional que lhe interessa. Verá as informações de contacto incluindo telefone e redes sociais. Pode contactá-lo directamente através destes meios."
+      question: "Como contacto um prestador de serviços?",
+      answer: "Clique no perfil do prestador de serviços que lhe interessa. Verá as informações de contacto incluindo telefone e redes sociais. Pode contactá-lo directamente através destes meios."
     },
     {
       question: "Posso editar o meu perfil após o registo?",
@@ -45,7 +45,7 @@ export default function Help() {
     },
     {
       question: "É seguro partilhar as minhas informações?",
-      answer: "Sim, levamos a segurança muito a sério. Todas as informações são protegidas e apenas os contactos essenciais são partilhados entre utilizadores interessados em estabelecer uma relação profissional."
+      answer: "Sim, levamos a segurança muito a sério. Todas as informações são protegidas e apenas os contactos essenciais são partilhados entre utilizadores interessados em estabelecer uma relação de prestação de serviços."
     },
     {
       question: "Que tipos de contrato estão disponíveis?",
@@ -53,10 +53,10 @@ export default function Help() {
     },
     {
       question: "Como posso reportar um problema?",
-      answer: "Se encontrar qualquer problema ou tiver questões adicionais, pode contactar-nos através do email suporte@domesticaangola.com ou através das nossas redes sociais."
+      answer: "Se encontrar qualquer problema ou tiver questões adicionais, pode contactar-nos através do email suporte@jikulumessu.com ou através das nossas redes sociais."
     },
     {
-      question: "Posso trabalhar como profissional doméstico em várias zonas?",
+      question: "Posso trabalhar como prestador de serviços em várias zonas?",
       answer: "Sim, no seu perfil pode indicar múltiplas zonas de trabalho e tipos de serviço que oferece. Isto aumenta as suas oportunidades de encontrar clientes."
     }
   ];

@@ -1,6 +1,6 @@
-# Doméstica Angola - Portal de Diaristas
+# Jikulumessu - Portal de Prestadores de Serviços
 
-Portal completo para conectar famílias com profissionais de serviços domésticos em Angola.
+Portal completo para conectar pessoas com prestadores de serviços domésticos em Angola.
 
 ## ✨ Funcionalidades
 
@@ -110,13 +110,13 @@ Para ativar o login com Google:
 
 ## 📱 Utilização
 
-### Para Famílias
-1. Pesquisar profissionais por localização
+### Para Pessoas
+1. Pesquisar prestadores de serviços por localização
 2. Filtrar por serviços e tipo de contrato
 3. Ver perfis detalhados
 4. Contactar directamente via telefone/redes sociais
 
-### Para Profissionais
+### Para Prestadores de Serviços
 1. Registar-se com um dos três métodos
 2. Completar perfil com experiência e serviços
 3. Definir disponibilidade e área de trabalho
@@ -143,10 +143,10 @@ Para ativar o login com Google:
 ## 📞 Suporte
 
 Para questões técnicas ou sugestões:
-- Email: suporte@domesticaangola.com
+- Email: suporte@jikulumessu.com
 - Documentação: Ver comentários no código
 - Issues: Reportar problemas no repositório
 
 ---
 
-**Doméstica Angola** - Conectando famílias com profissionais de confiança 🇦🇴
+**Jikulumessu** - Conectando pessoas com prestadores de serviços de confiança 🇦🇴
