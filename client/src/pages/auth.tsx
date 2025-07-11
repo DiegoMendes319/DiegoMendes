@@ -303,31 +303,12 @@ export default function Auth() {
   });
 
   const handleGoogleAuth = async () => {
-    try {
-      const result = await supabaseAuth.signInWithGoogle();
-      console.log('Google auth result:', result);
-      
-      if (result.error) {
-        toast({
-          title: "Erro na autenticação",
-          description: result.error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Autenticação bem-sucedida!",
-          description: "A redireccionar para o seu perfil...",
-        });
-        setTimeout(() => setLocation("/profile"), 1000);
-      }
-    } catch (error) {
-      console.error('Auth error:', error);
-      toast({
-        title: "Erro na autenticação",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
-    }
+    // Show message that Google authentication will be available soon
+    toast({
+      title: "Funcionalidade em Desenvolvimento",
+      description: "O registo e login via Google estarão disponíveis em breve. Por favor, utilize o registo com email ou o registo simples.",
+      variant: "default",
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -804,7 +785,7 @@ export default function Auth() {
 
                     <div>
                       <Label htmlFor="availability">
-                        Disponibilidade <span className="text-gray-500">(opcional)</span>
+                        Disponibilidade <span className="text-red-500">*</span>
                       </Label>
                       <Textarea
                         id="availability"
@@ -813,6 +794,7 @@ export default function Auth() {
                         placeholder="Ex: Segunda a Sexta, 8h às 17h"
                         rows={2}
                         className={errors.availability ? 'border-red-500' : ''}
+                        required
                       />
                       {errors.availability && <p className="text-red-500 text-sm mt-1">{errors.availability}</p>}
                     </div>
