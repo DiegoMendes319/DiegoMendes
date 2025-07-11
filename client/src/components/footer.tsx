@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Home, Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Home, Mail, MapPin } from "lucide-react";
 import JikulumessuIcon from "./jikulumessu-icon";
 
 export default function Footer() {
@@ -17,17 +17,7 @@ export default function Footer() {
               Intermediário neutro que conecta pessoas com prestadores de serviços.
               Facilitamos a descoberta de serviços em todo o país.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-[var(--angola-red)] transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-[var(--angola-red)] transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-[var(--angola-red)] transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-            </div>
+
           </div>
 
           {/* Quick Links */}

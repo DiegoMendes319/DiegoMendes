@@ -31,11 +31,9 @@ import {
   DollarSign,
   Save,
   Trash2,
-  Camera,
-  Facebook,
-  Instagram
+  Camera
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+
 import { SERVICE_OPTIONS, CONTRACT_TYPES } from "@shared/constants";
 
 const serviceOptions = SERVICE_OPTIONS;
@@ -64,9 +62,7 @@ export default function Profile() {
     services: [] as string[],
     availability: '',
     about_me: '',
-    facebook_url: '',
-    instagram_url: '',
-    whatsapp_url: ''
+    profile_url: ''
   });
 
   useEffect(() => {
@@ -103,9 +99,7 @@ export default function Profile() {
         services: profile.services || [],
         availability: profile.availability || '',
         about_me: profile.about_me || '',
-        facebook_url: profile.facebook_url || '',
-        instagram_url: profile.instagram_url || '',
-        whatsapp_url: profile.whatsapp_url || ''
+        profile_url: profile.profile_url || ''
       });
     }
   }, [profile]);
@@ -416,10 +410,9 @@ export default function Profile() {
 
         {/* Profile Content */}
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Detalhes</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
-            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -620,79 +613,7 @@ export default function Profile() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="social">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Redes Sociais
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {editMode ? (
-                  <>
-                    <div>
-                      <Label className="flex items-center">
-                        <Facebook className="h-4 w-4 mr-2 text-blue-600" />
-                        Facebook
-                      </Label>
-                      <Input
-                        value={formData.facebook_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
-                        placeholder="https://facebook.com/seu-perfil"
-                      />
-                    </div>
-                    <div>
-                      <Label className="flex items-center">
-                        <Instagram className="h-4 w-4 mr-2 text-pink-600" />
-                        Instagram
-                      </Label>
-                      <Input
-                        value={formData.instagram_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, instagram_url: e.target.value }))}
-                        placeholder="https://instagram.com/seu-perfil"
-                      />
-                    </div>
-                    <div>
-                      <Label className="flex items-center">
-                        <FaWhatsapp className="h-4 w-4 mr-2 text-green-600" />
-                        WhatsApp
-                      </Label>
-                      <Input
-                        value={formData.whatsapp_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_url: e.target.value }))}
-                        placeholder="https://wa.me/244900000000"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-3">
-                    {profile?.facebook_url && (
-                      <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline">
-                        <Facebook className="h-4 w-4 mr-2" />
-                        Facebook
-                      </a>
-                    )}
-                    {profile?.instagram_url && (
-                      <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-pink-600 hover:underline">
-                        <Instagram className="h-4 w-4 mr-2" />
-                        Instagram
-                      </a>
-                    )}
-                    {profile?.whatsapp_url && (
-                      <a href={profile.whatsapp_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-green-600 hover:underline">
-                        <FaWhatsapp className="h-4 w-4 mr-2" />
-                        WhatsApp
-                      </a>
-                    )}
-                    {!profile?.facebook_url && !profile?.instagram_url && !profile?.whatsapp_url && (
-                      <p className="text-gray-500">Nenhuma rede social adicionada</p>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           <TabsContent value="settings">
             <Card>

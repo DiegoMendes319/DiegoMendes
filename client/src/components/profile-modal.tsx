@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, Facebook, Instagram, ExternalLink } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon } from "lucide-react";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
@@ -109,50 +108,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
             </div>
           )}
 
-          {/* Social Media Links */}
-          {(user.facebook_url || user.instagram_url || user.tiktok_url) && (
-            <div>
-              <h5 className="font-semibold text-gray-900 mb-3">Redes Sociais</h5>
-              <div className="flex flex-wrap gap-3">
-                {user.facebook_url && (
-                  <a 
-                    href={user.facebook_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                  >
-                    <Facebook className="h-4 w-4" />
-                    Facebook
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-                {user.instagram_url && (
-                  <a 
-                    href={user.instagram_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition-colors"
-                  >
-                    <Instagram className="h-4 w-4" />
-                    Instagram
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-                {user.whatsapp_url && (
-                  <a 
-                    href={user.whatsapp_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
-                  >
-                    <FaWhatsapp className="h-4 w-4" />
-                    WhatsApp
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
+
 
           {/* Reviews Section - Always visible */}
           <div>

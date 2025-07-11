@@ -53,7 +53,7 @@ export default function Help() {
     },
     {
       question: "Como posso reportar um problema?",
-      answer: "Se encontrar qualquer problema ou tiver questões adicionais, pode contactar-nos através do email suporte@jikulumessu.com ou através das nossas redes sociais."
+      answer: "Se encontrar qualquer problema ou tiver questões adicionais, pode contactar-nos através do email suporte@jikulumessu.com."
     },
     {
       question: "Posso trabalhar como prestador de serviços em várias zonas?",
