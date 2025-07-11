@@ -47,6 +47,25 @@ export default function Auth() {
     return age;
   };
 
+  // Format phone number in groups of 3 digits
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, '');
+    
+    // Limit to 9 digits (Angola mobile format)
+    const limitedDigits = digits.slice(0, 9);
+    
+    // Format in groups of 3: XXX XXX XXX
+    const formatted = limitedDigits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+    
+    return formatted;
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -549,6 +568,27 @@ export default function Auth() {
                     </div>
                   </div>
 
+                  {/* Phone field for simple registration */}
+                  {authMode === 'register' && (
+                    <div>
+                      <Label htmlFor="phone" className="dark:text-gray-200">Telemóvel</Label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <span className="text-gray-500 dark:text-gray-400">+244</span>
+                        </div>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone || ""}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="9XX XXX XXX"
+                          className={`pl-14 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.phone ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                    </div>
+                  )}
+
                   {authMode === 'login' && (
                     <div>
                       <Label htmlFor="simple_password">Palavra-passe</Label>
@@ -609,6 +649,25 @@ export default function Auth() {
                       </div>
                     )}
 
+                    {/* Phone field for both email and simple registration */}
+                    <div>
+                      <Label htmlFor="reg_phone" className="dark:text-gray-200">Telemóvel</Label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <span className="text-gray-500 dark:text-gray-400">+244</span>
+                        </div>
+                        <Input
+                          id="reg_phone"
+                          type="tel"
+                          value={formData.phone || ""}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="9XX XXX XXX"
+                          className={`pl-14 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.phone ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                    </div>
+
                     {/* Password for Simple Method */}
                     {authMethod === 'simple' && (
                       <div>
@@ -637,30 +696,16 @@ export default function Auth() {
                     )}
 
                     {/* Common Registration Fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="date_of_birth">Data de Nascimento</Label>
-                        <Input
-                          id="date_of_birth"
-                          type="date"
-                          value={formData.date_of_birth || ""}
-                          onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
-                          className={errors.date_of_birth ? 'border-red-500' : ''}
-                        />
-                        {errors.date_of_birth && <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>}
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Telefone</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone || ""}
-                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                          placeholder="+244 923 456 789"
-                          className={errors.phone ? 'border-red-500' : ''}
-                        />
-                        {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                      </div>
+                    <div>
+                      <Label htmlFor="date_of_birth">Data de Nascimento</Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth || ""}
+                        onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                        className={errors.date_of_birth ? 'border-red-500' : ''}
+                      />
+                      {errors.date_of_birth && <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>}
                     </div>
 
                     {/* Location */}

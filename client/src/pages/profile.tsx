@@ -450,11 +450,22 @@ export default function Profile() {
                     <>
                       <div>
                         <Label>Telefone</Label>
-                        <Input
-                          value={formData.phone}
-                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                          placeholder="9XX XXX XXX"
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <span className="text-gray-500 dark:text-gray-400">+244</span>
+                          </div>
+                          <Input
+                            value={formData.phone}
+                            onChange={(e) => {
+                              const digits = e.target.value.replace(/\D/g, '');
+                              const limitedDigits = digits.slice(0, 9);
+                              const formatted = limitedDigits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+                              setFormData(prev => ({ ...prev, phone: formatted }));
+                            }}
+                            placeholder="9XX XXX XXX"
+                            className="pl-14"
+                          />
+                        </div>
                       </div>
                       <div>
                         <Label>Data de Nascimento</Label>
@@ -489,7 +500,7 @@ export default function Profile() {
                       {profile?.phone && (
                         <div className="flex items-center">
                           <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>{profile.phone}</span>
+                          <span>+244 {profile.phone}</span>
                         </div>
                       )}
                       {profile?.date_of_birth && (
