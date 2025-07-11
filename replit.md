@@ -50,6 +50,9 @@ Jikulumessu is a full-stack web application designed to connect people with qual
 ✓ **Generic Service Terminology**: Updated all platform text to use "prestadores de serviços" instead of "prestadores de serviços domésticos" to reflect expanded service scope
 ✓ **Updated About & How-It-Works Pages**: Modified all informational pages to describe platform as general service intermediary rather than domestic-focused
 ✓ **Enhanced Service Categories**: Reorganized services into logical categories: general services, personal care, transport, events, maintenance, beauty, education, and others
+✓ **Complete Site Rebrand Cleanup (Janeiro 2025)**: Removed all remaining references to "Doméstica Angola" from help, privacy, security, and terms pages
+✓ **Contact Information Standardization**: Updated all contact references to use only email (no phone numbers) with proper email mapping: suporte@jikulumessu.com and contacto@jikulumessu.ao both redirect to d2413175@gmail.com
+✓ **Footer Contact Optimization**: Removed phone number from footer, keeping only email contact with proper mailto functionality
 
 ## User Preferences
 

@@ -23,7 +23,7 @@ export default function Terms() {
             <p className="text-gray-600 leading-relaxed">
               Ao aceder e utilizar a plataforma Jikulumessu, o utilizador concorda em cumprir e ficar vinculado 
               aos presentes Termos de Serviço. O Jikulumessu funciona exclusivamente como intermediário neutro 
-              entre pessoas que procuram serviços domésticos e prestadores de serviços. Se não concordar com 
+              entre pessoas que procuram serviços e prestadores de serviços. Se não concordar com 
               algum dos termos aqui estabelecidos, não deve utilizar a nossa plataforma.
             </p>
           </section>
@@ -32,13 +32,13 @@ export default function Terms() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. Descrição do Serviço</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
               O Jikulumessu é uma plataforma digital de intermediação que permite a prestadores de serviços 
-              domésticos divulgar os seus serviços e a pessoas interessadas encontrar esses serviços. 
+              divulgar os seus serviços e a pessoas interessadas encontrar esses serviços. 
               Funcionamos exclusivamente como intermediário neutro, não sendo responsáveis pela qualidade 
               dos serviços prestados, acordos estabelecidos ou quaisquer transações entre utilizadores.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              Os serviços divulgados incluem, mas não se limitam a: limpeza doméstica, cozinha, lavanderia, 
-              jardinagem, pequenos trabalhos domésticos, e outros serviços de apoio doméstico.
+              Os serviços divulgados incluem, mas não se limitam a: limpeza, cozinha, lavanderia, 
+              jardinagem, transporte, eventos, manutenção, beleza, educação, segurança e outros serviços rápidos.
             </p>
           </section>
 
@@ -152,7 +152,7 @@ export default function Terms() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Contacto</h2>
             <p className="text-gray-600 leading-relaxed">
               Para questões sobre estes Termos de Serviço, contacte-nos através do email: 
-              legal@jikulumessu.com
+              <a href="mailto:d2413175@gmail.com" className="text-blue-600 hover:text-blue-800">contacto@jikulumessu.ao</a>
             </p>
           </section>
 

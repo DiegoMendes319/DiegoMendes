@@ -79,7 +79,7 @@ export default function Help() {
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Perguntas Frequentes</h2>
             <p className="text-gray-600">
-              Encontre respostas às perguntas mais comuns sobre a utilização da Doméstica Angola.
+              Encontre respostas às perguntas mais comuns sobre a utilização do Jikulumessu.
             </p>
           </div>
 
@@ -113,8 +113,7 @@ export default function Help() {
               A nossa equipa está sempre disponível para ajudar.
             </p>
             <div className="space-y-2">
-              <p><strong>Email:</strong> suporte@domesticaangola.com</p>
-              <p><strong>Telefone:</strong> +244 900 000 000</p>
+              <p><strong>Email:</strong> <a href="mailto:d2413175@gmail.com" className="text-white hover:text-gray-200">suporte@jikulumessu.com</a></p>
               <p><strong>Horário:</strong> Segunda a Sexta, das 8h às 18h</p>
             </div>
           </div>

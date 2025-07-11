@@ -179,8 +179,7 @@ export default function Security() {
                 inadequado, contacte-nos imediatamente através dos canais abaixo:
               </p>
               <div className="space-y-2">
-                <p><strong>Email de Segurança:</strong> seguranca@domesticaangola.com</p>
-                <p><strong>Telefone de Emergência:</strong> +244 900 000 000</p>
+                <p><strong>Email de Segurança:</strong> <a href="mailto:d2413175@gmail.com" className="text-white hover:text-gray-200">suporte@jikulumessu.com</a></p>
                 <p><strong>Disponível:</strong> 24 horas por dia, 7 dias por semana</p>
               </div>
             </div>

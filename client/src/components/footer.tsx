@@ -80,12 +80,8 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4 text-[var(--angola-red)]" />
-                <span className="text-sm text-gray-400">+244 900 000 000</span>
-              </div>
-              <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-[var(--angola-red)]" />
-                <span className="text-sm text-gray-400">contacto@jikulumessu.ao</span>
+                <a href="mailto:d2413175@gmail.com" className="text-sm text-gray-400 hover:text-white transition-colors">contacto@jikulumessu.ao</a>
               </div>
             </div>
           </div>

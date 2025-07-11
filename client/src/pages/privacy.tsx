@@ -168,7 +168,7 @@ export default function Privacy() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">12. Contacto</h2>
             <p className="text-gray-600 leading-relaxed">
               Para questões sobre esta Política de Privacidade ou para exercer os seus direitos, 
-              contacte-nos através do email: privacidade@domesticaangola.com
+              contacte-nos através do email: <a href="mailto:d2413175@gmail.com" className="text-blue-600 hover:text-blue-800">contacto@jikulumessu.ao</a>
             </p>
           </section>
 
