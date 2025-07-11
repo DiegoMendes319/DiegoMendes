@@ -823,9 +823,8 @@ class DatabaseStorage implements IStorage {
   }
 }
 
-// Using MemStorage due to DNS resolution issues with Supabase from Replit environment
-// All functionality works perfectly, data is just not persistent across server restarts
+// Replit environment has connectivity issues with Supabase - using MemStorage
 export const storage = new MemStorage();
 
-console.log('Using MemStorage - site totalmente funcional, dados temporários devido a problema DNS com Supabase');
-console.log('Funcionalidades disponíveis: registo, login, perfis, avaliações, admin panel em /admin');
+console.log('Using MemStorage - ambiente Replit não consegue conectar ao Supabase');
+console.log('Solução: Deploy noutra plataforma ou aguardar resolução do problema de conectividade');
