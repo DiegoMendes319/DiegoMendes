@@ -130,7 +130,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
           highlightElement(nextStepData.target);
           setCurrentStep(nextStepIndex);
           setIsAnimating(false);
-        }, 500);
+        }, 800); // Increased delay to ensure proper positioning
       }, 300);
     }
   };
@@ -178,7 +178,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       setTimeout(() => {
         highlightElement(firstStep.target);
       }, 500);
-    }, 500);
+    }, 1000); // Increased delay to ensure profile is created
   };
 
   const handleComplete = () => {
@@ -211,35 +211,37 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     const scrollY = window.pageYOffset;
     const scrollX = window.pageXOffset;
     const isMobile = window.innerWidth < 768;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
     
-    // Different positions for each step to make it more dynamic
+    // Calculate safe positions that don't overlap with highlighted element
     switch (currentStep) {
-      case 0: // Filters - top center
+      case 0: // Filters - position at top left corner
         return {
-          top: `${rect.top + scrollY - (isMobile ? 180 : 160)}px`,
-          left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)',
-          position: 'absolute' as const
-        };
-      case 1: // Profiles - bottom left
-        return {
-          top: `${rect.bottom + scrollY + 20}px`,
-          left: `${rect.left + scrollX}px`,
+          top: `${Math.max(20, rect.top + scrollY - (isMobile ? 200 : 180))}px`,
+          left: `${Math.max(20, rect.left + scrollX - (isMobile ? 150 : 200))}px`,
           transform: 'translateX(0)',
           position: 'absolute' as const
         };
-      case 2: // Contact - right center
+      case 1: // Profiles - position at bottom right
         return {
-          top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.right + scrollX + (isMobile ? 10 : 20)}px`,
-          transform: 'translateY(-50%)',
+          top: `${rect.bottom + scrollY + 30}px`,
+          left: `${Math.min(viewportWidth - (isMobile ? 350 : 400), rect.right + scrollX - (isMobile ? 300 : 350))}px`,
+          transform: 'translateX(0)',
           position: 'absolute' as const
         };
-      case 3: // Register - top right
+      case 2: // Contact - position at top right
         return {
-          top: `${rect.top + scrollY - (isMobile ? 180 : 160)}px`,
-          left: `${rect.right + scrollX}px`,
-          transform: 'translateX(-100%)',
+          top: `${Math.max(20, rect.top + scrollY - (isMobile ? 200 : 180))}px`,
+          left: `${Math.min(viewportWidth - (isMobile ? 350 : 400), rect.right + scrollX + 30)}px`,
+          transform: 'translateX(0)',
+          position: 'absolute' as const
+        };
+      case 3: // Register - position at bottom left
+        return {
+          top: `${rect.bottom + scrollY + 30}px`,
+          left: `${Math.max(20, rect.left + scrollX - (isMobile ? 150 : 200))}px`,
+          transform: 'translateX(0)',
           position: 'absolute' as const
         };
       default:
@@ -250,16 +252,11 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
   const getArrowIcon = () => {
     if (currentStep === -1) return null;
     
-    const stepData = steps[currentStep];
     const isMobile = window.innerWidth < 768;
     const arrowSize = isMobile ? "w-8 h-8" : "w-12 h-12";
     
-    switch (stepData.arrow) {
-      case 'up': return <ArrowUp className={`${arrowSize} text-angola-red tutorial-arrow-up`} strokeWidth={3} />;
-      case 'down': return <ArrowDown className={`${arrowSize} text-angola-red tutorial-arrow-down`} strokeWidth={3} />;
-      case 'left': return <ArrowLeft className={`${arrowSize} text-angola-red tutorial-arrow-left`} strokeWidth={3} />;
-      case 'right': return <ArrowRight className={`${arrowSize} text-angola-red tutorial-arrow-right`} strokeWidth={3} />;
-    }
+    // Always use right arrow pointing from tooltip to target
+    return <ArrowRight className={`${arrowSize} text-angola-red tutorial-arrow-right`} strokeWidth={3} />;
   };
 
   const getArrowPosition = () => {
@@ -267,46 +264,41 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     
     const stepData = steps[currentStep];
     const element = document.querySelector(stepData.target) as HTMLElement;
-    if (!element) return {};
+    const tooltipElement = document.querySelector('.tutorial-tooltip') as HTMLElement;
+    
+    if (!element || !tooltipElement) return {};
     
     const rect = element.getBoundingClientRect();
+    const tooltipRect = tooltipElement.getBoundingClientRect();
     const scrollY = window.pageYOffset;
     const scrollX = window.pageXOffset;
     const isMobile = window.innerWidth < 768;
-    const arrowOffset = isMobile ? 40 : 60;
     
-    switch (stepData.arrow) {
-      case 'up':
-        return {
-          top: `${rect.bottom + scrollY + 10}px`,
-          left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)',
-          position: 'absolute' as const
-        };
-      case 'down':
-        return {
-          top: `${rect.top + scrollY - arrowOffset}px`,
-          left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)',
-          position: 'absolute' as const
-        };
-      case 'left':
-        return {
-          top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.right + scrollX + 10}px`,
-          transform: 'translateY(-50%)',
-          position: 'absolute' as const
-        };
-      case 'right':
-        return {
-          top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.left + scrollX - arrowOffset}px`,
-          transform: 'translateY(-50%)',
-          position: 'absolute' as const
-        };
-      default:
-        return {};
+    // Calculate arrow position to connect tooltip to target element
+    const targetCenterX = rect.left + rect.width / 2;
+    const targetCenterY = rect.top + rect.height / 2;
+    const tooltipCenterX = tooltipRect.left + tooltipRect.width / 2;
+    const tooltipCenterY = tooltipRect.top + tooltipRect.height / 2;
+    
+    // Position arrow at the edge of tooltip closest to target
+    let arrowX, arrowY;
+    
+    if (targetCenterX > tooltipCenterX) {
+      // Target is to the right of tooltip
+      arrowX = tooltipRect.right + scrollX;
+      arrowY = tooltipCenterY + scrollY;
+    } else {
+      // Target is to the left of tooltip
+      arrowX = tooltipRect.left + scrollX - (isMobile ? 40 : 60);
+      arrowY = tooltipCenterY + scrollY;
     }
+    
+    return {
+      top: `${arrowY}px`,
+      left: `${arrowX}px`,
+      transform: 'translateY(-50%)',
+      position: 'absolute' as const
+    };
   };
 
   useEffect(() => {
@@ -317,6 +309,15 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
           scrollToElement(stepData.target);
           setTimeout(() => {
             highlightElement(stepData.target);
+            
+            // Force re-render to update arrow position after tooltip repositions
+            setTimeout(() => {
+              const arrowElement = document.querySelector('.tutorial-arrow');
+              if (arrowElement) {
+                const newPosition = getArrowPosition();
+                Object.assign(arrowElement.style, newPosition);
+              }
+            }, 100);
           }, 500);
         }, 300);
       }
@@ -349,10 +350,10 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       
       {/* Tutorial Card */}
       <div
-        className="fixed z-[60] pointer-events-auto max-w-sm w-full mx-4 sm:mx-0 sm:w-96"
+        className="fixed z-[60] pointer-events-auto max-w-sm w-full mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
         style={getTooltipPosition()}
       >
-        <Card className="shadow-2xl border-2 border-angola-yellow bg-white">
+        <Card className="shadow-2xl border-2 border-angola-red bg-white">
           <CardContent className="p-4 sm:p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
