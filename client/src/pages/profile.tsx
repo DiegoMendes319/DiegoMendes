@@ -35,7 +35,7 @@ import {
   Facebook,
   Instagram
 } from "lucide-react";
-import { FaTiktok } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
 
 const serviceOptions = [
   { value: "limpeza", label: "Limpeza Doméstica" },
@@ -79,7 +79,7 @@ export default function Profile() {
     about_me: '',
     facebook_url: '',
     instagram_url: '',
-    tiktok_url: ''
+    whatsapp_url: ''
   });
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function Profile() {
         about_me: profile.about_me || '',
         facebook_url: profile.facebook_url || '',
         instagram_url: profile.instagram_url || '',
-        tiktok_url: profile.tiktok_url || ''
+        whatsapp_url: profile.whatsapp_url || ''
       });
     }
   }, [profile]);
@@ -657,13 +657,13 @@ export default function Profile() {
                     </div>
                     <div>
                       <Label className="flex items-center">
-                        <FaTiktok className="h-4 w-4 mr-2" />
-                        TikTok
+                        <FaWhatsapp className="h-4 w-4 mr-2 text-green-600" />
+                        WhatsApp
                       </Label>
                       <Input
-                        value={formData.tiktok_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, tiktok_url: e.target.value }))}
-                        placeholder="https://tiktok.com/@seu-perfil"
+                        value={formData.whatsapp_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_url: e.target.value }))}
+                        placeholder="https://wa.me/244900000000"
                       />
                     </div>
                   </>
@@ -681,13 +681,13 @@ export default function Profile() {
                         Instagram
                       </a>
                     )}
-                    {profile?.tiktok_url && (
-                      <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="flex items-center hover:underline">
-                        <FaTiktok className="h-4 w-4 mr-2" />
-                        TikTok
+                    {profile?.whatsapp_url && (
+                      <a href={profile.whatsapp_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-green-600 hover:underline">
+                        <FaWhatsapp className="h-4 w-4 mr-2" />
+                        WhatsApp
                       </a>
                     )}
-                    {!profile?.facebook_url && !profile?.instagram_url && !profile?.tiktok_url && (
+                    {!profile?.facebook_url && !profile?.instagram_url && !profile?.whatsapp_url && (
                       <p className="text-gray-500">Nenhuma rede social adicionada</p>
                     )}
                   </div>

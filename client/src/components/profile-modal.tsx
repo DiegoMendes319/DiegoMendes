@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, Facebook, Instagram, Music, ExternalLink } from "lucide-react";
+import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, Facebook, Instagram, ExternalLink } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
@@ -137,15 +138,15 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
-                {user.tiktok_url && (
+                {user.whatsapp_url && (
                   <a 
-                    href={user.tiktok_url} 
+                    href={user.whatsapp_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
                   >
-                    <Music className="h-4 w-4" />
-                    TikTok
+                    <FaWhatsapp className="h-4 w-4" />
+                    WhatsApp
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}

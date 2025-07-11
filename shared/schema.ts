@@ -20,7 +20,7 @@ export const users = pgTable("users", {
   profile_url: text("profile_url"),
   facebook_url: text("facebook_url"),
   instagram_url: text("instagram_url"),
-  tiktok_url: text("tiktok_url"),
+  whatsapp_url: text("whatsapp_url"),
   password: text("password"), // For simple auth (hashed in real app)
   created_at: timestamp("created_at").defaultNow().notNull(),
   auth_user_id: uuid("auth_user_id").unique(), // For Supabase auth integration
@@ -64,7 +64,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   phone: z.string().min(1, "Telefone é obrigatório"),
   facebook_url: z.string().url("URL do Facebook inválida").optional().or(z.literal("")),
   instagram_url: z.string().url("URL do Instagram inválida").optional().or(z.literal("")),
-  tiktok_url: z.string().url("URL do TikTok inválida").optional().or(z.literal("")),
+  whatsapp_url: z.string().url("URL do WhatsApp inválida").optional().or(z.literal("")),
 });
 
 export const updateUserSchema = createInsertSchema(users).omit({

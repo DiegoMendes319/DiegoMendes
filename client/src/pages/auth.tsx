@@ -252,7 +252,20 @@ export default function Auth() {
             throw new Error(errorData.error || 'Erro no login simples');
           }
           
-          return response.json();
+          const result = await response.json();
+          
+          // Handle success for simple login
+          toast({
+            title: "Login realizado com sucesso!",
+            description: `Bem-vindo de volta, ${result.user?.name || ''}!`,
+          });
+          
+          // Force page reload to update auth state, then redirect
+          setTimeout(() => {
+            window.location.href = "/profile";
+          }, 1500);
+          
+          return result;
         }
         throw new Error('Método de login inválido');
       }
