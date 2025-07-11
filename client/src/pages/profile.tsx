@@ -429,7 +429,9 @@ export default function Profile() {
                   {editMode ? (
                     <>
                       <div>
-                        <Label>Telefone</Label>
+                        <Label>
+                          Telefone <span className="text-red-500">*</span>
+                        </Label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <span className="text-gray-500 dark:text-gray-400">+244</span>
@@ -444,19 +446,25 @@ export default function Profile() {
                             }}
                             placeholder="9XX XXX XXX"
                             className="pl-14"
+                            required
                           />
                         </div>
                       </div>
                       <div>
-                        <Label>Data de Nascimento</Label>
+                        <Label>
+                          Data de Nascimento <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                           type="date"
                           value={formData.date_of_birth}
                           onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                          required
                         />
                       </div>
                       <div>
-                        <Label>Localização</Label>
+                        <Label>
+                          Localização <span className="text-red-500">*</span>
+                        </Label>
                         <LocationSelector
                           onLocationChange={handleLocationChange}
                           defaultValues={{
@@ -467,7 +475,9 @@ export default function Profile() {
                         />
                       </div>
                       <div>
-                        <Label>Complemento de Endereço</Label>
+                        <Label>
+                          Complemento de Endereço <span className="text-gray-500">(opcional)</span>
+                        </Label>
                         <Input
                           value={formData.address_complement}
                           onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
@@ -511,7 +521,9 @@ export default function Profile() {
                   {editMode ? (
                     <>
                       <div>
-                        <Label>Tipo de Contrato</Label>
+                        <Label>
+                          Tipo de Contrato <span className="text-red-500">*</span>
+                        </Label>
                         <Select value={formData.contract_type} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}>
                           <SelectTrigger>
                             <SelectValue placeholder="Seleccione..." />
@@ -526,7 +538,9 @@ export default function Profile() {
                         </Select>
                       </div>
                       <div>
-                        <Label>Disponibilidade</Label>
+                        <Label>
+                          Disponibilidade <span className="text-gray-500">(opcional)</span>
+                        </Label>
                         <Textarea
                           value={formData.availability}
                           onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
@@ -534,7 +548,9 @@ export default function Profile() {
                         />
                       </div>
                       <div>
-                        <Label>Sobre Mim</Label>
+                        <Label>
+                          Sobre Mim <span className="text-gray-500">(opcional)</span>
+                        </Label>
                         <Textarea
                           value={formData.about_me}
                           onChange={(e) => setFormData(prev => ({ ...prev, about_me: e.target.value }))}
@@ -574,7 +590,7 @@ export default function Profile() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Briefcase className="h-5 w-5 mr-2" />
-                  Serviços Oferecidos
+                  Serviços Oferecidos <span className="text-red-500">*</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>

@@ -626,24 +626,30 @@ export default function Auth() {
                     {authMethod === 'email' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="reg_first_name">Primeiro Nome</Label>
+                          <Label htmlFor="reg_first_name">
+                            Primeiro Nome <span className="text-red-500">*</span>
+                          </Label>
                           <Input
                             id="reg_first_name"
                             value={formData.first_name || ""}
                             onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                             placeholder="João"
                             className={errors.first_name ? 'border-red-500' : ''}
+                            required
                           />
                           {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>}
                         </div>
                         <div>
-                          <Label htmlFor="reg_last_name">Último Nome</Label>
+                          <Label htmlFor="reg_last_name">
+                            Último Nome <span className="text-red-500">*</span>
+                          </Label>
                           <Input
                             id="reg_last_name"
                             value={formData.last_name || ""}
                             onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                             placeholder="Silva"
                             className={errors.last_name ? 'border-red-500' : ''}
+                            required
                           />
                           {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>}
                         </div>
@@ -652,7 +658,9 @@ export default function Auth() {
 
                     {/* Phone field for both email and simple registration */}
                     <div>
-                      <Label htmlFor="reg_phone" className="dark:text-gray-200">Telemóvel</Label>
+                      <Label htmlFor="reg_phone" className="dark:text-gray-200">
+                        Telemóvel <span className="text-red-500">*</span>
+                      </Label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                           <span className="text-gray-500 dark:text-gray-400">+244</span>
@@ -672,7 +680,9 @@ export default function Auth() {
                     {/* Password for Simple Method */}
                     {authMethod === 'simple' && (
                       <div>
-                        <Label htmlFor="reg_password">Palavra-passe</Label>
+                        <Label htmlFor="reg_password">
+                          Palavra-passe <span className="text-red-500">*</span>
+                        </Label>
                         <div className="relative">
                           <Input
                             id="reg_password"
@@ -698,13 +708,16 @@ export default function Auth() {
 
                     {/* Common Registration Fields */}
                     <div>
-                      <Label htmlFor="date_of_birth">Data de Nascimento</Label>
+                      <Label htmlFor="date_of_birth">
+                        Data de Nascimento <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         id="date_of_birth"
                         type="date"
                         value={formData.date_of_birth || ""}
                         onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
                         className={errors.date_of_birth ? 'border-red-500' : ''}
+                        required
                       />
                       {errors.date_of_birth && <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>}
                     </div>
@@ -721,20 +734,12 @@ export default function Auth() {
                     {errors.province && <p className="text-red-500 text-sm mt-1">{errors.province}</p>}
                     {errors.municipality && <p className="text-red-500 text-sm mt-1">{errors.municipality}</p>}
 
-                    <div>
-                      <Label htmlFor="neighborhood">Bairro</Label>
-                      <Input
-                        id="neighborhood"
-                        value={formData.neighborhood || ""}
-                        onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
-                        placeholder="Digite o nome do seu bairro"
-                        className={errors.neighborhood ? 'border-red-500' : ''}
-                      />
-                      {errors.neighborhood && <p className="text-red-500 text-sm mt-1">{errors.neighborhood}</p>}
-                    </div>
+
 
                     <div>
-                      <Label htmlFor="address_complement">Complemento de Endereço</Label>
+                      <Label htmlFor="address_complement">
+                        Complemento de Endereço <span className="text-gray-500">(opcional)</span>
+                      </Label>
                       <Input
                         id="address_complement"
                         value={formData.address_complement || ""}
@@ -747,7 +752,9 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label htmlFor="contract_type">Tipo de Contrato</Label>
+                      <Label htmlFor="contract_type">
+                        Tipo de Contrato <span className="text-red-500">*</span>
+                      </Label>
                       <Select onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}>
                         <SelectTrigger className={errors.contract_type ? 'border-red-500' : ''}>
                           <SelectValue placeholder="Selecione o tipo de contrato" />
@@ -763,7 +770,9 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label>Serviços Oferecidos</Label>
+                      <Label>
+                        Serviços Oferecidos <span className="text-red-500">*</span>
+                      </Label>
                       <div className="grid grid-cols-2 gap-3 mt-2 max-h-48 overflow-y-auto">
                         {SERVICE_OPTIONS.map((service) => (
                           <div key={service.value} className="flex items-center space-x-2">
@@ -794,7 +803,9 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label htmlFor="availability">Disponibilidade</Label>
+                      <Label htmlFor="availability">
+                        Disponibilidade <span className="text-gray-500">(opcional)</span>
+                      </Label>
                       <Textarea
                         id="availability"
                         value={formData.availability || ""}
@@ -807,7 +818,9 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label htmlFor="about_me">Sobre Mim</Label>
+                      <Label htmlFor="about_me">
+                        Sobre Mim <span className="text-gray-500">(opcional)</span>
+                      </Label>
                       <Textarea
                         id="about_me"
                         value={formData.about_me || ""}

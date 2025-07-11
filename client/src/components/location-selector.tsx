@@ -71,7 +71,9 @@ export default function LocationSelector({ onLocationChange, defaultValues }: Lo
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <Label htmlFor="province">Província</Label>
+        <Label htmlFor="province">
+          Província <span className="text-red-500">*</span>
+        </Label>
         <Select value={selectedProvince} onValueChange={handleProvinceChange}>
           <SelectTrigger className="cascading-select">
             <SelectValue placeholder="Selecione uma província" />
@@ -87,7 +89,9 @@ export default function LocationSelector({ onLocationChange, defaultValues }: Lo
       </div>
       
       <div>
-        <Label htmlFor="municipality">Município</Label>
+        <Label htmlFor="municipality">
+          Município <span className="text-red-500">*</span>
+        </Label>
         <Select 
           value={selectedMunicipality} 
           onValueChange={handleMunicipalityChange}
@@ -108,7 +112,9 @@ export default function LocationSelector({ onLocationChange, defaultValues }: Lo
       
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="neighborhood">Bairro</Label>
+          <Label htmlFor="neighborhood">
+            Bairro <span className="text-red-500">*</span>
+          </Label>
           <Button
             type="button"
             variant="outline"
