@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Home, LogIn } from "lucide-react";
+import { Menu, X, User, Home, LogIn, LogOut, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import JikulumessuIcon from "./jikulumessu-icon";
 import ThemeToggle from "./theme-toggle";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,15 +22,41 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleProfileClick = () => {
+  const handleConnectClick = () => {
     if (user) {
       // Utilizador está autenticado, redirecionar para perfil
       setLocation("/profile");
     } else {
-      // Utilizador não está autenticado, mostrar mensagem
+      // Utilizador não está autenticado, redirecionar para página de login
+      setLocation("/login");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Call logout API
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Logout realizado com sucesso",
+          description: "Até breve!",
+        });
+        
+        // Force page reload to update auth state
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+      } else {
+        throw new Error('Erro ao fazer logout');
+      }
+    } catch (error) {
       toast({
-        title: "Acesso Restrito",
-        description: "Deve primeiro conectar-se para aceder ao seu perfil.",
+        title: "Erro no logout",
+        description: "Tente novamente",
         variant: "destructive",
       });
     }
@@ -54,20 +81,50 @@ export default function Navbar() {
             <Link 
               href="/auth" 
               className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
-              data-tutorial="auth-link"
-            >
-              <LogIn className="w-4 h-4 inline mr-2" />
-              Entrar
-            </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleProfileClick}
-              className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
+              data-tutorial="register-link"
             >
               <User className="w-4 h-4 inline mr-2" />
-              Perfil
-            </Button>
+              Registar
+            </Link>
+            
+            {/* Connection Status */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="nav-link"
+                  >
+                    <User className="w-4 h-4 inline mr-2" />
+                    {user.name}
+                    <ChevronDown className="w-4 h-4 inline ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLocation("/profile")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Ver Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleConnectClick}
+                className="nav-link"
+                data-tutorial="connect-link"
+              >
+                <LogIn className="w-4 h-4 inline mr-2" />
+                Conectar-se
+              </Button>
+            )}
+            
             <ThemeToggle />
           </div>
 
@@ -95,21 +152,52 @@ export default function Navbar() {
                 className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <LogIn className="w-4 h-4 inline mr-2" />
-                Entrar
-              </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  handleProfileClick();
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full justify-start mobile-nav-link ${isActive('/profile') ? 'active' : ''}`}
-              >
                 <User className="w-4 h-4 inline mr-2" />
-                Perfil
-              </Button>
+                Registar
+              </Link>
+              
+              {/* Mobile Connection Status */}
+              {user ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setLocation("/profile");
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <User className="w-4 h-4 inline mr-2" />
+                    {user.name} - Ver Perfil
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <LogOut className="w-4 h-4 inline mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    handleConnectClick();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full justify-start mobile-nav-link"
+                >
+                  <LogIn className="w-4 h-4 inline mr-2" />
+                  Conectar-se
+                </Button>
+              )}
             </div>
           </div>
         )}

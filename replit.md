@@ -59,6 +59,14 @@ Jikulumessu is a full-stack web application designed to connect people with qual
 ✓ **Registration Form Cleanup (Janeiro 2025)**: Removed "Política de Cookies" option from registration forms and fixed Terms/Privacy links to redirect to correct pages
 ✓ **Tutorial Button Removal**: Completely removed tutorial button from navbar while maintaining automatic tutorial functionality for new users
 ✓ **Smart Profile Button**: Implemented intelligent profile button that redirects authenticated users to profile or shows connection message for non-authenticated users
+✓ **Complete Authentication Flow Restructure (Janeiro 2025)**: 
+  - Separated registration (/auth) from login (/login) into dedicated pages
+  - Changed "Perfil" button to "Conectar-se" button for non-authenticated users
+  - Changed "Entrar" button to "Registar" button in navbar
+  - Added user dropdown menu with profile access and logout for authenticated users
+  - Created dedicated login page with email, Google, and simple authentication methods
+  - Simplified registration page to registration-only functionality
+  - Updated tutorial to reflect new navigation structure
 
 ## User Preferences
 

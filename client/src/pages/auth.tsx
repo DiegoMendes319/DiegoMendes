@@ -24,7 +24,7 @@ type AuthMode = 'login' | 'register';
 
 export default function Auth() {
   const [, setLocation] = useLocation();
-  const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [authMode, setAuthMode] = useState<AuthMode>('register');
   const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<Partial<InsertUser>>({
@@ -412,35 +412,13 @@ export default function Auth() {
         <Card className="shadow-lg dark:bg-gray-800 dark:border-gray-700 transition-colors">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-[var(--angola-red)] mb-2">
-              {authMode === 'login' ? 'Entrar na Conta' : 'Registar Conta'}
+              Registar no Jikulumessu
             </CardTitle>
             <p className="text-gray-600 dark:text-gray-300">
-              {authMode === 'login' 
-                ? 'Escolha uma das três formas de entrar:'
-                : 'Registe-se para divulgar os seus serviços'
-              }
+              Registe-se para divulgar os seus serviços
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Mode Switch */}
-            <div className="flex justify-center space-x-4">
-              <Button
-                variant={authMode === 'login' ? 'default' : 'outline'}
-                onClick={() => switchAuthMode('login')}
-                className={authMode === 'login' ? 'bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90' : ''}
-              >
-                <LogIn className="h-4 w-4 mr-2" />
-                Entrar
-              </Button>
-              <Button
-                variant={authMode === 'register' ? 'default' : 'outline'}
-                onClick={() => switchAuthMode('register')}
-                className={authMode === 'register' ? 'bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90' : ''}
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Registar
-              </Button>
-            </div>
 
             {/* Auth Method Selection */}
             <Tabs value={authMethod} onValueChange={(value) => switchAuthMethod(value as AuthMethod)}>

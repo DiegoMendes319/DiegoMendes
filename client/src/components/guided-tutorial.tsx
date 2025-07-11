@@ -55,9 +55,9 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       id: "register",
       title: isMobile() ? "📱 Menu e Registo" : "📝 Registar-se",
       description: isMobile() 
-        ? "Clique no menu hambúrguer (≡) no canto superior direito e depois em 'Entrar' para se registar e criar o seu perfil profissional!"
+        ? "Clique no menu hambúrguer (≡) no canto superior direito e depois em 'Registar' para criar o seu perfil profissional!"
         : "Clique aqui para se registar e criar o seu próprio perfil profissional. É rápido e gratuito!",
-      target: isMobile() ? '[data-tutorial="mobile-menu"]' : '[data-tutorial="auth-link"]',
+      target: isMobile() ? '[data-tutorial="mobile-menu"]' : '[data-tutorial="register-link"]',
       arrow: 'down',
       position: 'top'
     }

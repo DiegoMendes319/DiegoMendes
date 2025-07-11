@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import Home from "@/pages/home";
 import Auth from "@/pages/auth";
+import Login from "@/pages/login";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import AdminPanel from "@/pages/admin";
@@ -30,6 +31,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/auth" component={Auth} />
+          <Route path="/login" component={Login} />
           <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/profile" component={Profile} />
           <Route path="/about" component={About} />
