@@ -435,7 +435,7 @@ export default function Auth() {
             <p className="text-gray-600 dark:text-gray-300">
               {authMode === 'login' 
                 ? 'Escolha uma das três formas de entrar:'
-                : 'Registe-se para conectar com famílias'
+                : 'Registe-se para divulgar os seus serviços'
               }
             </p>
           </CardHeader>

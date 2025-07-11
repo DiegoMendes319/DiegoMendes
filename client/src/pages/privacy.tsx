@@ -21,86 +21,79 @@ export default function Privacy() {
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Introdução</h2>
             <p className="text-gray-600 leading-relaxed">
-              A Doméstica Angola valoriza a sua privacidade e compromete-se a proteger os seus dados pessoais. 
-              Esta Política de Privacidade explica como recolhemos, utilizamos, armazenamos e protegemos as suas 
-              informações quando utiliza a nossa plataforma.
+              O Jikulumessu é uma plataforma de intermediação que conecta pessoas com prestadores de serviços 
+              domésticos. Esta Política de Privacidade explica como funciona a nossa plataforma e esclarece 
+              que não coletamos ou armazenamos dados pessoais dos utilizadores.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. Informações que Recolhemos</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. Política de Não Coleta de Dados</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">2.1 Informações Fornecidas pelo Utilizador</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Nome completo e dados de contacto</li>
-                  <li>• Endereço de email e número de telefone</li>
-                  <li>• Data de nascimento e localização</li>
-                  <li>• Informações profissionais e experiência</li>
-                  <li>• Fotografias de perfil</li>
-                  <li>• Informações de redes sociais (opcional)</li>
-                </ul>
+                <h3 className="font-semibold text-gray-800 mb-2">2.1 Dados de Utilizadores</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  O Jikulumessu NÃO coleta, armazena ou processa dados pessoais dos utilizadores. 
+                  Todas as informações fornecidas pelos utilizadores são armazenadas exclusivamente 
+                  na base de dados da plataforma para fins de exibição de perfis públicos.
+                </p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">2.2 Informações Recolhidas Automaticamente</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Endereço IP e localização geográfica</li>
-                  <li>• Tipo de dispositivo e navegador</li>
-                  <li>• Páginas visitadas e tempo de permanência</li>
-                  <li>• Preferências de utilização</li>
-                </ul>
+                <h3 className="font-semibold text-gray-800 mb-2">2.2 Dados Técnicos</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  A plataforma pode utilizar dados técnicos básicos (como endereço IP) apenas para 
+                  funcionamento técnico essencial da plataforma, mas não os armazena ou processa 
+                  para fins comerciais ou de análise.
+                </p>
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. Como Utilizamos as Suas Informações</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. Função de Intermediação</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
-              Utilizamos as suas informações para:
+              O Jikulumessu funciona exclusivamente como intermediário neutro:
             </p>
             <ul className="space-y-2 text-gray-600">
-              <li>• Facilitar a ligação entre profissionais e clientes</li>
-              <li>• Manter e melhorar a funcionalidade da plataforma</li>
-              <li>• Verificar a identidade dos utilizadores</li>
-              <li>• Fornecer apoio ao cliente</li>
-              <li>• Enviar notificações importantes sobre o serviço</li>
-              <li>• Prevenir fraudes e garantir a segurança</li>
-              <li>• Cumprir obrigações legais</li>
+              <li>• Permite a exibição de perfis públicos de prestadores de serviços</li>
+              <li>• Facilita a descoberta de serviços através de filtros de pesquisa</li>
+              <li>• Não intermedeia contactos ou negociações</li>
+              <li>• Não verifica ou valida informações dos utilizadores</li>
+              <li>• Não é responsável por acordos ou transações entre utilizadores</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Partilha de Informações</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Responsabilidades dos Utilizadores</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">4.1 Entre Utilizadores</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4.1 Informações Públicas</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Partilhamos informações básicas de perfil (nome, contacto, serviços) entre utilizadores 
-                  interessados em estabelecer uma relação profissional.
+                  Ao criar um perfil na plataforma, os utilizadores concordam que as suas informações 
+                  serão exibidas publicamente para fins de divulgação de serviços.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">4.2 Terceiros</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4.2 Responsabilidade Própria</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Não vendemos, alugamos ou partilhamos as suas informações pessoais com terceiros para 
-                  fins comerciais, excepto quando necessário para o funcionamento da plataforma ou 
-                  exigido por lei.
+                  Os utilizadores são responsáveis por verificar e validar as informações de outros 
+                  utilizadores antes de estabelecer qualquer contacto ou acordo.
                 </p>
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Segurança dos Dados</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Limitações de Responsabilidade</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
-              Implementamos medidas de segurança técnicas e organizacionais para proteger os seus dados:
+              O Jikulumessu não se responsabiliza por:
             </p>
             <ul className="space-y-2 text-gray-600">
-              <li>• Encriptação de dados em trânsito e em repouso</li>
-              <li>• Acesso restrito às informações pessoais</li>
-              <li>• Monitorização regular de segurança</li>
-              <li>• Backups seguros e regulares</li>
-              <li>• Formação da equipa em privacidade de dados</li>
+              <li>• Veracidade das informações fornecidas pelos utilizadores</li>
+              <li>• Qualidade dos serviços prestados</li>
+              <li>• Acordos ou transações entre utilizadores</li>
+              <li>• Danos resultantes de contactos através da plataforma</li>
+              <li>• Segurança de dados partilhados directamente entre utilizadores</li>
             </ul>
           </section>
 

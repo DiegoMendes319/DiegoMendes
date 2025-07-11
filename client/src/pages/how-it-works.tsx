@@ -20,7 +20,7 @@ export default function HowItWorks() {
         <div className="space-y-12">
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-              Para Famílias que Procuram Ajuda
+              Para Pessoas que Procuram Ajuda
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
@@ -29,7 +29,7 @@ export default function HowItWorks() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">1. Pesquisar</h3>
                 <p className="text-sm text-gray-600">
-                  Use os filtros para encontrar profissionais na sua área por localização, serviços e tipo de contrato.
+                  Use os filtros para encontrar prestadores de serviços na sua área por localização, serviços e tipo de contrato.
                 </p>
               </div>
               <div className="text-center">
@@ -38,7 +38,7 @@ export default function HowItWorks() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">2. Escolher</h3>
                 <p className="text-sm text-gray-600">
-                  Veja os perfis detalhados, experiência e disponibilidade dos profissionais.
+                  Veja os perfis detalhados, experiência e disponibilidade dos prestadores de serviços.
                 </p>
               </div>
               <div className="text-center">
@@ -54,9 +54,9 @@ export default function HowItWorks() {
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-2">4. Contratar</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4. Negociar</h3>
                 <p className="text-sm text-gray-600">
-                  Combine os detalhes do serviço e comece a trabalhar com o profissional escolhido.
+                  Negocie directamente os termos e condições do serviço pretendido.
                 </p>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default function HowItWorks() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-              Para Profissionais de Serviços Domésticos
+              Para Prestadores de Serviços
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
@@ -91,16 +91,16 @@ export default function HowItWorks() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">3. Receber</h3>
                 <p className="text-sm text-gray-600">
-                  Famílias interessadas irão contactá-lo directamente através das suas informações.
+                  Pessoas interessadas irão contactá-lo directamente através das suas informações.
                 </p>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-2">4. Trabalhar</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4. Negociar</h3>
                 <p className="text-sm text-gray-600">
-                  Negocie os termos e comece a prestar os seus serviços profissionais.
+                  Negocie directamente os termos e condições dos seus serviços.
                 </p>
               </div>
             </div>

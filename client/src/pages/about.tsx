@@ -21,20 +21,20 @@ export default function About() {
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">A Nossa Missão</h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              O Jikulumessu foi criado para revolucionar a forma como as famílias angolanas encontram 
-              profissionais de serviços domésticos qualificados. A nossa missão é conectar pessoas que precisam 
-              de ajuda nas tarefas domésticas com profissionais experientes e de confiança, promovendo 
-              oportunidades de emprego digno e melhorando a qualidade de vida de ambas as partes.
+              O Jikulumessu foi criado como uma plataforma de intermediação para conectar pessoas que precisam 
+              de serviços domésticos com prestadores de serviços na região. A nossa missão é facilitar estas 
+              conexões, servindo como intermediário neutro que permite a divulgação e descoberta de serviços 
+              domésticos, desde limpeza até pequenos trabalhos e ajudas pontuais.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">A Nossa Visão</h2>
             <p className="text-gray-600 leading-relaxed">
-              Ser a plataforma de referência em Angola para serviços domésticos, onde a confiança, 
-              qualidade e transparência são os pilares fundamentais. Queremos criar um ecossistema 
-              onde profissionais domésticos possam prosperar e as famílias encontrem o apoio que 
-              precisam para o seu dia a dia.
+              Ser a plataforma de referência em Angola para divulgação de serviços domésticos, 
+              funcionando como um intermediário neutro e transparente. Queremos criar um espaço 
+              onde prestadores de serviços possam divulgar o seu trabalho e pessoas interessadas 
+              possam encontrar ajuda para as suas necessidades domésticas.
             </p>
           </section>
 
@@ -45,7 +45,7 @@ export default function About() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Tecnologia e Inovação</h3>
                 <p className="text-gray-600">
                   A nossa equipa técnica trabalha continuamente para melhorar a plataforma, 
-                  garantindo uma experiência segura e intuitiva para todos os utilizadores.
+                  garantindo uma experiência intuitiva para todos os utilizadores como intermediário neutro.
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -67,7 +67,7 @@ export default function About() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">Confiança</h3>
                 <p className="text-sm text-gray-600">
-                  Promovemos relacionamentos baseados na confiança mútua e transparência.
+                  Promovemos transparência na intermediação, sem assumir responsabilidades diretas.
                 </p>
               </div>
               <div className="text-center p-4">
@@ -85,7 +85,7 @@ export default function About() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">Respeito</h3>
                 <p className="text-sm text-gray-600">
-                  Valorizamos e respeitamos todos os profissionais e famílias da nossa comunidade.
+                  Valorizamos e respeitamos todos os profissionais e pessoas da nossa comunidade.
                 </p>
               </div>
             </div>

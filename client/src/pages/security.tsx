@@ -113,7 +113,7 @@ export default function Security() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Para Famílias/Clientes</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Para Pessoas/Clientes</h3>
                   <ul className="space-y-2 text-gray-600">
                     <li className="flex items-start">
                       <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />

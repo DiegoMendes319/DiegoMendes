@@ -38,6 +38,9 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Multiple Authentication Methods**: Email-based and simple name-based registration and login systems
 ✓ **Real-time Profile Updates**: Profile editing with instant image preview and data persistence
 ✓ **Complete User Management**: Registration, login, profile editing, image upload, and logout functionality
+✓ **Complete Text Neutralization**: Updated all platform text to position as neutral intermediary, not family-focused service
+✓ **Phone Number Formatting**: Added automatic +244 prefix and three-digit grouping for Angola phone numbers
+✓ **Comprehensive Policy Updates**: Updated privacy policy and terms of service to reflect intermediary role and data non-collection
 
 ## User Preferences
 

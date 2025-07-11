@@ -21,22 +21,24 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Aceitação dos Termos</h2>
             <p className="text-gray-600 leading-relaxed">
-              Ao aceder e utilizar a plataforma Doméstica Angola, o utilizador concorda em cumprir e ficar vinculado 
-              aos presentes Termos de Serviço. Se não concordar com algum dos termos aqui estabelecidos, não deve 
-              utilizar a nossa plataforma.
+              Ao aceder e utilizar a plataforma Jikulumessu, o utilizador concorda em cumprir e ficar vinculado 
+              aos presentes Termos de Serviço. O Jikulumessu funciona exclusivamente como intermediário neutro 
+              entre pessoas que procuram serviços domésticos e prestadores de serviços. Se não concordar com 
+              algum dos termos aqui estabelecidos, não deve utilizar a nossa plataforma.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. Descrição do Serviço</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
-              A Doméstica Angola é uma plataforma online que conecta famílias que necessitam de serviços domésticos 
-              com profissionais qualificados. A nossa plataforma facilita o contacto entre as partes, mas não 
-              participamos directamente na prestação dos serviços.
+              O Jikulumessu é uma plataforma digital de intermediação que permite a prestadores de serviços 
+              domésticos divulgar os seus serviços e a pessoas interessadas encontrar esses serviços. 
+              Funcionamos exclusivamente como intermediário neutro, não sendo responsáveis pela qualidade 
+              dos serviços prestados, acordos estabelecidos ou quaisquer transações entre utilizadores.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              Os serviços oferecidos incluem, mas não se limitam a: limpeza doméstica, cozinha, lavanderia, 
-              jardinagem, cuidados com idosos, e outros serviços domésticos especializados.
+              Os serviços divulgados incluem, mas não se limitam a: limpeza doméstica, cozinha, lavanderia, 
+              jardinagem, pequenos trabalhos domésticos, e outros serviços de apoio doméstico.
             </p>
           </section>
 
@@ -70,21 +72,21 @@ export default function Terms() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Responsabilidades dos Utilizadores</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">4.1 Profissionais Domésticos</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4.1 Prestadores de Serviços</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Fornecer informações verdadeiras sobre experiência e qualificações</li>
+                  <li>• Fornecer informações verdadeiras sobre experiência e serviços</li>
                   <li>• Manter actualizado o perfil e disponibilidade</li>
-                  <li>• Cumprir com os acordos estabelecidos com os clientes</li>
+                  <li>• Ser responsável por todos os acordos estabelecidos directamente</li>
                   <li>• Respeitar a privacidade e propriedade dos clientes</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">4.2 Famílias/Clientes</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">4.2 Pessoas/Clientes</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Tratar os profissionais com respeito e dignidade</li>
-                  <li>• Fornecer informações claras sobre os serviços necessários</li>
-                  <li>• Cumprir com os acordos de pagamento estabelecidos</li>
-                  <li>• Respeitar os horários e disponibilidade dos profissionais</li>
+                  <li>• Tratar os prestadores de serviços com respeito e dignidade</li>
+                  <li>• Verificar informações antes de estabelecer contacto</li>
+                  <li>• Ser responsável por todos os acordos estabelecidos directamente</li>
+                  <li>• Respeitar os horários e disponibilidade dos prestadores de serviços</li>
                 </ul>
               </div>
             </div>
@@ -107,10 +109,10 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">6. Limitação de Responsabilidade</h2>
             <p className="text-gray-600 leading-relaxed">
-              A Doméstica Angola actua apenas como intermediária entre profissionais e clientes. Não somos 
-              responsáveis por disputas, danos ou problemas que possam surgir da relação de trabalho estabelecida 
-              entre as partes. Cada utilizador é responsável por verificar referências e estabelecer acordos 
-              apropriados de trabalho.
+              O Jikulumessu actua exclusivamente como intermediário neutro para divulgação de serviços. 
+              NÃO somos responsáveis por disputas, danos, problemas, acordos ou transações que possam surgir 
+              entre utilizadores. Cada utilizador é inteiramente responsável por verificar informações, 
+              estabelecer acordos e negociar condições directamente.
             </p>
           </section>
 
@@ -118,7 +120,7 @@ export default function Terms() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Propriedade Intelectual</h2>
             <p className="text-gray-600 leading-relaxed">
               Todo o conteúdo da plataforma, incluindo design, logótipos, textos e funcionalidades, é propriedade 
-              da Doméstica Angola e está protegido por leis de direitos autorais. O uso não autorizado é proibido.
+              do Jikulumessu e está protegido por leis de direitos autorais. O uso não autorizado é proibido.
             </p>
           </section>
 
@@ -150,7 +152,7 @@ export default function Terms() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Contacto</h2>
             <p className="text-gray-600 leading-relaxed">
               Para questões sobre estes Termos de Serviço, contacte-nos através do email: 
-              legal@domesticaangola.com
+              legal@jikulumessu.com
             </p>
           </section>
 

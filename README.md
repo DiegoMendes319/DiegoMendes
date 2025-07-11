@@ -120,7 +120,7 @@ Para ativar o login com Google:
 1. Registar-se com um dos três métodos
 2. Completar perfil com experiência e serviços
 3. Definir disponibilidade e área de trabalho
-4. Receber contactos de famílias interessadas
+4. Receber contactos de pessoas interessadas
 
 ## 🔧 Desenvolvimento
 
