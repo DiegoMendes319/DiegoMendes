@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -857,17 +857,13 @@ export default function Auth() {
                         />
                         <Label htmlFor="agree_terms" className="text-sm leading-relaxed">
                           Concordo com os{" "}
-                          <a href="/termos" className="text-[var(--angola-red)] hover:underline">
+                          <Link href="/terms" className="text-[var(--angola-red)] hover:underline">
                             Termos de Serviço
-                          </a>
-                          ,{" "}
-                          <a href="/privacidade" className="text-[var(--angola-red)] hover:underline">
-                            Política de Privacidade
-                          </a>
+                          </Link>
                           {" "}e{" "}
-                          <a href="/cookies" className="text-[var(--angola-red)] hover:underline">
-                            Política de Cookies
-                          </a>
+                          <Link href="/privacy" className="text-[var(--angola-red)] hover:underline">
+                            Política de Privacidade
+                          </Link>
                         </Label>
                       </div>
                       {errors.agreeTerms && <p className="text-red-500 text-sm">{errors.agreeTerms}</p>}
