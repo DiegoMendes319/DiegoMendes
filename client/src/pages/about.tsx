@@ -22,19 +22,19 @@ export default function About() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">A Nossa Missão</h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               O Jikulumessu foi criado como uma plataforma de intermediação para conectar pessoas que precisam 
-              de serviços domésticos com prestadores de serviços na região. A nossa missão é facilitar estas 
+              de serviços com prestadores de serviços na região. A nossa missão é facilitar estas 
               conexões, servindo como intermediário neutro que permite a divulgação e descoberta de serviços 
-              domésticos, desde limpeza até pequenos trabalhos e ajudas pontuais.
+              diversos, desde limpeza até transporte, educação, eventos e muitos outros.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">A Nossa Visão</h2>
             <p className="text-gray-600 leading-relaxed">
-              Ser a plataforma de referência em Angola para divulgação de serviços domésticos, 
+              Ser a plataforma de referência em Angola para divulgação de serviços, 
               funcionando como um intermediário neutro e transparente. Queremos criar um espaço 
               onde prestadores de serviços possam divulgar o seu trabalho e pessoas interessadas 
-              possam encontrar ajuda para as suas necessidades domésticas.
+              possam encontrar ajuda para as suas necessidades diversas.
             </p>
           </section>
 

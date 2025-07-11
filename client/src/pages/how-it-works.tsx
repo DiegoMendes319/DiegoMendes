@@ -73,7 +73,7 @@ export default function HowItWorks() {
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">1. Registar-se</h3>
                 <p className="text-sm text-gray-600">
-                  Crie o seu perfil com informações pessoais, experiência e serviços oferecidos.
+                  Crie o seu perfil com informações pessoais, experiência e serviços que oferece.
                 </p>
               </div>
               <div className="text-center">
@@ -108,41 +108,60 @@ export default function HowItWorks() {
 
           <section className="bg-white rounded-lg shadow-md p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Tipos de Serviços Disponíveis</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Serviços de Limpeza</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">Serviços Gerais</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Limpeza geral da casa</li>
-                  <li>• Limpeza profunda</li>
-                  <li>• Organização de espaços</li>
-                  <li>• Limpeza de escritórios</li>
+                  <li>• Limpeza geral</li>
+                  <li>• Cozinhar</li>
+                  <li>• Passadoria</li>
+                  <li>• Jardinagem</li>
+                  <li>• Lavanderia</li>
+                  <li>• Organização</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Serviços de Cozinha</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">Cuidados Pessoais</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Preparação de refeições</li>
-                  <li>• Cozinha angolana tradicional</li>
-                  <li>• Cozinha internacional</li>
-                  <li>• Planeamento de refeições</li>
+                  <li>• Cuidado de crianças</li>
+                  <li>• Cuidado de idosos</li>
+                  <li>• Babá</li>
+                  <li>• Fazer compras</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Cuidados Especiais</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">Transporte</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Cuidados com idosos</li>
-                  <li>• Apoio a pessoas com mobilidade reduzida</li>
-                  <li>• Acompanhamento diário</li>
-                  <li>• Administração de medicamentos</li>
+                  <li>• Taxista de automóvel</li>
+                  <li>• Taxista de mota</li>
+                  <li>• Cobrador de táxi</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Outros Serviços</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">Eventos e Entretenimento</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Lavanderia e engomadoria</li>
-                  <li>• Jardinagem e manutenção</li>
-                  <li>• Compras e recados</li>
-                  <li>• Serviços personalizados</li>
+                  <li>• Decoração de eventos</li>
+                  <li>• Animador de festas</li>
+                  <li>• Fotógrafo</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-3">Manutenção e Reparos</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li>• Pintura</li>
+                  <li>• Carpintaria</li>
+                  <li>• Electricista</li>
+                  <li>• Canalização</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-3">Beleza e Educação</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li>• Cabeleireiro</li>
+                  <li>• Manicure</li>
+                  <li>• Massagista</li>
+                  <li>• Professor particular</li>
+                  <li>• Costura</li>
                 </ul>
               </div>
             </div>
@@ -152,21 +171,21 @@ export default function HowItWorks() {
             <h2 className="text-2xl font-semibold mb-4">Tipos de Contrato</h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div>
-                <h3 className="font-semibold mb-2">Contrato Mensal</h3>
+                <h3 className="font-semibold mb-2">Tempo Inteiro</h3>
                 <p className="text-sm opacity-90">
                   Trabalho regular com horário fixo e salário mensal definido.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Diarista</h3>
+                <h3 className="font-semibold mb-2">Por Horas</h3>
                 <p className="text-sm opacity-90">
-                  Trabalho por dias específicos da semana, com pagamento por dia.
+                  Trabalho por horas específicas, com pagamento por hora ou por serviço.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Contrato Verbal</h3>
+                <h3 className="font-semibold mb-2">Freelance</h3>
                 <p className="text-sm opacity-90">
-                  Acordo informal entre as partes, com flexibilidade nos termos.
+                  Trabalho projectual ou eventual, com flexibilidade nos termos.
                 </p>
               </div>
             </div>

@@ -119,7 +119,7 @@ export default function Home() {
                       Como pretende procurar?
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 text-center">
-                      Escolha a forma de encontrar diaristas próximos de si
+                      Escolha a forma de encontrar prestadores de serviços próximos de si
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 w-full max-w-full">
                       <Button 
@@ -152,7 +152,7 @@ export default function Home() {
           <Card className="p-4 md:p-6 bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center flex items-center justify-center gap-2 flex-wrap">
               <Filter className="h-5 w-5 md:h-6 md:w-6 text-[var(--angola-red)]" />
-              <span>Filtrar Diaristas</span>
+              <span>Filtrar Prestadores</span>
             </h2>
             
             <div className="space-y-4 md:space-y-6">
@@ -224,7 +224,7 @@ export default function Home() {
               <div className="text-center">
                 <Button onClick={() => refetch()} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 w-full sm:w-auto px-6 py-3 text-sm md:text-base">
                   <Search className="h-4 w-4 mr-2" />
-                  Buscar Diaristas
+                  Buscar Prestadores
                 </Button>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Users className="h-6 w-6 md:h-8 md:w-8 text-[var(--angola-red)]" />
-              Diaristas Disponíveis
+              Prestadores Disponíveis
             </h2>
             <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
               <span>{users?.length || 0} profissionais encontrados</span>
@@ -266,7 +266,7 @@ export default function Home() {
                   <div className="mb-4">
                     <HomeIcon className="h-12 w-12 mx-auto text-gray-400" />
                   </div>
-                  <p className="text-lg">Nenhum diarista encontrado na sua região</p>
+                  <p className="text-lg">Nenhum prestador encontrado na sua região</p>
                   <p className="text-sm mt-2">Tente ajustar os filtros de pesquisa ou expandir a área de busca</p>
                 </div>
               )}

@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="text-xl font-bold">Jikulumessu</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Intermediário neutro que conecta pessoas com prestadores de serviços domésticos.
+              Intermediário neutro que conecta pessoas com prestadores de serviços.
               Facilitamos a descoberta de serviços em todo o país.
             </p>
             <div className="flex space-x-4">

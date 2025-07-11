@@ -2,7 +2,7 @@
 
 ## Overview
 
-Jikulumessu is a full-stack web application designed to connect families with qualified domestic workers in Angola. The platform provides a comprehensive solution for finding, filtering, and contacting domestic service providers based on location, services offered, and contract preferences. "Jikulumessu" means "open your eyes" or "stay alert" in Angolan languages, representing awareness and vigilance in choosing domestic services.
+Jikulumessu is a full-stack web application designed to connect people with qualified service providers in Angola. The platform provides a comprehensive solution for finding, filtering, and contacting various "flash service" providers based on location, services offered, and contract preferences. "Jikulumessu" means "open your eyes" or "stay alert" in Angolan languages, representing awareness and vigilance in choosing service providers.
 
 ## Recent Updates (Janeiro 2025)
 
@@ -45,6 +45,11 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Portuguese Portugal Consistency**: Corrected "ônibus" to "autocarro" and "senha" to "palavra-passe" throughout the platform
 ✓ **Complete Terminology Update**: Changed all references from "famílias/profissionais" to "pessoas/prestadores de serviços" across all pages
 ✓ **Animated Onboarding Tutorial**: Implemented comprehensive tutorial with playful "Jiku" character guide featuring smooth animations, 6-step walkthrough, and localStorage persistence
+✓ **Flash Services Expansion (Janeiro 2025)**: Expanded service offerings from domestic-only to comprehensive "flash services" including transport, events, maintenance, beauty, education, and security services
+✓ **26+ Service Categories**: Added extensive service options including taxi drivers, collectors, decorators, security, electricians, beauticians, and more
+✓ **Generic Service Terminology**: Updated all platform text to use "prestadores de serviços" instead of "prestadores de serviços domésticos" to reflect expanded service scope
+✓ **Updated About & How-It-Works Pages**: Modified all informational pages to describe platform as general service intermediary rather than domestic-focused
+✓ **Enhanced Service Categories**: Reorganized services into logical categories: general services, personal care, transport, events, maintenance, beauty, education, and others
 
 ## User Preferences
 

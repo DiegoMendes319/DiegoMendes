@@ -1,6 +1,6 @@
 // Service options for Angola
 export const SERVICE_OPTIONS = [
-  { value: "limpeza", label: "Limpeza Doméstica" },
+  { value: "limpeza", label: "Limpeza Geral" },
   { value: "cozinha", label: "Cozinhar" },
   { value: "passadoria", label: "Passar Roupa" },
   { value: "jardinagem", label: "Jardinagem" },
@@ -42,7 +42,7 @@ export const CONTRACT_TYPES = [
 // Service categories for better organization
 export const SERVICE_CATEGORIES = {
   domesticos: {
-    label: "Serviços Domésticos",
+    label: "Serviços Gerais",
     services: ["limpeza", "cozinha", "passadoria", "lavanderia", "organizacao"]
   },
   cuidados: {

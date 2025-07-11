@@ -43,8 +43,8 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     },
     {
       id: "profiles",
-      title: "👤 Diaristas Disponíveis",
-      description: "Aqui aparecem os diaristas disponíveis na sua região. Quando há prestadores registados, verá os seus perfis com informações como localização, serviços oferecidos e avaliações de outros clientes.",
+      title: "👤 Prestadores Disponíveis",
+      description: "Aqui aparecem os prestadores disponíveis na sua região. Quando há profissionais registados, verá os seus perfis com informações como localização, serviços oferecidos e avaliações de outros clientes.",
       target: '[data-tutorial="profiles-area"]',
       arrow: 'up',
       position: 'bottom'
@@ -356,7 +356,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                   </p>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Vou mostrar-lhe como funciona o nosso site para encontrar prestadores de serviços domésticos em Angola.
+                  Vou mostrar-lhe como funciona o nosso site para encontrar prestadores de serviços em Angola.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2 pt-4">
                   <Button
