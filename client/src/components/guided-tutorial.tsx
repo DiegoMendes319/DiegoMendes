@@ -41,9 +41,9 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     },
     {
       id: "profiles",
-      title: "👤 Área dos Perfis",
-      description: "Nesta secção aparecem os perfis dos prestadores de serviços. Cada perfil mostra informações importantes como localização, serviços e avaliações.",
-      target: '.grid',
+      title: "👤 Diaristas Disponíveis",
+      description: "Aqui aparecem os diaristas disponíveis na sua região. Quando há prestadores registados, verá os seus perfis com informações como localização, serviços oferecidos e avaliações de outros clientes.",
+      target: '[data-tutorial="profiles-area"]',
       arrow: 'up',
       position: 'bottom'
     },
@@ -314,7 +314,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
         className="fixed z-[60] pointer-events-auto max-w-sm w-full mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
         style={getTooltipPosition()}
       >
-        <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-xl shadow-2xl border border-red-200 backdrop-blur-sm">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200">
           <div className="p-4 sm:p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -337,13 +337,13 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
             {/* Introduction */}
             {currentStep === -1 && (
               <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-100 to-orange-100 rounded-full mb-2 shadow-lg">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-2 shadow-lg">
                   <span className="text-3xl">👋</span>
                 </div>
                 <h3 className="font-bold text-xl sm:text-2xl text-gray-800">
                   Olá! Sou o Jiku
                 </h3>
-                <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 p-4 rounded-lg shadow-sm">
+                <div className="bg-blue-50/50 p-4 rounded-lg">
                   <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                     Bem-vindo ao <strong>Jikulumessu</strong>! 
                     <br />
@@ -376,7 +376,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
               <div className="space-y-4">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
                       <span className="text-2xl">
                         {steps[currentStep].title.split(' ')[0]}
                       </span>
@@ -385,7 +385,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                       {steps[currentStep].title.substring(2)}
                     </h3>
                   </div>
-                  <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 p-4 rounded-lg shadow-sm">
+                  <div className="bg-blue-50/50 p-4 rounded-lg">
                     <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                       {steps[currentStep].description}
                     </p>

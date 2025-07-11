@@ -222,13 +222,13 @@ export default function Home() {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tutorial="profiles-area">
               {[...Array(6)].map((_, i) => (
                 <SkeletonLoader key={i} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tutorial="profiles-area">
               {users?.map((user) => (
                 <div key={user.id} data-tutorial="profile-card">
                   <ProfileCard
@@ -237,6 +237,15 @@ export default function Home() {
                   />
                 </div>
               ))}
+              {users?.length === 0 && (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  <div className="mb-4">
+                    <HomeIcon className="h-12 w-12 mx-auto text-gray-400" />
+                  </div>
+                  <p className="text-lg">Nenhum diarista encontrado na sua região</p>
+                  <p className="text-sm mt-2">Tente ajustar os filtros de pesquisa ou expandir a área de busca</p>
+                </div>
+              )}
             </div>
           )}
 
