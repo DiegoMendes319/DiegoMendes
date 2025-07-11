@@ -38,7 +38,10 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={startOnboarding}
+              onClick={() => {
+                console.log('Tutorial button clicked');
+                startOnboarding();
+              }}
               className="text-angola-red hover:text-angola-red/80 hover:bg-angola-red/10"
             >
               <HelpCircle className="w-4 h-4 inline mr-2" />
@@ -84,6 +87,7 @@ export default function Navbar() {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
+                  console.log('Mobile tutorial button clicked');
                   startOnboarding();
                   setIsMenuOpen(false);
                 }}

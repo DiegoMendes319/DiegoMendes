@@ -248,18 +248,6 @@ export default function Home() {
               )}
             </div>
           )}
-
-          {!isLoading && users?.length === 0 && (
-            <div className="text-center py-12">
-              <HomeIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Nenhum profissional encontrado
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Tente ajustar seus filtros ou expandir a área de busca.
-              </p>
-            </div>
-          )}
         </div>
       </section>
 
