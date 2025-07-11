@@ -32,6 +32,8 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
 
   // Removed tutorial profile creation/deletion mutations as they're no longer needed
 
+  const isMobile = () => window.innerWidth < 768;
+
   const steps: TutorialStep[] = [
     {
       id: "filters",
@@ -51,9 +53,11 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     },
     {
       id: "register",
-      title: "📝 Registar-se",
-      description: "Clique aqui para se registar e criar o seu próprio perfil profissional. É rápido e gratuito!",
-      target: '[data-tutorial="auth-link"]',
+      title: isMobile() ? "📱 Menu e Registo" : "📝 Registar-se",
+      description: isMobile() 
+        ? "Em dispositivos móveis, clique no menu hambúrguer (≡) no canto superior direito e depois em 'Entrar' para se registar e criar o seu perfil profissional!"
+        : "Clique aqui para se registar e criar o seu próprio perfil profissional. É rápido e gratuito!",
+      target: isMobile() ? '[data-tutorial="mobile-menu"]' : '[data-tutorial="auth-link"]',
       arrow: 'down',
       position: 'top'
     }
@@ -181,37 +185,60 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     const rect = element.getBoundingClientRect();
     const scrollY = window.pageYOffset;
     const scrollX = window.pageXOffset;
-    const isMobile = window.innerWidth < 768;
+    const isMobileView = window.innerWidth < 768;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Calculate safe positions that don't overlap with highlighted element
+    // Enhanced mobile responsive positioning
+    if (isMobileView) {
+      // For mobile, use simpler positioning to avoid clipping
+      switch (currentStep) {
+        case 0: // Filters
+          return {
+            top: `${Math.max(80, rect.top + scrollY - 250)}px`,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            position: 'absolute' as const
+          };
+        case 1: // Profiles
+          return {
+            top: `${rect.bottom + scrollY + 20}px`,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            position: 'absolute' as const
+          };
+        case 2: // Register/Menu
+          return {
+            top: `${Math.max(80, rect.bottom + scrollY + 20)}px`,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            position: 'absolute' as const
+          };
+        default:
+          return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' as const };
+      }
+    }
+    
+    // Desktop positioning (existing logic)
     switch (currentStep) {
       case 0: // Filters - position at top left corner
         return {
-          top: `${Math.max(20, rect.top + scrollY - (isMobile ? 200 : 180))}px`,
-          left: `${Math.max(20, rect.left + scrollX - (isMobile ? 150 : 200))}px`,
+          top: `${Math.max(20, rect.top + scrollY - 180)}px`,
+          left: `${Math.max(20, rect.left + scrollX - 200)}px`,
           transform: 'translateX(0)',
           position: 'absolute' as const
         };
       case 1: // Profiles - position at bottom right
         return {
           top: `${rect.bottom + scrollY + 30}px`,
-          left: `${Math.min(viewportWidth - (isMobile ? 350 : 400), rect.right + scrollX - (isMobile ? 300 : 350))}px`,
+          left: `${Math.min(viewportWidth - 400, rect.right + scrollX - 350)}px`,
           transform: 'translateX(0)',
           position: 'absolute' as const
         };
-      case 2: // Contact - position at top right
+      case 2: // Register - position at top right
         return {
-          top: `${Math.max(20, rect.top + scrollY - (isMobile ? 200 : 180))}px`,
-          left: `${Math.min(viewportWidth - (isMobile ? 350 : 400), rect.right + scrollX + 30)}px`,
-          transform: 'translateX(0)',
-          position: 'absolute' as const
-        };
-      case 3: // Register - position at bottom left
-        return {
-          top: `${rect.bottom + scrollY + 30}px`,
-          left: `${Math.max(20, rect.left + scrollX - (isMobile ? 150 : 200))}px`,
+          top: `${Math.max(20, rect.top + scrollY - 180)}px`,
+          left: `${Math.min(viewportWidth - 400, rect.right + scrollX + 30)}px`,
           transform: 'translateX(0)',
           position: 'absolute' as const
         };
@@ -316,10 +343,10 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       
       {/* Tutorial Card */}
       <div
-        className="fixed z-[60] pointer-events-auto max-w-sm w-full mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
+        className="fixed z-[60] pointer-events-auto w-[calc(100vw-2rem)] max-w-sm mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
         style={getTooltipPosition()}
       >
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200 max-h-[80vh] overflow-y-auto">
           <div className="p-4 sm:p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">

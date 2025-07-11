@@ -73,6 +73,7 @@ export default function Navbar() {
               size="icon"
               onClick={toggleMenu}
               className="text-gray-600 dark:text-gray-300"
+              data-tutorial="mobile-menu"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </Button>
