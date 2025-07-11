@@ -9,14 +9,12 @@ export function useOnboarding() {
   });
 
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
-  const [manuallyStarted, setManuallyStarted] = useState<boolean>(false);
   
-  console.log('useOnboarding hook - showOnboarding:', showOnboarding, 'isOnboardingCompleted:', isOnboardingCompleted, 'manuallyStarted:', manuallyStarted);
+  console.log('useOnboarding hook - showOnboarding:', showOnboarding, 'isOnboardingCompleted:', isOnboardingCompleted);
 
+  // Auto-show onboarding only if never completed before
   useEffect(() => {
-    // Show onboarding automatically if not completed and not manually started
-    if (!isOnboardingCompleted && !manuallyStarted) {
-      // Small delay to let the page load
+    if (!isOnboardingCompleted) {
       const timer = setTimeout(() => {
         setShowOnboarding(true);
       }, 1000);
@@ -28,25 +26,22 @@ export function useOnboarding() {
   const completeOnboarding = () => {
     setIsOnboardingCompleted(true);
     setShowOnboarding(false);
-    setManuallyStarted(false);
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
   };
 
   const resetOnboarding = () => {
     setIsOnboardingCompleted(false);
-    setManuallyStarted(false);
+    setShowOnboarding(false);
     localStorage.removeItem(ONBOARDING_STORAGE_KEY);
   };
 
   const startOnboarding = () => {
-    console.log('startOnboarding called, setting showOnboarding to true');
-    setManuallyStarted(true);
+    console.log('startOnboarding called manually');
     setShowOnboarding(true);
   };
 
   const closeOnboarding = () => {
     setShowOnboarding(false);
-    setManuallyStarted(false);
   };
 
   return {
