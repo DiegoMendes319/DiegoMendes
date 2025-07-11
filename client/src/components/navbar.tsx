@@ -1,13 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Home, LogIn } from "lucide-react";
+import { Menu, X, User, Home, LogIn, HelpCircle } from "lucide-react";
 import JikulumessuIcon from "./jikulumessu-icon";
 import ThemeToggle from "./theme-toggle";
+import { useOnboarding } from "@/hooks/use-onboarding";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { startOnboarding } = useOnboarding();
 
   const isActive = (path: string) => {
     return location === path;
@@ -33,6 +35,15 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={startOnboarding}
+              className="text-angola-red hover:text-angola-red/80 hover:bg-angola-red/10"
+            >
+              <HelpCircle className="w-4 h-4 inline mr-2" />
+              Tutorial
+            </Button>
             <Link 
               href="/auth" 
               className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
@@ -68,6 +79,18 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  startOnboarding();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full justify-start text-angola-red hover:text-angola-red/80 hover:bg-angola-red/10"
+              >
+                <HelpCircle className="w-4 h-4 inline mr-2" />
+                Tutorial
+              </Button>
               <Link 
                 href="/auth" 
                 className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}

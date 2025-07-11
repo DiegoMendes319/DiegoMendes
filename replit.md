@@ -44,6 +44,7 @@ Jikulumessu is a full-stack web application designed to connect families with qu
 ✓ **Footer Corrections**: Updated footer description to reflect intermediary role instead of family-focused service
 ✓ **Portuguese Portugal Consistency**: Corrected "ônibus" to "autocarro" and "senha" to "palavra-passe" throughout the platform
 ✓ **Complete Terminology Update**: Changed all references from "famílias/profissionais" to "pessoas/prestadores de serviços" across all pages
+✓ **Animated Onboarding Tutorial**: Implemented comprehensive tutorial with playful "Jiku" character guide featuring smooth animations, 6-step walkthrough, and localStorage persistence
 
 ## User Preferences
 

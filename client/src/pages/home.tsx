@@ -6,6 +6,8 @@ import LocationSelector from "@/components/location-selector";
 import SkeletonLoader from "@/components/skeleton-loader";
 import ProfileModal from "@/components/profile-modal";
 import ContactModal from "@/components/contact-modal";
+import OnboardingTutorial from "@/components/onboarding-tutorial";
+import { useOnboarding } from "@/hooks/use-onboarding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +29,7 @@ export default function Home() {
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const [showContactModal, setShowContactModal] = useState(false);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
+  const { showOnboarding, completeOnboarding, closeOnboarding } = useOnboarding();
 
   const { data: users, isLoading, refetch } = useQuery<User[]>({
     queryKey: ['/api/users', searchFilters],
@@ -267,6 +270,13 @@ export default function Home() {
           onClose={() => setShowContactModal(false)}
         />
       )}
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial
+        isOpen={showOnboarding}
+        onClose={closeOnboarding}
+        onComplete={completeOnboarding}
+      />
     </div>
   );
 }
