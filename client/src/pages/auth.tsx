@@ -17,6 +17,7 @@ import { FaGoogle } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
 import { scrollToElement } from "@/hooks/use-scroll-to-top";
 import type { InsertUser } from "@shared/schema";
+import { SERVICE_OPTIONS } from "@shared/constants";
 
 type AuthMethod = 'email' | 'google' | 'simple';
 type AuthMode = 'login' | 'register';
@@ -763,20 +764,32 @@ export default function Auth() {
 
                     <div>
                       <Label>Serviços Oferecidos</Label>
-                      <div className="grid grid-cols-2 gap-3 mt-2">
-                        {['limpeza', 'cozinha', 'lavanderia', 'jardinagem', 'cuidados'].map((service) => (
-                          <div key={service} className="flex items-center space-x-2">
+                      <div className="grid grid-cols-2 gap-3 mt-2 max-h-48 overflow-y-auto">
+                        {SERVICE_OPTIONS.map((service) => (
+                          <div key={service.value} className="flex items-center space-x-2">
                             <Checkbox
-                              id={service}
-                              checked={formData.services?.includes(service)}
-                              onCheckedChange={(checked) => handleServiceChange(service, checked as boolean)}
+                              id={service.value}
+                              checked={formData.services?.includes(service.value)}
+                              onCheckedChange={(checked) => handleServiceChange(service.value, checked as boolean)}
                             />
-                            <Label htmlFor={service} className="text-sm capitalize">
-                              {service === 'cuidados' ? 'Cuidados Pessoais' : service}
+                            <Label htmlFor={service.value} className="text-sm">
+                              {service.label}
                             </Label>
                           </div>
                         ))}
                       </div>
+                      {/* Custom service input for "Other" */}
+                      {formData.services?.includes('outros') && (
+                        <div className="mt-3">
+                          <Label className="text-sm">Especifique o serviço:</Label>
+                          <Input
+                            placeholder="Descreva o seu serviço personalizado"
+                            value={formData.custom_service || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, custom_service: e.target.value }))}
+                            className="mt-1"
+                          />
+                        </div>
+                      )}
                       {errors.services && <p className="text-red-500 text-sm mt-1">{errors.services}</p>}
                     </div>
 

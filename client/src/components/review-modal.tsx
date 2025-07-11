@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import RatingStars from "./rating-stars";
 import type { User, InsertReview } from "@shared/schema";
+import { SERVICE_OPTIONS } from "@shared/constants";
 
 interface ReviewModalProps {
   user: User;
@@ -220,12 +221,11 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
                 <SelectValue placeholder="Selecione o serviço" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="limpeza">Limpeza</SelectItem>
-                <SelectItem value="cozinha">Cozinha</SelectItem>
-                <SelectItem value="lavanderia">Lavanderia</SelectItem>
-                <SelectItem value="jardinagem">Jardinagem</SelectItem>
-                <SelectItem value="cuidados">Cuidados</SelectItem>
-                <SelectItem value="outros">Outros</SelectItem>
+                {SERVICE_OPTIONS.map((service) => (
+                  <SelectItem key={service.value} value={service.value}>
+                    {service.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

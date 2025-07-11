@@ -14,7 +14,7 @@ export function useOnboarding() {
   console.log('useOnboarding hook - showOnboarding:', showOnboarding, 'isOnboardingCompleted:', isOnboardingCompleted, 'manuallyStarted:', manuallyStarted);
 
   useEffect(() => {
-    // Show onboarding automatically if not completed and user is not authenticated
+    // Show onboarding automatically if not completed and not manually started
     if (!isOnboardingCompleted && !manuallyStarted) {
       // Small delay to let the page load
       const timer = setTimeout(() => {
@@ -23,7 +23,7 @@ export function useOnboarding() {
       
       return () => clearTimeout(timer);
     }
-  }, [isOnboardingCompleted, manuallyStarted]);
+  }, [isOnboardingCompleted]);
 
   const completeOnboarding = () => {
     setIsOnboardingCompleted(true);

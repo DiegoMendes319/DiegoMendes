@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   address_complement: text("address_complement"), // Address complement (number, block, reference)
   contract_type: text("contract_type").notNull(), // "diarista" | "mensal" | "verbal" | "escrito"
   services: text("services").array().notNull(), // ["limpeza", "jardinagem", ...]
+  custom_service: text("custom_service"), // Custom service description when "outros" is selected
   availability: text("availability").notNull(),
   about_me: text("about_me"), // Free text "Sobre mim"
   profile_url: text("profile_url"),

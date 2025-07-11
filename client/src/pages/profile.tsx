@@ -36,24 +36,11 @@ import {
   Instagram
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { SERVICE_OPTIONS, CONTRACT_TYPES } from "@shared/constants";
 
-const serviceOptions = [
-  { value: "limpeza", label: "Limpeza Doméstica" },
-  { value: "cozinha", label: "Cozinhar" },
-  { value: "passadoria", label: "Passar Roupa" },
-  { value: "jardinagem", label: "Jardinagem" },
-  { value: "cuidado_criancas", label: "Cuidado de Crianças" },
-  { value: "cuidado_idosos", label: "Cuidado de Idosos" },
-  { value: "compras", label: "Fazer Compras" },
-  { value: "organizacao", label: "Organização" }
-];
+const serviceOptions = SERVICE_OPTIONS;
 
-const contractTypes = [
-  { value: "diarista", label: "Diarista" },
-  { value: "mensalista", label: "Mensalista" },
-  { value: "fixo", label: "Contrato Fixo" },
-  { value: "temporario", label: "Temporário" }
-];
+const contractTypes = CONTRACT_TYPES;
 
 export default function Profile() {
   const [, setLocation] = useLocation();

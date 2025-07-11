@@ -169,11 +169,33 @@ export default function Home() {
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
                       <SelectItem value="todos">Todos os serviços</SelectItem>
-                      <SelectItem value="limpeza">Limpeza Geral</SelectItem>
-                      <SelectItem value="cozinha">Cozinha</SelectItem>
-                      <SelectItem value="lavanderia">Lavanderia</SelectItem>
+                      <SelectItem value="limpeza">Limpeza Doméstica</SelectItem>
+                      <SelectItem value="cozinha">Cozinhar</SelectItem>
+                      <SelectItem value="passadoria">Passar Roupa</SelectItem>
                       <SelectItem value="jardinagem">Jardinagem</SelectItem>
-                      <SelectItem value="cuidados">Cuidados Pessoais</SelectItem>
+                      <SelectItem value="cuidado_criancas">Cuidado de Crianças</SelectItem>
+                      <SelectItem value="cuidado_idosos">Cuidado de Idosos</SelectItem>
+                      <SelectItem value="compras">Fazer Compras</SelectItem>
+                      <SelectItem value="organizacao">Organização</SelectItem>
+                      <SelectItem value="lavanderia">Lavanderia</SelectItem>
+                      <SelectItem value="baba">Babá</SelectItem>
+                      <SelectItem value="decoracao_eventos">Decoração de Eventos</SelectItem>
+                      <SelectItem value="taxista_automovel">Taxista de Automóvel</SelectItem>
+                      <SelectItem value="taxista_mota">Taxista de Mota</SelectItem>
+                      <SelectItem value="cobrador_taxi">Cobrador de Táxi</SelectItem>
+                      <SelectItem value="seguranca">Segurança</SelectItem>
+                      <SelectItem value="pintura">Pintura</SelectItem>
+                      <SelectItem value="carpintaria">Carpintaria</SelectItem>
+                      <SelectItem value="electricista">Electricista</SelectItem>
+                      <SelectItem value="canalizacao">Canalização</SelectItem>
+                      <SelectItem value="costura">Costura</SelectItem>
+                      <SelectItem value="cabeleireiro">Cabeleireiro</SelectItem>
+                      <SelectItem value="manicure">Manicure</SelectItem>
+                      <SelectItem value="massagista">Massagista</SelectItem>
+                      <SelectItem value="professor_particular">Professor Particular</SelectItem>
+                      <SelectItem value="animador_festas">Animador de Festas</SelectItem>
+                      <SelectItem value="fotografo">Fotógrafo</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -188,10 +210,12 @@ export default function Home() {
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
                       <SelectItem value="todos">Todos os contratos</SelectItem>
-                      <SelectItem value="diarista">Diarista</SelectItem>
-                      <SelectItem value="mensal">Mensal</SelectItem>
-                      <SelectItem value="verbal">Acordo Verbal</SelectItem>
-                      <SelectItem value="escrito">Contrato Escrito</SelectItem>
+                      <SelectItem value="tempo_inteiro">Tempo Inteiro</SelectItem>
+                      <SelectItem value="meio_periodo">Meio Período</SelectItem>
+                      <SelectItem value="por_horas">Por Horas</SelectItem>
+                      <SelectItem value="fins_semana">Fins de Semana</SelectItem>
+                      <SelectItem value="eventual">Eventual</SelectItem>
+                      <SelectItem value="freelance">Freelance</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
