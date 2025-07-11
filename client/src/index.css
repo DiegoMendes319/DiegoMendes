@@ -12,31 +12,98 @@
 .tutorial-highlight::before {
   content: '';
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
   background: transparent;
-  border: 3px solid #DC2626;
-  border-radius: 8px;
+  border: 4px solid #DC2626;
+  border-radius: 12px;
   animation: tutorialGlow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.tutorial-highlight::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 16px;
+  animation: tutorialBackglow 2s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes tutorialPulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50% { transform: scale(1.03); }
 }
 
 @keyframes tutorialGlow {
   0%, 100% { 
     border-color: #DC2626;
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8);
   }
   50% { 
     border-color: #EF4444;
-    box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+    box-shadow: 0 0 0 15px rgba(220, 38, 38, 0);
   }
+}
+
+@keyframes tutorialBackglow {
+  0%, 100% { 
+    background: rgba(220, 38, 38, 0.1);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.2);
+  }
+  50% { 
+    background: rgba(220, 38, 38, 0.2);
+    box-shadow: 0 0 0 20px rgba(220, 38, 38, 0);
+  }
+}
+
+/* Tutorial arrow styles */
+.tutorial-arrow {
+  position: absolute;
+  z-index: 52;
+  pointer-events: none;
+}
+
+.tutorial-arrow-up {
+  animation: arrowBounceUp 1.5s ease-in-out infinite;
+}
+
+.tutorial-arrow-down {
+  animation: arrowBounceDown 1.5s ease-in-out infinite;
+}
+
+.tutorial-arrow-left {
+  animation: arrowBounceLeft 1.5s ease-in-out infinite;
+}
+
+.tutorial-arrow-right {
+  animation: arrowBounceRight 1.5s ease-in-out infinite;
+}
+
+@keyframes arrowBounceUp {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes arrowBounceDown {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes arrowBounceLeft {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(-10px); }
+}
+
+@keyframes arrowBounceRight {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(10px); }
 }
 
 /* Onboarding Tutorial Animations */

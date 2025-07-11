@@ -54,7 +54,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     {
       id: "profiles",
       title: "Perfis dos Prestadores",
-      description: "Clique em qualquer perfil para ver mais detalhes, avaliações e informações.",
+      description: "Aqui aparecem os perfis disponíveis. Vou criar um exemplo para si.",
       target: '[data-tutorial="profile-card"]',
       arrow: 'up',
       position: 'bottom'
@@ -210,34 +210,36 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     const rect = element.getBoundingClientRect();
     const scrollY = window.pageYOffset;
     const scrollX = window.pageXOffset;
+    const isMobile = window.innerWidth < 768;
     
-    switch (stepData.position) {
-      case 'top':
+    // Different positions for each step to make it more dynamic
+    switch (currentStep) {
+      case 0: // Filters - top center
         return {
-          top: `${rect.top + scrollY - 140}px`,
+          top: `${rect.top + scrollY - (isMobile ? 180 : 160)}px`,
           left: `${rect.left + scrollX + rect.width / 2}px`,
           transform: 'translateX(-50%)',
           position: 'absolute' as const
         };
-      case 'bottom':
+      case 1: // Profiles - bottom left
         return {
           top: `${rect.bottom + scrollY + 20}px`,
-          left: `${rect.left + scrollX + rect.width / 2}px`,
-          transform: 'translateX(-50%)',
+          left: `${rect.left + scrollX}px`,
+          transform: 'translateX(0)',
           position: 'absolute' as const
         };
-      case 'left':
+      case 2: // Contact - right center
         return {
           top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.left + scrollX - 340}px`,
+          left: `${rect.right + scrollX + (isMobile ? 10 : 20)}px`,
           transform: 'translateY(-50%)',
           position: 'absolute' as const
         };
-      case 'right':
+      case 3: // Register - top right
         return {
-          top: `${rect.top + scrollY + rect.height / 2}px`,
-          left: `${rect.right + scrollX + 20}px`,
-          transform: 'translateY(-50%)',
+          top: `${rect.top + scrollY - (isMobile ? 180 : 160)}px`,
+          left: `${rect.right + scrollX}px`,
+          transform: 'translateX(-100%)',
           position: 'absolute' as const
         };
       default:
@@ -249,11 +251,61 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     if (currentStep === -1) return null;
     
     const stepData = steps[currentStep];
+    const isMobile = window.innerWidth < 768;
+    const arrowSize = isMobile ? "w-8 h-8" : "w-12 h-12";
+    
     switch (stepData.arrow) {
-      case 'up': return <ArrowUp className="w-6 h-6 text-angola-red animate-bounce" />;
-      case 'down': return <ArrowDown className="w-6 h-6 text-angola-red animate-bounce" />;
-      case 'left': return <ArrowLeft className="w-6 h-6 text-angola-red animate-bounce" />;
-      case 'right': return <ArrowRight className="w-6 h-6 text-angola-red animate-bounce" />;
+      case 'up': return <ArrowUp className={`${arrowSize} text-angola-red tutorial-arrow-up`} strokeWidth={3} />;
+      case 'down': return <ArrowDown className={`${arrowSize} text-angola-red tutorial-arrow-down`} strokeWidth={3} />;
+      case 'left': return <ArrowLeft className={`${arrowSize} text-angola-red tutorial-arrow-left`} strokeWidth={3} />;
+      case 'right': return <ArrowRight className={`${arrowSize} text-angola-red tutorial-arrow-right`} strokeWidth={3} />;
+    }
+  };
+
+  const getArrowPosition = () => {
+    if (currentStep === -1) return {};
+    
+    const stepData = steps[currentStep];
+    const element = document.querySelector(stepData.target) as HTMLElement;
+    if (!element) return {};
+    
+    const rect = element.getBoundingClientRect();
+    const scrollY = window.pageYOffset;
+    const scrollX = window.pageXOffset;
+    const isMobile = window.innerWidth < 768;
+    const arrowOffset = isMobile ? 40 : 60;
+    
+    switch (stepData.arrow) {
+      case 'up':
+        return {
+          top: `${rect.bottom + scrollY + 10}px`,
+          left: `${rect.left + scrollX + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+          position: 'absolute' as const
+        };
+      case 'down':
+        return {
+          top: `${rect.top + scrollY - arrowOffset}px`,
+          left: `${rect.left + scrollX + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+          position: 'absolute' as const
+        };
+      case 'left':
+        return {
+          top: `${rect.top + scrollY + rect.height / 2}px`,
+          left: `${rect.right + scrollX + 10}px`,
+          transform: 'translateY(-50%)',
+          position: 'absolute' as const
+        };
+      case 'right':
+        return {
+          top: `${rect.top + scrollY + rect.height / 2}px`,
+          left: `${rect.left + scrollX - arrowOffset}px`,
+          transform: 'translateY(-50%)',
+          position: 'absolute' as const
+        };
+      default:
+        return {};
     }
   };
 
@@ -284,6 +336,16 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 z-50 pointer-events-none" />
+      
+      {/* Giant Arrow */}
+      {currentStep >= 0 && (
+        <div
+          className="fixed z-[58] pointer-events-none tutorial-arrow"
+          style={getArrowPosition()}
+        >
+          {getArrowIcon()}
+        </div>
+      )}
       
       {/* Tutorial Card */}
       <div
@@ -320,7 +382,7 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Bem-vindo ao <strong>Jikulumessu</strong>! 
                   <br />
-                  Em angolano, "Jikulumessu" significa <em>"abre o olho"</em> ou <em>"fica atento"</em>.
+                  "Jikulumessu" significa <em>"abre o olho"</em> ou <em>"fica atento"</em>.
                 </p>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Vou mostrar-lhe como funciona o nosso site para encontrar prestadores de serviços domésticos em Angola.
@@ -354,11 +416,6 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {steps[currentStep].description}
                   </p>
-                </div>
-                
-                {/* Arrow */}
-                <div className="flex justify-center">
-                  {getArrowIcon()}
                 </div>
                 
                 {/* Navigation */}
