@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [newSettingKey, setNewSettingKey] = useState("");
   const [newSettingValue, setNewSettingValue] = useState("");
+  const [editingSettings, setEditingSettings] = useState({});
 
   // Check if user is admin
   const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
@@ -42,31 +43,31 @@ export default function AdminPage() {
   // Admin stats
   const { data: stats } = useQuery({
     queryKey: ['/api/admin/stats'],
-    enabled: isAdmin,
+    enabled: !!isAdmin,
   });
 
   // All users
   const { data: users } = useQuery({
     queryKey: ['/api/admin/users'],
-    enabled: isAdmin,
+    enabled: !!isAdmin,
   });
 
   // Admin logs
   const { data: logs } = useQuery({
     queryKey: ['/api/admin/logs'],
-    enabled: isAdmin,
+    enabled: !!isAdmin,
   });
 
   // Site settings
   const { data: settings } = useQuery({
     queryKey: ['/api/admin/settings'],
-    enabled: isAdmin,
+    enabled: !!isAdmin,
   });
 
   // Analytics
   const { data: analytics } = useQuery({
     queryKey: ['/api/admin/analytics'],
-    enabled: isAdmin,
+    enabled: !!isAdmin,
   });
 
   // Update user role mutation
@@ -495,31 +496,99 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="grid gap-4">
                   {settings?.map((setting: any) => (
-                    <div key={setting.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <div className="font-medium">{setting.key}</div>
-                        <div className="text-sm text-gray-500">{setting.description}</div>
+                    <div key={setting.id} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <div className="font-medium text-base">{setting.description || setting.key}</div>
+                          <div className="text-sm text-gray-500">{setting.key}</div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Atualizado: {formatDate(setting.updated_at)}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Input
-                          value={setting.value}
-                          onChange={(e) => {
-                            const newValue = e.target.value;
-                            // Update immediately on blur or enter
-                            if (newValue !== setting.value) {
+                        {setting.type === 'color' ? (
+                          <div className="flex items-center gap-3 w-full">
+                            <input
+                              type="color"
+                              value={setting.value}
+                              onChange={(e) => {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }}
+                              className="w-12 h-10 border rounded cursor-pointer"
+                            />
+                            <Input
+                              value={setting.value}
+                              onChange={(e) => {
+                                if (e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                                  updateSettingMutation.mutate({
+                                    key: setting.key,
+                                    value: e.target.value
+                                  });
+                                }
+                              }}
+                              className="flex-1"
+                              placeholder="#000000"
+                            />
+                          </div>
+                        ) : setting.type === 'boolean' ? (
+                          <div className="flex items-center gap-3 w-full">
+                            <input
+                              type="checkbox"
+                              checked={setting.value === 'true'}
+                              onChange={(e) => {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.checked ? 'true' : 'false'
+                                });
+                              }}
+                              className="w-5 h-5"
+                            />
+                            <span className="text-sm">
+                              {setting.value === 'true' ? 'Activado' : 'Desactivado'}
+                            </span>
+                          </div>
+                        ) : setting.type === 'number' ? (
+                          <Input
+                            type="number"
+                            value={setting.value}
+                            onChange={(e) => {
                               updateSettingMutation.mutate({
                                 key: setting.key,
-                                value: newValue
+                                value: e.target.value
                               });
-                            }
-                          }}
-                          className="w-64"
-                        />
-                        <div className="text-xs text-gray-500">
-                          {formatDate(setting.updated_at)}
-                        </div>
+                            }}
+                            className="w-full"
+                          />
+                        ) : setting.type === 'email' ? (
+                          <Input
+                            type="email"
+                            value={setting.value}
+                            onChange={(e) => {
+                              updateSettingMutation.mutate({
+                                key: setting.key,
+                                value: e.target.value
+                              });
+                            }}
+                            className="w-full"
+                          />
+                        ) : (
+                          <Input
+                            value={setting.value}
+                            onChange={(e) => {
+                              updateSettingMutation.mutate({
+                                key: setting.key,
+                                value: e.target.value
+                              });
+                            }}
+                            className="w-full"
+                          />
+                        )}
                       </div>
                     </div>
                   ))}

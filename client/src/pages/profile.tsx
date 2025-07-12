@@ -297,20 +297,20 @@ export default function Profile() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
           <Button
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
+            className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10 self-start sm:self-auto"
           >
             <Home className="h-4 w-4 mr-2" />
             Página Inicial
           </Button>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
             <Button
               variant="outline"
               onClick={() => setEditMode(!editMode)}
-              className="text-[var(--angola-red)] border-[var(--angola-red)]"
+              className="text-[var(--angola-red)] border-[var(--angola-red)] text-sm sm:text-base px-3 sm:px-4"
             >
               <Edit className="h-4 w-4 mr-2" />
               {editMode ? 'Cancelar' : 'Editar Perfil'}
@@ -318,7 +318,7 @@ export default function Profile() {
             <Button
               variant="outline"
               onClick={handleSignOut}
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              className="text-red-600 border-red-200 hover:bg-red-50 text-sm sm:text-base px-3 sm:px-4"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sair
@@ -327,11 +327,11 @@ export default function Profile() {
         </div>
 
         {/* Profile Header */}
-        <Card className="mb-6 shadow-lg">
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Avatar className="h-20 w-20">
+        <Card className="mb-4 sm:mb-6 shadow-lg">
+          <CardHeader className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="relative flex-shrink-0 self-center sm:self-auto">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
                   {(formData.profile_url || profile?.profile_url) ? (
                     <img 
                       src={formData.profile_url || profile?.profile_url} 
@@ -339,7 +339,7 @@ export default function Profile() {
                       className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
-                    <AvatarFallback className="text-2xl bg-[var(--angola-red)] text-white">
+                    <AvatarFallback className="text-xl sm:text-2xl bg-[var(--angola-red)] text-white">
                       {userInitials}
                     </AvatarFallback>
                   )}
@@ -355,42 +355,44 @@ export default function Profile() {
                     />
                     <Button
                       size="sm"
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                      className="absolute -bottom-2 -right-2 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
                       onClick={() => document.getElementById('profile-image-upload')?.click()}
                     >
-                      <Camera className="h-4 w-4" />
+                      <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 )}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-center sm:text-left">
                 {editMode ? (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Input
                       value={formData.first_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                       placeholder="Primeiro nome"
+                      className="text-sm sm:text-base"
                     />
                     <Input
                       value={formData.last_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                       placeholder="Último nome"
+                      className="text-sm sm:text-base"
                     />
                   </div>
                 ) : (
-                  <CardTitle className="text-2xl text-[var(--angola-red)]">
+                  <CardTitle className="text-xl sm:text-2xl text-[var(--angola-red)]">
                     {profile ? `${profile.first_name} ${profile.last_name}` : user.email}
                   </CardTitle>
                 )}
-                <p className="text-gray-600 dark:text-gray-300 flex items-center mt-1">
-                  <Mail className="h-4 w-4 mr-2" />
-                  {user.email}
+                <p className="text-gray-600 dark:text-gray-300 flex items-center justify-center sm:justify-start mt-1 text-sm sm:text-base">
+                  <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{user.email}</span>
                 </p>
                 {profile?.rating && (
-                  <div className="flex items-center mt-2">
+                  <div className="flex items-center justify-center sm:justify-start mt-2">
                     <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                    <span className="font-semibold">{profile.rating.toFixed(1)}</span>
-                    <span className="text-gray-500 ml-1">({profile.review_count} avaliações)</span>
+                    <span className="font-semibold text-sm sm:text-base">{profile.rating.toFixed(1)}</span>
+                    <span className="text-gray-500 ml-1 text-sm">({profile.review_count} avaliações)</span>
                   </div>
                 )}
               </div>
@@ -398,7 +400,7 @@ export default function Profile() {
                 <Button 
                   onClick={handleSaveProfile}
                   disabled={updateProfileMutation.isPending}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 w-full sm:w-auto mt-2 sm:mt-0"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Guardar
@@ -410,31 +412,31 @@ export default function Profile() {
 
         {/* Profile Content */}
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="details">Detalhes</TabsTrigger>
-            <TabsTrigger value="services">Serviços</TabsTrigger>
-            <TabsTrigger value="settings">Configurações</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="details" className="text-xs sm:text-sm py-2 sm:py-3">Detalhes</TabsTrigger>
+            <TabsTrigger value="services" className="text-xs sm:text-sm py-2 sm:py-3">Serviços</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm py-2 sm:py-3">Configurações</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="details" className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-6">
+          <TabsContent value="details" className="space-y-3 sm:space-y-4 mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="h-5 w-5 mr-2" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Informações Pessoais
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
                   {editMode ? (
                     <>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Telefone <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <span className="text-gray-500 dark:text-gray-400">+244</span>
+                            <span className="text-gray-500 dark:text-gray-400 text-sm">+244</span>
                           </div>
                           <Input
                             value={formData.phone}
@@ -445,24 +447,25 @@ export default function Profile() {
                               setFormData(prev => ({ ...prev, phone: formatted }));
                             }}
                             placeholder="9XX XXX XXX"
-                            className="pl-14"
+                            className="pl-12 sm:pl-14 text-sm sm:text-base"
                             required
                           />
                         </div>
                       </div>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Data de Nascimento <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           type="date"
                           value={formData.date_of_birth}
                           onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                          className="text-sm sm:text-base"
                           required
                         />
                       </div>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Localização <span className="text-red-500">*</span>
                         </Label>
                         <LocationSelector
@@ -475,13 +478,14 @@ export default function Profile() {
                         />
                       </div>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Complemento de Endereço <span className="text-gray-500">(opcional)</span>
                         </Label>
                         <Input
                           value={formData.address_complement}
                           onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
                           placeholder="Apartamento, Bloco, etc."
+                          className="text-sm sm:text-base"
                         />
                       </div>
                     </>
@@ -489,20 +493,26 @@ export default function Profile() {
                     <>
                       {profile?.phone && (
                         <div className="flex items-center">
-                          <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>+244 {profile.phone}</span>
+                          <Phone className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm sm:text-base">+244 {profile.phone}</span>
                         </div>
                       )}
                       {profile?.date_of_birth && (
                         <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>{new Date(profile.date_of_birth).toLocaleDateString('pt-PT')}</span>
+                          <Calendar className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm sm:text-base">{new Date(profile.date_of_birth).toLocaleDateString('pt-PT')}</span>
                         </div>
                       )}
                       {(profile?.province || profile?.municipality || profile?.neighborhood) && (
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>{[profile?.neighborhood, profile?.municipality, profile?.province].filter(Boolean).join(', ')}</span>
+                        <div className="flex items-start">
+                          <MapPin className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm sm:text-base">{[profile?.neighborhood, profile?.municipality, profile?.province].filter(Boolean).join(', ')}</span>
+                        </div>
+                      )}
+                      {profile?.address_complement && (
+                        <div className="flex items-start">
+                          <Home className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm sm:text-base">{profile.address_complement}</span>
                         </div>
                       )}
                     </>
@@ -511,21 +521,21 @@ export default function Profile() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Briefcase className="h-5 w-5 mr-2" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Informações Profissionais
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
                   {editMode ? (
                     <>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Tipo de Contrato <span className="text-red-500">*</span>
                         </Label>
                         <Select value={formData.contract_type} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}>
-                          <SelectTrigger>
+                          <SelectTrigger className="text-sm sm:text-base">
                             <SelectValue placeholder="Seleccione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -538,23 +548,25 @@ export default function Profile() {
                         </Select>
                       </div>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Disponibilidade <span className="text-gray-500">(opcional)</span>
                         </Label>
                         <Textarea
                           value={formData.availability}
                           onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
                           placeholder="Ex: Segunda a Sexta, 8h-17h"
+                          className="text-sm sm:text-base min-h-[60px] sm:min-h-[80px]"
                         />
                       </div>
                       <div>
-                        <Label>
+                        <Label className="text-sm sm:text-base">
                           Sobre Mim <span className="text-gray-500">(opcional)</span>
                         </Label>
                         <Textarea
                           value={formData.about_me}
                           onChange={(e) => setFormData(prev => ({ ...prev, about_me: e.target.value }))}
                           placeholder="Conte-nos um pouco sobre você..."
+                          className="text-sm sm:text-base min-h-[60px] sm:min-h-[80px]"
                         />
                       </div>
                     </>
@@ -562,20 +574,20 @@ export default function Profile() {
                     <>
                       {profile?.contract_type && (
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Tipo de Contrato</label>
-                          <p className="capitalize">{profile.contract_type}</p>
+                          <label className="text-xs sm:text-sm font-medium text-gray-500">Tipo de Contrato</label>
+                          <p className="capitalize text-sm sm:text-base">{profile.contract_type}</p>
                         </div>
                       )}
                       {profile?.availability && (
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Disponibilidade</label>
-                          <p>{profile.availability}</p>
+                          <label className="text-xs sm:text-sm font-medium text-gray-500">Disponibilidade</label>
+                          <p className="text-sm sm:text-base">{profile.availability}</p>
                         </div>
                       )}
                       {profile?.about_me && (
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Sobre Mim</label>
-                          <p className="text-gray-700 dark:text-gray-300">{profile.about_me}</p>
+                          <label className="text-xs sm:text-sm font-medium text-gray-500">Sobre Mim</label>
+                          <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">{profile.about_me}</p>
                         </div>
                       )}
                     </>
@@ -585,17 +597,17 @@ export default function Profile() {
             </div>
           </TabsContent>
 
-          <TabsContent value="services">
+          <TabsContent value="services" className="mt-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Briefcase className="h-5 w-5 mr-2" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Serviços Oferecidos <span className="text-red-500">*</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 {editMode ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     {serviceOptions.map(service => (
                       <div key={service.value} className="flex items-center space-x-2">
                         <Checkbox
@@ -603,19 +615,19 @@ export default function Profile() {
                           checked={formData.services.includes(service.value)}
                           onCheckedChange={() => handleServiceToggle(service.value)}
                         />
-                        <Label htmlFor={service.value} className="text-sm">
+                        <Label htmlFor={service.value} className="text-xs sm:text-sm">
                           {service.label}
                         </Label>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
                     {profile?.services?.length > 0 ? (
                       profile.services.map((service: string, index: number) => {
                         const serviceLabel = serviceOptions.find(opt => opt.value === service)?.label || service;
                         return (
-                          <Badge key={index} variant="secondary">
+                          <Badge key={index} variant="secondary" className="text-xs sm:text-sm">
                             {serviceLabel}
                           </Badge>
                         );
@@ -631,39 +643,40 @@ export default function Profile() {
 
 
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="mt-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Zona Perigosa</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-red-600 text-base sm:text-lg">Zona Perigosa</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-4 sm:p-6">
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <h3 className="font-medium text-red-600 mb-2">Eliminar Conta</h3>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <h3 className="font-medium text-red-600 mb-2 text-sm sm:text-base">Eliminar Conta</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-4">
                       Esta acção é irreversível. Todos os seus dados serão permanentemente eliminados.
                     </p>
                     <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+                        <Button variant="destructive" className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
                           <Trash2 className="h-4 w-4 mr-2" />
                           Eliminar Conta
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="mx-4 sm:mx-0">
                         <DialogHeader>
-                          <DialogTitle>Tem a certeza?</DialogTitle>
+                          <DialogTitle className="text-base sm:text-lg">Tem a certeza?</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
-                          <p>Esta acção não pode ser desfeita. Isto irá eliminar permanentemente a sua conta e todos os dados associados.</p>
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                          <p className="text-xs sm:text-sm">Esta acção não pode ser desfeita. Isto irá eliminar permanentemente a sua conta e todos os dados associados.</p>
+                          <div className="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="w-full sm:w-auto">
                               Cancelar
                             </Button>
                             <Button 
                               variant="destructive" 
                               onClick={handleDeleteAccount}
                               disabled={deleteAccountMutation.isPending}
+                              className="w-full sm:w-auto"
                             >
                               {deleteAccountMutation.isPending ? 'A eliminar...' : 'Sim, eliminar'}
                             </Button>

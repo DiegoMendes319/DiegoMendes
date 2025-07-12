@@ -125,7 +125,79 @@ export class MemStorage implements IStorage {
     this.usersByEmail.set(adminUser.email, adminUser);
     this.usersByAuthId.set(adminUser.auth_user_id, adminUser);
     
+    // Initialize default site settings
+    this.initializeDefaultSettings();
+    
     console.log("MemStorage initialized with admin user: admin@jikulumessu.com / admin123");
+  }
+
+  private initializeDefaultSettings() {
+    const defaultSettings = [
+      {
+        key: "site_name",
+        value: "Jikulumessu",
+        description: "Nome do site",
+        type: "text"
+      },
+      {
+        key: "site_description", 
+        value: "Portal de prestadores de serviços em Angola",
+        description: "Descrição do site",
+        type: "text"
+      },
+      {
+        key: "primary_color",
+        value: "#dc2626",
+        description: "Cor primária do site",
+        type: "color"
+      },
+      {
+        key: "secondary_color",
+        value: "#facc15",
+        description: "Cor secundária do site",
+        type: "color"
+      },
+      {
+        key: "contact_email",
+        value: "d2413175@gmail.com",
+        description: "Email de contacto principal",
+        type: "email"
+      },
+      {
+        key: "max_users_per_page",
+        value: "20",
+        description: "Número máximo de utilizadores por página",
+        type: "number"
+      },
+      {
+        key: "enable_registration",
+        value: "true",
+        description: "Permitir novos registos",
+        type: "boolean"
+      },
+      {
+        key: "maintenance_mode",
+        value: "false",
+        description: "Modo de manutenção",
+        type: "boolean"
+      }
+    ];
+
+    defaultSettings.forEach(setting => {
+      const siteSettingId = crypto.randomUUID();
+      const siteSetting = {
+        id: siteSettingId,
+        key: setting.key,
+        value: setting.value,
+        description: setting.description,
+        type: setting.type,
+        created_at: new Date(),
+        updated_at: new Date(),
+        updated_by: "admin-test-user",
+      };
+      
+      this.siteSettings.set(setting.key, siteSetting);
+    });
   }
 
   // Tutorial-specific methods
