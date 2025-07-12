@@ -83,7 +83,9 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Create admin user for testing
+    // Create admin user for testing - using synchronous hash (not recommended for production)
+    const adminPassword = bcrypt.hashSync("admin123", 10);
+    
     const adminUser = {
       id: "admin-test-user",
       auth_user_id: "admin-test-auth",
@@ -106,7 +108,7 @@ export class MemStorage implements IStorage {
       tiktok_url: null,
       address_complement: "Sede da Jikulumessu",
       about_me: "Administrador principal da plataforma",
-      password: "$2b$10$4V9PjTUx9I5/hI6EkKcN2uKgaYNHtP1MRVLhRJvQKNJmZYrKNMOAK", // "admin123"
+      password: adminPassword,
       rating: 5.0,
       review_count: 0,
       average_rating: 5.0,
@@ -358,17 +360,28 @@ export class MemStorage implements IStorage {
 
   // Authentication methods
   async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
+    console.log(`Authenticating user with email: ${email}`);
+    
     const user = this.usersByEmail.get(email.toLowerCase());
     
-    if (!user || !user.password) {
+    if (!user) {
+      console.log(`User not found for email: ${email}`);
+      return null;
+    }
+    
+    if (!user.password) {
+      console.log(`User found but no password set for email: ${email}`);
       return null;
     }
 
+    console.log(`Verifying password for user: ${email}`);
     const isValidPassword = await this.verifyPassword(password, user.password);
     if (!isValidPassword) {
+      console.log(`Invalid password for user: ${email}`);
       return null;
     }
 
+    console.log(`Authentication successful for user: ${email}`);
     // Create session
     const sessionToken = this.generateSessionToken();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
