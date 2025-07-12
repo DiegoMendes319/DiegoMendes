@@ -11,6 +11,7 @@ import Login from "@/pages/login";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import AdminPanel from "@/pages/admin";
+import AdminLogin from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
 import MaintenancePage from "@/pages/maintenance";
 import Footer from "@/components/footer";
@@ -44,7 +45,8 @@ function Router() {
   });
 
   // Show maintenance page if maintenance mode is active
-  if (maintenanceMode) {
+  // But allow access to admin login page
+  if (maintenanceMode && window.location.pathname !== '/admin-login') {
     return <MaintenancePage />;
   }
   
@@ -65,6 +67,7 @@ function Router() {
           <Route path="/privacy" component={Privacy} />
           <Route path="/security" component={Security} />
           <Route path="/admin" component={AdminPanel} />
+          <Route path="/admin-login" component={AdminLogin} />
           <Route component={NotFound} />
         </Switch>
       </main>

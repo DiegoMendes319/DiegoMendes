@@ -218,6 +218,10 @@
   --angola-black: hsl(0, 0%, 12%);
   --angola-yellow: hsl(51, 100%, 50%);
   --angola-yellow-dark: hsl(51, 100%, 45%);
+  
+  /* Dynamic site colors */
+  --dynamic-primary: #dc2626;
+  --dynamic-secondary: #facc15;
 }
 
 .dark {

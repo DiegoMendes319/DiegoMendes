@@ -51,6 +51,11 @@ app.use(async (req, res, next) => {
     const isMaintenanceMode = maintenanceSetting?.value === 'true';
     
     if (isMaintenanceMode) {
+      // Allow access to admin login page
+      if (req.path === '/admin-login') {
+        return next();
+      }
+      
       // Check if user is admin
       const sessionToken = req.cookies?.session_token;
       if (sessionToken) {

@@ -8,6 +8,7 @@ import ThemeToggle from "./theme-toggle";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
+  const { getSetting } = useSiteSettings();
 
   const isActive = (path: string) => {
     return location === path;
@@ -73,7 +75,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center space-x-3">
               <JikulumessuIcon size="lg" className="text-white" />
               <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                Jikulumessu
+                {getSetting('site_name', 'Jikulumessu')}
               </span>
             </Link>
           </div>

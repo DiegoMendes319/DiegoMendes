@@ -51,7 +51,7 @@ export default function MaintenancePage() {
           {/* Footer */}
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-              Feito com <Heart className="w-3 h-3 text-red-500" /> pela equipa Jikulumessu
+              Feito com <Heart className="w-3 h-3 text-red-500" /> pela equipa <span className="cursor-pointer select-none" onClick={() => window.location.href = '/admin-login'}>Jikulumessu</span>
             </p>
           </div>
         </div>
