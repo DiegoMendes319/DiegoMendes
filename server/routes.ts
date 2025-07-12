@@ -799,6 +799,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Maintenance mode check endpoint
+  app.get("/api/maintenance-mode", async (req, res) => {
+    try {
+      const maintenanceSetting = await storage.getSiteSetting('maintenance_mode');
+      const isEnabled = maintenanceSetting?.value === 'true';
+      res.json({ enabled: isEnabled });
+    } catch (error) {
+      console.error('Error checking maintenance mode:', error);
+      res.json({ enabled: false });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

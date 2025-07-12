@@ -1,6 +1,6 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -12,6 +12,7 @@ import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import AdminPanel from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import MaintenancePage from "@/pages/maintenance";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import About from "@/pages/about";
@@ -23,6 +24,29 @@ import Security from "@/pages/security";
 
 function Router() {
   useScrollToTop(); // Automatically scroll to top on route changes
+  
+  // Check if maintenance mode is active
+  const { data: maintenanceMode } = useQuery({
+    queryKey: ['/api/maintenance-mode'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/maintenance-mode');
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.enabled;
+      } catch (error) {
+        console.error('Error checking maintenance mode:', error);
+        return false;
+      }
+    },
+    refetchInterval: 30000, // Check every 30 seconds
+    retry: 1,
+  });
+
+  // Show maintenance page if maintenance mode is active
+  if (maintenanceMode) {
+    return <MaintenancePage />;
+  }
   
   return (
     <div className="min-h-screen flex flex-col">

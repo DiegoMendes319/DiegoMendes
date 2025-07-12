@@ -756,6 +756,7 @@ export class MemStorage implements IStorage {
   }
 
   async updateSiteSetting(key: string, value: string): Promise<SiteSetting> {
+    console.log(`Updating setting ${key} to ${value}`);
     const existing = this.siteSettings.get(key);
     const setting: SiteSetting = {
       id: existing?.id || crypto.randomUUID(),
@@ -763,11 +764,13 @@ export class MemStorage implements IStorage {
       value,
       type: existing?.type || 'text',
       description: existing?.description || null,
+      created_at: existing?.created_at || new Date(),
       updated_at: new Date(),
       updated_by: null,
     };
     
     this.siteSettings.set(key, setting);
+    console.log(`Setting ${key} updated successfully`);
     return setting;
   }
 

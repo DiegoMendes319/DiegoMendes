@@ -524,8 +524,16 @@ export default function AdminPage() {
                             />
                             <Input
                               value={setting.value}
-                              onChange={(e) => {
+                              onBlur={(e) => {
                                 if (e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                                  updateSettingMutation.mutate({
+                                    key: setting.key,
+                                    value: e.target.value
+                                  });
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) {
                                   updateSettingMutation.mutate({
                                     key: setting.key,
                                     value: e.target.value
@@ -557,11 +565,21 @@ export default function AdminPage() {
                           <Input
                             type="number"
                             value={setting.value}
-                            onChange={(e) => {
-                              updateSettingMutation.mutate({
-                                key: setting.key,
-                                value: e.target.value
-                              });
+                            onBlur={(e) => {
+                              if (e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
                             }}
                             className="w-full"
                           />
@@ -569,22 +587,42 @@ export default function AdminPage() {
                           <Input
                             type="email"
                             value={setting.value}
-                            onChange={(e) => {
-                              updateSettingMutation.mutate({
-                                key: setting.key,
-                                value: e.target.value
-                              });
+                            onBlur={(e) => {
+                              if (e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
                             }}
                             className="w-full"
                           />
                         ) : (
                           <Input
                             value={setting.value}
-                            onChange={(e) => {
-                              updateSettingMutation.mutate({
-                                key: setting.key,
-                                value: e.target.value
-                              });
+                            onBlur={(e) => {
+                              if (e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.target.value !== setting.value) {
+                                updateSettingMutation.mutate({
+                                  key: setting.key,
+                                  value: e.target.value
+                                });
+                              }
                             }}
                             className="w-full"
                           />
