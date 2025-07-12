@@ -80,15 +80,15 @@ export default function Login() {
       }
       throw new Error('Método de login inválido');
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast({
         title: "Login realizado com sucesso!",
         description: `Bem-vindo de volta, ${data.user?.name || ''}!`,
       });
       
-      setTimeout(() => {
-        window.location.href = "/profile";
-      }, 1500);
+      // Refresh user context after successful login
+      await new Promise(resolve => setTimeout(resolve, 500));
+      window.location.href = "/profile";
     },
     onError: (error) => {
       toast({

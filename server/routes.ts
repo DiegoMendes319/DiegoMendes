@@ -272,13 +272,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const filters = searchFiltersSchema.parse(req.query);
       
+      let users;
       if (Object.keys(filters).length === 0) {
-        const users = await storage.getAllUsers();
-        res.json(users);
+        users = await storage.getAllUsers();
       } else {
-        const users = await storage.searchUsers(filters);
-        res.json(users);
+        users = await storage.searchUsers(filters);
       }
+      
+      // Remove passwords from response for security
+      const usersWithoutPasswords = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(usersWithoutPasswords);
     } catch (error) {
       res.status(400).json({ 
         message: "Invalid search parameters",
@@ -332,7 +339,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userData = insertUserSchema.parse(req.body);
       const user = await storage.createUser(userData);
-      res.status(201).json(user);
+      
+      // Remove password from response for security
+      const { password, ...userWithoutPassword } = user;
+      
+      res.status(201).json(userWithoutPassword);
     } catch (error) {
       res.status(400).json({ 
         message: "Invalid user data",

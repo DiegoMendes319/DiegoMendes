@@ -125,6 +125,12 @@ export class MemStorage implements IStorage {
     const id = crypto.randomUUID();
     const dateOfBirth = insertUser.date_of_birth ? new Date(insertUser.date_of_birth) : new Date('1990-01-01');
     
+    // Hash password if provided
+    let hashedPassword: string | null = null;
+    if (insertUser.password) {
+      hashedPassword = await this.hashPassword(insertUser.password);
+    }
+    
     const user: User = {
       ...insertUser,
       id,
@@ -138,7 +144,7 @@ export class MemStorage implements IStorage {
       facebook_url: insertUser.facebook_url || null,
       instagram_url: insertUser.instagram_url || null,
       tiktok_url: insertUser.tiktok_url || null,
-      password: insertUser.password || null,
+      password: hashedPassword,
       average_rating: 0,
       total_reviews: 0,
       // Computed fields
@@ -148,7 +154,7 @@ export class MemStorage implements IStorage {
     
     this.users.set(id, user);
     if (user.email) {
-      this.usersByEmail.set(user.email, user);
+      this.usersByEmail.set(user.email.toLowerCase(), user);
     }
     if (user.auth_user_id) {
       this.usersByAuthId.set(user.auth_user_id, user);
