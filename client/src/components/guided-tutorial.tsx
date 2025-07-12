@@ -37,26 +37,26 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
   const steps: TutorialStep[] = [
     {
       id: "filters",
-      title: "🔍 Filtros de Pesquisa",
-      description: "Aqui pode procurar prestadores por localização, tipo de serviço e contrato. Use estes filtros para encontrar exactamente o que precisa.",
+      title: "🔍 Filtros",
+      description: "Procure por localização, serviço e tipo de contrato.",
       target: '[data-tutorial="search-filters"]',
       arrow: 'down',
       position: 'top'
     },
     {
       id: "profiles",
-      title: "👤 Prestadores Disponíveis",
-      description: "Aqui aparecem os prestadores disponíveis na sua região. Quando há profissionais registados, verá os seus perfis com informações como localização, serviços oferecidos e avaliações de outros clientes.",
+      title: "👤 Prestadores",
+      description: "Veja aqui os perfis dos prestadores disponíveis.",
       target: '[data-tutorial="profiles-area"]',
       arrow: 'up',
       position: 'bottom'
     },
     {
       id: "register",
-      title: isMobile() ? "📱 Menu e Registo" : "📝 Registar-se",
+      title: isMobile() ? "📱 Menu" : "📝 Registar",
       description: isMobile() 
-        ? "Clique no menu hambúrguer (≡) no canto superior direito e depois em 'Registar' para criar o seu perfil profissional!"
-        : "Clique aqui para se registar e criar o seu próprio perfil profissional. É rápido e gratuito!",
+        ? "Clique no menu (≡) e depois em 'Registar'."
+        : "Clique para criar o seu perfil profissional.",
       target: isMobile() ? '[data-tutorial="mobile-menu"]' : '[data-tutorial="register-link"]',
       arrow: 'down',
       position: 'top'
@@ -343,11 +343,11 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
       
       {/* Tutorial Card */}
       <div
-        className="fixed z-[60] pointer-events-auto w-[calc(100vw-2rem)] max-w-sm mx-4 sm:mx-0 sm:w-96 tutorial-tooltip"
+        className="fixed z-[60] pointer-events-auto w-[calc(100vw-2rem)] max-w-xs mx-4 sm:mx-0 sm:w-80 tutorial-tooltip"
         style={getTooltipPosition()}
       >
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-[var(--angola-red)] max-h-[80vh] overflow-y-auto">
-          <div className="p-4 sm:p-6">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-[var(--angola-red)] max-h-[60vh] overflow-y-auto">
+          <div className="p-3 sm:p-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
@@ -368,34 +368,32 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
             
             {/* Introduction */}
             {currentStep === -1 && (
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-2 shadow-lg">
-                  <span className="text-3xl">👋</span>
+              <div className="text-center space-y-3">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-2 shadow-lg">
+                  <span className="text-2xl">👋</span>
                 </div>
-                <h3 className="font-bold text-xl sm:text-2xl text-gray-800">
+                <h3 className="font-bold text-lg sm:text-xl text-gray-800">
                   Olá! Sou o Jiku
                 </h3>
-                <div className="bg-blue-50/50 p-4 rounded-lg">
-                  <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                    Bem-vindo ao <strong>Jikulumessu</strong>! 
-                    <br />
-                    "Jikulumessu" significa <em>"abre o olho"</em> ou <em>"fica atento"</em>.
+                <div className="bg-blue-50/50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    Bem-vindo ao <strong>Jikulumessu</strong>!
                   </p>
                 </div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Vou mostrar-lhe como funciona o nosso site para encontrar prestadores de serviços em Angola.
+                <p className="text-sm text-gray-600">
+                  Vou mostrar como funciona o site.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   <Button
                     onClick={startTutorial}
-                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex-1 shadow-lg"
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex-1 shadow-lg py-2 text-sm"
                   >
                     Começar Tour
                   </Button>
                   <Button
                     onClick={skipTutorial}
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 py-2 text-sm"
                   >
                     Saltar
                   </Button>
@@ -405,35 +403,35 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
             
             {/* Tutorial Steps */}
             {currentStep >= 0 && (
-              <div className="space-y-4">
-                <div className="space-y-4">
+              <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
-                      <span className="text-2xl">
+                    <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-2">
+                      <span className="text-xl">
                         {steps[currentStep].title.split(' ')[0]}
                       </span>
                     </div>
-                    <h3 className="font-bold text-lg sm:text-xl text-gray-800 mb-3">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-800 mb-2">
                       {steps[currentStep].title.substring(2)}
                     </h3>
                   </div>
-                  <div className="bg-blue-50/50 p-4 rounded-lg">
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                  <div className="bg-blue-50/50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-700">
                       {steps[currentStep].description}
                     </p>
                   </div>
                 </div>
                 
                 {/* Navigation */}
-                <div className="flex justify-between items-center pt-4">
+                <div className="flex justify-between items-center pt-2">
                   <Button
                     onClick={prevStep}
                     variant="outline"
                     size="sm"
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-1 px-3 py-1 text-xs"
                     disabled={isAnimating}
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-3 h-3" />
                     <span className="hidden sm:inline">Anterior</span>
                   </Button>
                   
@@ -453,17 +451,17 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                       onClick={skipTutorial}
                       variant="ghost"
                       size="sm"
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 px-3 py-1 text-xs"
                       disabled={isAnimating}
                     >
-                      <SkipForward className="w-4 h-4" />
+                      <SkipForward className="w-3 h-3" />
                       <span className="hidden sm:inline">Saltar</span>
                     </Button>
                     
                     {currentStep === steps.length - 1 ? (
                       <Button
                         onClick={handleComplete}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex items-center gap-1"
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex items-center gap-1 px-3 py-1 text-xs"
                         disabled={isAnimating}
                       >
                         <span className="hidden sm:inline">Concluir</span>
@@ -472,12 +470,12 @@ export default function GuidedTutorial({ isOpen, onClose, onComplete }: GuidedTu
                     ) : (
                       <Button
                         onClick={nextStep}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex items-center gap-1"
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex items-center gap-1 px-3 py-1 text-xs"
                         disabled={isAnimating}
                       >
                         <span className="hidden sm:inline">Próximo</span>
                         <span className="sm:hidden">OK</span>
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-3 h-3" />
                       </Button>
                     )}
                   </div>
