@@ -1,4 +1,4 @@
-import { users, reviews, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview } from "@shared/schema";
+import { users, reviews, admin_logs, site_settings, site_analytics, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics } from "@shared/schema";
 import { eq, and, ilike, or, sql, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
@@ -35,6 +35,29 @@ export interface IStorage {
   getReviewsForUser(userId: string): Promise<Review[]>;
   updateUserRating(userId: string): Promise<void>;
   deleteReview(reviewId: string): Promise<boolean>;
+  
+  // Admin methods
+  isAdmin(userId: string): Promise<boolean>;
+  logAdminAction(log: InsertAdminLog): Promise<AdminLog>;
+  getAdminLogs(limit?: number): Promise<AdminLog[]>;
+  getUserStats(): Promise<{
+    total: number;
+    active: number;
+    suspended: number;
+    admins: number;
+    newToday: number;
+  }>;
+  updateUserRole(userId: string, role: string): Promise<User | undefined>;
+  updateUserStatus(userId: string, status: string): Promise<User | undefined>;
+  
+  // Site settings
+  getSiteSettings(): Promise<SiteSetting[]>;
+  getSiteSetting(key: string): Promise<SiteSetting | undefined>;
+  updateSiteSetting(key: string, value: string): Promise<SiteSetting>;
+  
+  // Analytics
+  getAnalytics(days?: number): Promise<SiteAnalytics[]>;
+  recordAnalytics(data: InsertAnalytics): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -43,6 +66,9 @@ export class MemStorage implements IStorage {
   private usersByAuthId: Map<string, User>;
   private sessions: Map<string, { userId: string; expiresAt: Date }>;
   private reviews: Map<string, Review>;
+  private adminLogs: Map<string, AdminLog>;
+  private siteSettings: Map<string, SiteSetting>;
+  private analytics: Map<string, SiteAnalytics>;
 
   constructor() {
     this.users = new Map();
@@ -50,12 +76,54 @@ export class MemStorage implements IStorage {
     this.usersByAuthId = new Map();
     this.sessions = new Map();
     this.reviews = new Map();
+    this.adminLogs = new Map();
+    this.siteSettings = new Map();
+    this.analytics = new Map();
     this.initializeSampleData();
   }
 
   private initializeSampleData() {
-    // No sample data - only real registered users
-    console.log("MemStorage initialized with empty data");
+    // Create admin user for testing
+    const adminUser = {
+      id: "admin-test-user",
+      auth_user_id: "admin-test-auth",
+      email: "admin@jikulumessu.com",
+      first_name: "Admin",
+      last_name: "Jikulumessu",
+      phone: "+244 900 000 000",
+      date_of_birth: new Date("1990-01-01"),
+      province: "Luanda",
+      municipality: "Luanda",
+      neighborhood: "Maianga",
+      services: ["administração"],
+      contract_type: "permanente",
+      availability: "24/7",
+      bio: "Administrador do sistema Jikulumessu",
+      profile_image: null,
+      profile_url: null,
+      facebook_url: null,
+      instagram_url: null,
+      tiktok_url: null,
+      address_complement: "Sede da Jikulumessu",
+      about_me: "Administrador principal da plataforma",
+      password: "$2b$10$4V9PjTUx9I5/hI6EkKcN2uKgaYNHtP1MRVLhRJvQKNJmZYrKNMOAK", // "admin123"
+      rating: 5.0,
+      review_count: 0,
+      average_rating: 5.0,
+      total_reviews: 0,
+      role: "super_admin",
+      status: "active",
+      created_at: new Date(),
+      updated_at: new Date(),
+      name: "Admin Jikulumessu",
+      age: 34
+    };
+
+    this.users.set(adminUser.id, adminUser);
+    this.usersByEmail.set(adminUser.email, adminUser);
+    this.usersByAuthId.set(adminUser.auth_user_id, adminUser);
+    
+    console.log("MemStorage initialized with admin user: admin@jikulumessu.com / admin123");
   }
 
   // Tutorial-specific methods
@@ -513,6 +581,130 @@ export class MemStorage implements IStorage {
     this.reviews.delete(reviewId);
     await this.updateUserRating(review.reviewee_id);
     return true;
+  }
+
+  // Admin methods implementation
+  async isAdmin(userId: string): Promise<boolean> {
+    const user = this.users.get(userId);
+    return user?.role === 'admin' || user?.role === 'super_admin';
+  }
+
+  async logAdminAction(log: InsertAdminLog): Promise<AdminLog> {
+    const id = crypto.randomUUID();
+    const adminLog: AdminLog = {
+      ...log,
+      id,
+      created_at: new Date(),
+    };
+    
+    this.adminLogs.set(id, adminLog);
+    return adminLog;
+  }
+
+  async getAdminLogs(limit: number = 100): Promise<AdminLog[]> {
+    return Array.from(this.adminLogs.values())
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, limit);
+  }
+
+  async getUserStats(): Promise<{
+    total: number;
+    active: number;
+    suspended: number;
+    admins: number;
+    newToday: number;
+  }> {
+    const users = Array.from(this.users.values());
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return {
+      total: users.length,
+      active: users.filter(u => u.status === 'active').length,
+      suspended: users.filter(u => u.status === 'suspended').length,
+      admins: users.filter(u => u.role === 'admin' || u.role === 'super_admin').length,
+      newToday: users.filter(u => u.created_at >= today).length,
+    };
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (!user) return undefined;
+
+    const updatedUser = { ...user, role };
+    this.users.set(userId, updatedUser);
+    
+    if (user.email) {
+      this.usersByEmail.set(user.email.toLowerCase(), updatedUser);
+    }
+    if (user.auth_user_id) {
+      this.usersByAuthId.set(user.auth_user_id, updatedUser);
+    }
+    
+    return updatedUser;
+  }
+
+  async updateUserStatus(userId: string, status: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (!user) return undefined;
+
+    const updatedUser = { ...user, status };
+    this.users.set(userId, updatedUser);
+    
+    if (user.email) {
+      this.usersByEmail.set(user.email.toLowerCase(), updatedUser);
+    }
+    if (user.auth_user_id) {
+      this.usersByAuthId.set(user.auth_user_id, updatedUser);
+    }
+    
+    return updatedUser;
+  }
+
+  // Site settings
+  async getSiteSettings(): Promise<SiteSetting[]> {
+    return Array.from(this.siteSettings.values());
+  }
+
+  async getSiteSetting(key: string): Promise<SiteSetting | undefined> {
+    return this.siteSettings.get(key);
+  }
+
+  async updateSiteSetting(key: string, value: string): Promise<SiteSetting> {
+    const existing = this.siteSettings.get(key);
+    const setting: SiteSetting = {
+      id: existing?.id || crypto.randomUUID(),
+      key,
+      value,
+      type: existing?.type || 'text',
+      description: existing?.description || null,
+      updated_at: new Date(),
+      updated_by: null,
+    };
+    
+    this.siteSettings.set(key, setting);
+    return setting;
+  }
+
+  // Analytics
+  async getAnalytics(days: number = 30): Promise<SiteAnalytics[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    return Array.from(this.analytics.values())
+      .filter(a => new Date(a.date) >= startDate)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  async recordAnalytics(data: InsertAnalytics): Promise<void> {
+    const id = crypto.randomUUID();
+    const analytics: SiteAnalytics = {
+      ...data,
+      id,
+      created_at: new Date(),
+    };
+    
+    this.analytics.set(id, analytics);
   }
 }
 

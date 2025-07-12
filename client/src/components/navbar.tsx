@@ -1,17 +1,19 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Home, LogIn, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, User, Home, LogIn, LogOut, ChevronDown, Shield } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import JikulumessuIcon from "./jikulumessu-icon";
 import ThemeToggle from "./theme-toggle";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdmin } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const { toast } = useToast();
 
   const isActive = (path: string) => {
@@ -106,6 +108,12 @@ export default function Navbar() {
                     <User className="w-4 h-4 mr-2" />
                     Ver Perfil
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => setLocation("/admin")}>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Painel Admin
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -171,6 +179,20 @@ export default function Navbar() {
                     <User className="w-4 h-4 inline mr-2" />
                     {user.name} - Ver Perfil
                   </Button>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setLocation("/admin");
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full justify-start mobile-nav-link"
+                    >
+                      <Shield className="w-4 h-4 inline mr-2" />
+                      Painel Admin
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

@@ -23,6 +23,8 @@ export const users = pgTable("users", {
   instagram_url: text("instagram_url"),
   whatsapp_url: text("whatsapp_url"),
   password: text("password"), // For simple auth (hashed in real app)
+  role: text("role").default("user"), // "user", "admin", "super_admin"
+  status: text("status").default("active"), // "active", "suspended", "inactive"
   created_at: timestamp("created_at").defaultNow().notNull(),
   auth_user_id: uuid("auth_user_id").unique(), // For Supabase auth integration
   // Rating fields
@@ -44,6 +46,41 @@ export const reviews = pgTable("reviews", {
   would_recommend: boolean("would_recommend").notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Admin tables
+export const admin_logs = pgTable("admin_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  admin_id: uuid("admin_id").references(() => users.id),
+  action: text("action").notNull(), // "create_user", "update_user", "delete_user", "login", etc.
+  target_type: text("target_type"), // "user", "review", "system", etc.
+  target_id: text("target_id"),
+  details: text("details"), // JSON string with additional details
+  ip_address: text("ip_address"),
+  user_agent: text("user_agent"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const site_settings = pgTable("site_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(),
+  value: text("value"),
+  type: text("type").default("text"), // "text", "number", "boolean", "json"
+  description: text("description"),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  updated_by: uuid("updated_by").references(() => users.id),
+});
+
+export const site_analytics = pgTable("site_analytics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  date: timestamp("date").notNull(),
+  page_views: integer("page_views").default(0),
+  unique_visitors: integer("unique_visitors").default(0),
+  new_users: integer("new_users").default(0),
+  active_users: integer("active_users").default(0),
+  searches: integer("searches").default(0),
+  contacts: integer("contacts").default(0),
+  created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -95,13 +132,42 @@ export const updateReviewSchema = createInsertSchema(reviews).omit({
   reviewee_id: true,
 }).partial();
 
+// Admin schemas
+export const insertAdminLogSchema = createInsertSchema(admin_logs).omit({
+  id: true,
+  created_at: true,
+});
+
+export const insertSiteSettingSchema = createInsertSchema(site_settings).omit({
+  id: true,
+  updated_at: true,
+});
+
+export const updateSiteSettingSchema = createInsertSchema(site_settings).omit({
+  id: true,
+  updated_at: true,
+}).partial();
+
+export const insertAnalyticsSchema = createInsertSchema(site_analytics).omit({
+  id: true,
+  created_at: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type UpdateReview = z.infer<typeof updateReviewSchema>;
+export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
+export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
+export type UpdateSiteSetting = z.infer<typeof updateSiteSettingSchema>;
+export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+
 export type User = typeof users.$inferSelect & {
   // Add computed fields for compatibility
   name: string;
   age: number;
 };
 export type Review = typeof reviews.$inferSelect;
+export type AdminLog = typeof admin_logs.$inferSelect;
+export type SiteSetting = typeof site_settings.$inferSelect;
+export type SiteAnalytics = typeof site_analytics.$inferSelect;

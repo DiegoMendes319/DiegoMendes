@@ -1,312 +1,559 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Shield, Users, Settings, Activity, BarChart3, User, UserCheck, UserX, Eye, Edit, Trash2, Clock, MapPin, Star, AlertTriangle } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Trash2, Search, Eye, Shield, Users } from "lucide-react";
-import type { User } from "@shared/schema";
+import { useLocation } from "wouter";
 
-export default function AdminPanel() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const { toast } = useToast();
+export default function AdminPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [location, navigate] = useLocation();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const [newSettingKey, setNewSettingKey] = useState("");
+  const [newSettingValue, setNewSettingValue] = useState("");
 
-  // Fetch all users
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ['/api/users'],
+  // Check if user is admin
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+    queryKey: ['/api/admin/stats'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/users');
-      return response.json();
+      try {
+        const response = await fetch('/api/admin/stats');
+        return response.ok;
+      } catch {
+        return false;
+      }
     },
+    enabled: !!user,
   });
 
-  // Delete user mutation
-  const deleteUserMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const response = await apiRequest('DELETE', `/api/users/${userId}`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao eliminar utilizador');
-      }
-      return response.json();
+  // Admin stats
+  const { data: stats } = useQuery({
+    queryKey: ['/api/admin/stats'],
+    enabled: isAdmin,
+  });
+
+  // All users
+  const { data: users } = useQuery({
+    queryKey: ['/api/admin/users'],
+    enabled: isAdmin,
+  });
+
+  // Admin logs
+  const { data: logs } = useQuery({
+    queryKey: ['/api/admin/logs'],
+    enabled: isAdmin,
+  });
+
+  // Site settings
+  const { data: settings } = useQuery({
+    queryKey: ['/api/admin/settings'],
+    enabled: isAdmin,
+  });
+
+  // Analytics
+  const { data: analytics } = useQuery({
+    queryKey: ['/api/admin/analytics'],
+    enabled: isAdmin,
+  });
+
+  // Update user role mutation
+  const updateUserRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      return await apiRequest(`/api/admin/users/${userId}/role`, 'PATCH', { role });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
       toast({
-        title: "Utilizador eliminado",
-        description: "O utilizador foi removido com sucesso da plataforma.",
+        title: "Papel atualizado",
+        description: "O papel do utilizador foi atualizado com sucesso.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
-      setShowDeleteDialog(false);
-      setSelectedUser(null);
     },
     onError: (error) => {
       toast({
-        title: "Erro ao eliminar",
-        description: error.message,
+        title: "Erro",
+        description: "Não foi possível atualizar o papel do utilizador.",
         variant: "destructive",
       });
     },
   });
 
-  const filteredUsers = users.filter((user: User) => 
-    user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phone?.includes(searchTerm)
-  );
+  // Update user status mutation
+  const updateUserStatusMutation = useMutation({
+    mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
+      return await apiRequest(`/api/admin/users/${userId}/status`, 'PATCH', { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
+      toast({
+        title: "Status atualizado",
+        description: "O status do utilizador foi atualizado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status do utilizador.",
+        variant: "destructive",
+      });
+    },
+  });
 
-  const handleDeleteUser = () => {
-    if (selectedUser) {
-      deleteUserMutation.mutate(selectedUser.id);
+  // Update site setting mutation
+  const updateSettingMutation = useMutation({
+    mutationFn: async ({ key, value }: { key: string; value: string }) => {
+      return await apiRequest(`/api/admin/settings/${key}`, 'PATCH', { value });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
+      toast({
+        title: "Definição atualizada",
+        description: "A definição do site foi atualizada com sucesso.",
+      });
+      setIsSettingsDialogOpen(false);
+      setNewSettingKey("");
+      setNewSettingValue("");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar a definição.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // Redirect if not admin
+  useEffect(() => {
+    if (!isAdminLoading && !isAdmin) {
+      navigate('/');
+      toast({
+        title: "Acesso negado",
+        description: "Não tem permissões para aceder a esta página.",
+        variant: "destructive",
+      });
+    }
+  }, [isAdmin, isAdminLoading, navigate]);
+
+  if (isAdminLoading || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">A carregar painel administrativo...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'super_admin': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'admin': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'suspended': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'inactive': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('pt-PT');
+  };
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'update_user_role': return <UserCheck className="w-4 h-4" />;
+      case 'update_user_status': return <UserX className="w-4 h-4" />;
+      case 'update_site_setting': return <Settings className="w-4 h-4" />;
+      default: return <Activity className="w-4 h-4" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
-            <Shield className="h-8 w-8 mr-3 text-[var(--angola-red)]" />
-            Painel de Administração
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Gerir utilizadores registados na plataforma Jikulumessu
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Shield className="w-8 h-8 text-red-600" />
+                Painel Administrativo
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">
+                Gestão completa da plataforma Jikulumessu
+              </p>
+            </div>
+            <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+              {user?.role || 'Admin'}
+            </Badge>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Utilizadores</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-[var(--angola-red)]">{users.length}</div>
+              <div className="text-2xl font-bold">{stats?.total || 0}</div>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Utilizadores Activos</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <UserCheck className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{users.filter((u: User) => u.services?.length > 0).length}</div>
+              <div className="text-2xl font-bold text-green-600">{stats?.active || 0}</div>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Novos Este Mês</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Utilizadores Suspensos</CardTitle>
+              <UserX className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {users.filter((u: User) => {
-                  const userDate = new Date(u.created_at);
-                  const now = new Date();
-                  return userDate.getMonth() === now.getMonth() && userDate.getFullYear() === now.getFullYear();
-                }).length}
-              </div>
+              <div className="text-2xl font-bold text-red-600">{stats?.suspended || 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Administradores</CardTitle>
+              <Shield className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{stats?.admins || 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Novos Hoje</CardTitle>
+              <Users className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">{stats?.newToday || 0}</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Search and Filter */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-5 w-5 mr-2" />
-              Pesquisar Utilizadores
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Input
-              placeholder="Procurar por nome, email ou telefone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
-            />
-          </CardContent>
-        </Card>
+        {/* Main Content */}
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="users">Utilizadores</TabsTrigger>
+            <TabsTrigger value="logs">Logs</TabsTrigger>
+            <TabsTrigger value="settings">Definições</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
 
-        {/* Users List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Utilizadores Registados ({filteredUsers.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--angola-red)] mx-auto mb-4"></div>
-                <p className="text-gray-600">A carregar utilizadores...</p>
-              </div>
-            ) : filteredUsers.length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">
-                  {searchTerm ? "Nenhum utilizador encontrado" : "Ainda não há utilizadores registados"}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredUsers.map((user: User) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={user.profile_url || undefined} alt={user.first_name} />
-                        <AvatarFallback>
-                          {user.first_name?.[0]}{user.last_name?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gestão de Utilizadores</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Localização</TableHead>
+                        <TableHead>Papel</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Avaliação</TableHead>
+                        <TableHead>Registado</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users?.map((user: any) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <User className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="font-medium">{user.name}</div>
+                                <div className="text-sm text-gray-500">{user.phone}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{user.email || 'N/A'}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm">
+                              <MapPin className="w-3 h-3" />
+                              {user.municipality}, {user.province}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getRoleColor(user.role || 'user')}>
+                              {user.role || 'user'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusColor(user.status || 'active')}>
+                              {user.status || 'active'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-yellow-500" />
+                              {user.average_rating?.toFixed(1) || '0.0'}
+                              <span className="text-sm text-gray-500">({user.total_reviews || 0})</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-500">
+                            {formatDate(user.created_at)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Select
+                                value={user.role || 'user'}
+                                onValueChange={(role) => updateUserRoleMutation.mutate({ userId: user.id, role })}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">Utilizador</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Select
+                                value={user.status || 'active'}
+                                onValueChange={(status) => updateUserStatusMutation.mutate({ userId: user.id, status })}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="active">Activo</SelectItem>
+                                  <SelectItem value="suspended">Suspenso</SelectItem>
+                                  <SelectItem value="inactive">Inactivo</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Logs Tab */}
+          <TabsContent value="logs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Logs de Atividade</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Ação</TableHead>
+                        <TableHead>Admin</TableHead>
+                        <TableHead>Alvo</TableHead>
+                        <TableHead>Detalhes</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>IP</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {logs?.map((log: any) => (
+                        <TableRow key={log.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getActionIcon(log.action)}
+                              <span className="capitalize">{log.action.replace('_', ' ')}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{log.admin_id}</TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              <div>{log.target_type}</div>
+                              <div className="text-gray-500">{log.target_id}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-gray-600 max-w-xs truncate">
+                              {log.details}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {formatDate(log.created_at)}
+                          </TableCell>
+                          <TableCell className="text-sm font-mono">
+                            {log.ip_address}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Definições do Site
+                  <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Nova Definição
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Adicionar Nova Definição</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="setting-key">Chave</Label>
+                          <Input
+                            id="setting-key"
+                            value={newSettingKey}
+                            onChange={(e) => setNewSettingKey(e.target.value)}
+                            placeholder="site_title"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="setting-value">Valor</Label>
+                          <Textarea
+                            id="setting-value"
+                            value={newSettingValue}
+                            onChange={(e) => setNewSettingValue(e.target.value)}
+                            placeholder="Jikulumessu - Portal de Serviços"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              if (newSettingKey && newSettingValue) {
+                                updateSettingMutation.mutate({
+                                  key: newSettingKey,
+                                  value: newSettingValue
+                                });
+                              }
+                            }}
+                            disabled={!newSettingKey || !newSettingValue}
+                          >
+                            Guardar
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsSettingsDialogOpen(false)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {settings?.map((setting: any) => (
+                    <div key={setting.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {user.first_name} {user.last_name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{user.phone}</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {user.services?.slice(0, 3).map((service, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {service}
-                            </Badge>
-                          ))}
-                          {user.services?.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{user.services.length - 3} mais
-                            </Badge>
-                          )}
+                        <div className="font-medium">{setting.key}</div>
+                        <div className="text-sm text-gray-500">{setting.description}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={setting.value}
+                          onChange={(e) => {
+                            const newValue = e.target.value;
+                            // Update immediately on blur or enter
+                            if (newValue !== setting.value) {
+                              updateSettingMutation.mutate({
+                                key: setting.key,
+                                value: newValue
+                              });
+                            }
+                          }}
+                          className="w-64"
+                        />
+                        <div className="text-xs text-gray-500">
+                          {formatDate(setting.updated_at)}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedUser(user)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowDeleteDialog(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* User Details Dialog */}
-        <Dialog open={!!selectedUser && !showDeleteDialog} onOpenChange={() => setSelectedUser(null)}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Detalhes do Utilizador</DialogTitle>
-            </DialogHeader>
-            {selectedUser && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <Avatar className="h-24 w-24 mx-auto mb-4">
-                    <AvatarImage src={selectedUser.profile_url || undefined} alt={selectedUser.first_name} />
-                    <AvatarFallback className="text-xl">
-                      {selectedUser.first_name?.[0]}{selectedUser.last_name?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <h3 className="text-xl font-bold">
-                    {selectedUser.first_name} {selectedUser.last_name}
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics e Relatórios</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <BarChart3 className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Analytics em Desenvolvimento
                   </h3>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Esta secção estará disponível em breve com relatórios detalhados sobre:
+                  </p>
+                  <ul className="mt-4 text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                    <li>• Visitantes e visualizações de página</li>
+                    <li>• Novos registos e atividade de utilizadores</li>
+                    <li>• Pesquisas e contactos realizados</li>
+                    <li>• Avaliações e feedback dos utilizadores</li>
+                  </ul>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Informações de Contacto</h4>
-                    <p className="text-sm text-gray-600">Email: {selectedUser.email}</p>
-                    <p className="text-sm text-gray-600">Telefone: {selectedUser.phone}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-2">Localização</h4>
-                    <p className="text-sm text-gray-600">Província: {selectedUser.province}</p>
-                    <p className="text-sm text-gray-600">Município: {selectedUser.municipality}</p>
-                    <p className="text-sm text-gray-600">Bairro: {selectedUser.neighborhood}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-2">Serviços Oferecidos</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedUser.services?.map((service, index) => (
-                      <Badge key={index} variant="secondary">
-                        {service}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                
-                {selectedUser.about_me && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Sobre</h4>
-                    <p className="text-sm text-gray-600">{selectedUser.about_me}</p>
-                  </div>
-                )}
-                
-                <div className="text-sm text-gray-500 border-t pt-4">
-                  <p>Registado em: {new Date(selectedUser.created_at).toLocaleDateString('pt-PT')}</p>
-                  <p>ID: {selectedUser.id}</p>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-red-600">Confirmar Eliminação</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p>
-                Tem a certeza de que pretende eliminar permanentemente o utilizador{" "}
-                <strong>{selectedUser?.first_name} {selectedUser?.last_name}</strong>?
-              </p>
-              <p className="text-sm text-gray-600">
-                Esta acção não pode ser desfeita. Todos os dados do utilizador serão eliminados.
-              </p>
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowDeleteDialog(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDeleteUser}
-                  disabled={deleteUserMutation.isPending}
-                >
-                  {deleteUserMutation.isPending ? "A eliminar..." : "Eliminar"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

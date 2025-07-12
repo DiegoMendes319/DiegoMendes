@@ -541,6 +541,264 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const stats = await storage.getUserStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/role", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const { role } = req.body;
+
+      if (!role || !['user', 'admin', 'super_admin'].includes(role)) {
+        return res.status(400).json({ error: "Papel inválido" });
+      }
+
+      const updatedUser = await storage.updateUserRole(id, role);
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Utilizador não encontrado" });
+      }
+
+      // Log admin action
+      await storage.logAdminAction({
+        admin_id: user.id,
+        action: 'update_user_role',
+        target_type: 'user',
+        target_id: id,
+        details: JSON.stringify({ from: updatedUser.role, to: role }),
+        ip_address: req.ip,
+        user_agent: req.headers['user-agent'] || null,
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/status", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!status || !['active', 'suspended', 'inactive'].includes(status)) {
+        return res.status(400).json({ error: "Status inválido" });
+      }
+
+      const updatedUser = await storage.updateUserStatus(id, status);
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Utilizador não encontrado" });
+      }
+
+      // Log admin action
+      await storage.logAdminAction({
+        admin_id: user.id,
+        action: 'update_user_status',
+        target_type: 'user',
+        target_id: id,
+        details: JSON.stringify({ from: updatedUser.status, to: status }),
+        ip_address: req.ip,
+        user_agent: req.headers['user-agent'] || null,
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/logs", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const logs = await storage.getAdminLogs(limit);
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/settings", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const settings = await storage.getSiteSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/admin/settings/:key", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { key } = req.params;
+      const { value } = req.body;
+
+      if (!value) {
+        return res.status(400).json({ error: "Valor é obrigatório" });
+      }
+
+      const setting = await storage.updateSiteSetting(key, value);
+      
+      // Log admin action
+      await storage.logAdminAction({
+        admin_id: user.id,
+        action: 'update_site_setting',
+        target_type: 'system',
+        target_id: key,
+        details: JSON.stringify({ key, value }),
+        ip_address: req.ip,
+        user_agent: req.headers['user-agent'] || null,
+      });
+
+      res.json(setting);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/analytics", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const analytics = await storage.getAnalytics(days);
+      res.json(analytics);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
