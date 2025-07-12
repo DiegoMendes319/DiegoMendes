@@ -283,11 +283,19 @@ export default function Login() {
               </form>
             </Tabs>
 
-            <div className="text-center text-sm text-gray-600 dark:text-gray-300">
-              Não tem conta?{" "}
-              <Link href="/auth" className="text-[var(--angola-red)] hover:underline">
-                Registar aqui
-              </Link>
+            <div className="text-center text-sm text-gray-600 dark:text-gray-300 space-y-2">
+              <div>
+                Esqueceu a palavra-passe?{" "}
+                <Link href="/recover-password" className="text-blue-600 hover:underline">
+                  Recuperar
+                </Link>
+              </div>
+              <div>
+                Não tem conta?{" "}
+                <Link href="/auth" className="text-[var(--angola-red)] hover:underline">
+                  Registar aqui
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>
