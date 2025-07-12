@@ -528,27 +528,6 @@ export default function Auth() {
                     </div>
                   </div>
 
-                  {/* Phone field for simple registration */}
-                  {authMode === 'register' && (
-                    <div>
-                      <Label htmlFor="phone" className="dark:text-gray-200">Telemóvel</Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                          <span className="text-gray-500 dark:text-gray-400">+244</span>
-                        </div>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone || ""}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
-                          placeholder="9XX XXX XXX"
-                          className={`pl-14 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 ${errors.phone ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                    </div>
-                  )}
-
                   {authMode === 'login' && (
                     <div>
                       <Label htmlFor="simple_password">Palavra-passe</Label>
