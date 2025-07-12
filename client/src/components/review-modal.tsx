@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,8 +35,31 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
   const [reviewerFirstName, setReviewerFirstName] = useState("");
   const [reviewerLastName, setReviewerLastName] = useState("");
   
+  // Ref for identification section
+  const identificationRef = useRef<HTMLDivElement>(null);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Auto-scroll to identification section when it becomes visible
+  useEffect(() => {
+    if (showIdentification && identificationRef.current) {
+      // Small delay to ensure the element is rendered
+      setTimeout(() => {
+        identificationRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+        
+        // Focus on the first input field after scroll
+        setTimeout(() => {
+          const firstInput = identificationRef.current?.querySelector('input');
+          firstInput?.focus();
+        }, 500);
+      }, 100);
+    }
+  }, [showIdentification]);
 
   const createReviewMutation = useMutation({
     mutationFn: async (reviewData: InsertReview) => {
@@ -166,7 +189,10 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
         <div className="space-y-6">
           {/* Identification Form */}
           {showIdentification && (
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div 
+              ref={identificationRef}
+              className="bg-blue-50 p-4 rounded-lg border border-blue-200"
+            >
               <h3 className="text-lg font-semibold text-blue-900 mb-3">
                 Identificação Necessária
               </h3>
