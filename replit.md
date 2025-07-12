@@ -81,6 +81,18 @@ Jikulumessu is a full-stack web application designed to connect people with qual
   - Integrated admin panel navigation in navbar for authenticated admins
   - Added admin user auto-creation system with credentials: admin@jikulumessu.com / admin123
   - Implemented complete admin API endpoints for all management functions
+✓ **Maintenance Mode System (Janeiro 2025)**:
+  - Implemented server-side maintenance mode middleware with database settings
+  - Added admin bypass functionality - administrators can access site during maintenance
+  - Created dedicated maintenance page with proper branding and contact information
+  - Maintenance page displays standardized email (contacto@jikulumessu.ao) instead of real email
+  - Complete maintenance mode toggle functionality in admin settings panel
+✓ **API Request Parameter Fix (Janeiro 2025)**:
+  - Resolved critical apiRequest function parameter order issues across entire codebase
+  - Fixed authentication endpoints causing "Invalid request method" errors
+  - Corrected parameter order from (method, url, data) to (url, method, data) in all files
+  - Authentication system now fully operational with proper session management
+  - Admin panel settings persistence working correctly
 
 ## User Preferences
 

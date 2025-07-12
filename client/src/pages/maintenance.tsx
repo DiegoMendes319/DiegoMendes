@@ -41,10 +41,10 @@ export default function MaintenancePage() {
               Precisa de ajuda urgente?
             </p>
             <a 
-              href="mailto:d2413175@gmail.com"
+              href="mailto:contacto@jikulumessu.ao"
               className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
             >
-              d2413175@gmail.com
+              contacto@jikulumessu.ao
             </a>
           </div>
           
