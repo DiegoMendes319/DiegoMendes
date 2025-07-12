@@ -84,7 +84,7 @@ export default function Footer() {
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <span className="text-sm text-gray-400">
-              🔥 Feito por Phoenix
+              🔥 Feito por Jiku
             </span>
           </div>
         </div>
