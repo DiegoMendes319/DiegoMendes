@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-supabase-auth";
 import App from "./App";
 import "./index.css";
+import "./utils/error-handler";
 
 const queryClient = new QueryClient();
 

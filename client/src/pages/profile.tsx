@@ -31,7 +31,8 @@ import {
   DollarSign,
   Save,
   Trash2,
-  Camera
+  Camera,
+  Lock
 } from "lucide-react";
 
 import { SERVICE_OPTIONS, CONTRACT_TYPES } from "@shared/constants";
@@ -314,6 +315,14 @@ export default function Profile() {
             >
               <Edit className="h-4 w-4 mr-2" />
               {editMode ? 'Cancelar' : 'Editar Perfil'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setLocation('/change-password')}
+              className="text-blue-600 border-blue-200 hover:bg-blue-50 text-sm sm:text-base px-3 sm:px-4"
+            >
+              <Lock className="h-4 w-4 mr-2" />
+              Alterar Palavra-passe
             </Button>
             <Button
               variant="outline"

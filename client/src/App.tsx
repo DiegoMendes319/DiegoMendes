@@ -12,6 +12,9 @@ import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import AdminPanel from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
+import ChangePassword from "@/pages/change-password";
+import RecoverPassword from "@/pages/recover-password";
+import ServerErrorPage from "@/pages/server-error";
 import NotFound from "@/pages/not-found";
 import MaintenancePage from "@/pages/maintenance";
 import Footer from "@/components/footer";
@@ -68,6 +71,9 @@ function Router() {
           <Route path="/security" component={Security} />
           <Route path="/admin" component={AdminPanel} />
           <Route path="/admin-login" component={AdminLogin} />
+          <Route path="/change-password" component={ChangePassword} />
+          <Route path="/recover-password" component={RecoverPassword} />
+          <Route path="/server-error" component={ServerErrorPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

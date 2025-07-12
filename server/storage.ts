@@ -30,6 +30,10 @@ export interface IStorage {
   validateSession(sessionToken: string): Promise<User | null>;
   logout(sessionToken: string): Promise<boolean>;
   
+  // Password management
+  verifyPassword(userId: string, password: string): Promise<boolean>;
+  updatePassword(userId: string, newPassword: string): Promise<boolean>;
+  
   // Review methods
   createReview(review: InsertReview): Promise<Review>;
   getReviewsForUser(userId: string): Promise<Review[]>;
@@ -592,6 +596,26 @@ export class MemStorage implements IStorage {
 
   async logout(sessionToken: string): Promise<boolean> {
     return this.sessions.delete(sessionToken);
+  }
+
+  async verifyPassword(userId: string, password: string): Promise<boolean> {
+    const user = this.users.get(userId);
+    if (!user || !user.password) {
+      return false;
+    }
+    return await bcrypt.compare(password, user.password);
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<boolean> {
+    const user = this.users.get(userId);
+    if (!user) {
+      return false;
+    }
+    
+    const hashedPassword = await this.hashPassword(newPassword);
+    user.password = hashedPassword;
+    this.users.set(userId, user);
+    return true;
   }
 
   private cleanupExpiredSessions(): void {

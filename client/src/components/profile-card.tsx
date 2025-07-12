@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Star, Calendar, Eye } from "lucide-react";
 import RatingStars from "./rating-stars";
+import FullSizeImageModal from "./full-size-image-modal";
 import type { User } from "@/types/user";
 
 interface ProfileCardProps {
@@ -11,12 +13,26 @@ interface ProfileCardProps {
 }
 
 export default function ProfileCard({ user, onClick }: ProfileCardProps) {
+  const [showFullImage, setShowFullImage] = useState(false);
+  
   return (
     <Card className="profile-card overflow-hidden fade-in">
       <div className="relative">
         <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-          <Avatar className="h-32 w-32">
-            <AvatarImage src={user.profile_url || undefined} alt={user.name} />
+          <Avatar 
+            className="h-32 w-32 cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (user.profile_url) {
+                setShowFullImage(true);
+              }
+            }}
+          >
+            <AvatarImage 
+              src={user.profile_url || undefined} 
+              alt={user.name}
+              className="object-cover"
+            />
             <AvatarFallback className="text-2xl">
               {user.name.charAt(0)}
             </AvatarFallback>
@@ -75,6 +91,14 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
           Ver Detalhes
         </Button>
       </CardContent>
+      
+      {showFullImage && user.profile_url && (
+        <FullSizeImageModal
+          imageUrl={user.profile_url}
+          userName={user.name}
+          onClose={() => setShowFullImage(false)}
+        />
+      )}
     </Card>
   );
 }

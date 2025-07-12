@@ -6,6 +6,7 @@ import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon } from "lucid
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
+import FullSizeImageModal from "./full-size-image-modal";
 import { useAuth } from "@/hooks/use-auth";
 import type { User } from "@shared/schema";
 
@@ -18,6 +19,7 @@ interface ProfileModalProps {
 
 export default function ProfileModal({ user, isOpen, onClose, onContact }: ProfileModalProps) {
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
   const { user: currentUser } = useAuth();
 
   return (
@@ -31,8 +33,19 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
         
         <div className="space-y-6">
           <div className="text-center">
-            <Avatar className="h-32 w-32 mx-auto mb-4 ring-4 ring-[var(--angola-yellow)]">
-              <AvatarImage src={user.profile_url || undefined} alt={user.name} />
+            <Avatar 
+              className="h-32 w-32 mx-auto mb-4 ring-4 ring-[var(--angola-yellow)] cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => {
+                if (user.profile_url) {
+                  setShowFullImage(true);
+                }
+              }}
+            >
+              <AvatarImage 
+                src={user.profile_url || undefined} 
+                alt={user.name}
+                className="object-cover"
+              />
               <AvatarFallback className="text-2xl">
                 {user.name.charAt(0)}
               </AvatarFallback>
@@ -149,6 +162,14 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
           currentUserId={currentUser?.id}
         />
       </DialogContent>
+      
+      {showFullImage && user.profile_url && (
+        <FullSizeImageModal
+          imageUrl={user.profile_url}
+          userName={user.name}
+          onClose={() => setShowFullImage(false)}
+        />
+      )}
     </Dialog>
   );
 }

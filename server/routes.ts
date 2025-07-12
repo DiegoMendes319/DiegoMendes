@@ -259,6 +259,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password change endpoint
+  app.post('/api/auth/change-password', async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: 'Não autenticado' });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: 'Sessão inválida' });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'Palavra-passe actual e nova são obrigatórias' });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await storage.verifyPassword(user.id, currentPassword);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ error: 'Palavra-passe actual incorrecta' });
+      }
+
+      // Update password
+      const success = await storage.updatePassword(user.id, newPassword);
+      if (!success) {
+        return res.status(500).json({ error: 'Erro ao alterar palavra-passe' });
+      }
+
+      res.json({ message: 'Palavra-passe alterada com sucesso' });
+    } catch (error) {
+      console.error('Change password error:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Password recovery endpoint
+  app.post('/api/auth/recover-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
+
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Return success even if user doesn't exist (security best practice)
+        return res.json({ message: 'Se o email existir, receberá as instruções de recuperação' });
+      }
+
+      // In a real application, you would send an email with recovery link
+      // For now, we'll just log the recovery attempt
+      console.log(`Password recovery requested for: ${email}`);
+
+      res.json({ message: 'Se o email existir, receberá as instruções de recuperação' });
+    } catch (error) {
+      console.error('Password recovery error:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Supabase configuration endpoint
   app.get("/api/config/supabase", (req, res) => {
     res.json({
