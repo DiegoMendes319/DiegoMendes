@@ -57,7 +57,7 @@ export default function Login() {
   const loginMutation = useMutation({
     mutationFn: async (data: FormData) => {
       if (authMethod === 'email' && data.email && data.password) {
-        const response = await apiRequest('POST', '/api/auth/login', {
+        const response = await apiRequest('/api/auth/login', 'POST', {
           email: data.email,
           password: data.password
         });
@@ -67,7 +67,7 @@ export default function Login() {
         }
         return response.json();
       } else if (authMethod === 'simple' && data.first_name && data.last_name && data.password) {
-        const response = await apiRequest('POST', '/api/auth/simple-login', {
+        const response = await apiRequest('/api/auth/simple-login', 'POST', {
           first_name: data.first_name,
           last_name: data.last_name,
           password: data.password

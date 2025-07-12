@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const response = await apiRequest('GET', '/api/auth/me');
+      const response = await apiRequest('/api/auth/me', 'GET');
       const userData = await response.json();
       setUser(userData);
     } catch (error) {
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await apiRequest('POST', '/api/auth/login', { email, password });
+    const response = await apiRequest('/api/auth/login', 'POST', { email, password });
     const result = await response.json();
     
     if (result.user) {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (userData: any) => {
-    const response = await apiRequest('POST', '/api/auth/register', userData);
+    const response = await apiRequest('/api/auth/register', 'POST', userData);
     const result = await response.json();
     
     if (result.user) {
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await apiRequest('POST', '/api/auth/logout', {});
+      await apiRequest('/api/auth/logout', 'POST', {});
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

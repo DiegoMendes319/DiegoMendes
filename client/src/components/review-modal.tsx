@@ -63,7 +63,7 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
 
   const createReviewMutation = useMutation({
     mutationFn: async (reviewData: InsertReview) => {
-      const response = await apiRequest("POST", "/api/reviews", reviewData);
+      const response = await apiRequest("/api/reviews", "POST", reviewData);
       return response.json();
     },
     onSuccess: () => {

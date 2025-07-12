@@ -77,7 +77,7 @@ export default function Profile() {
     queryKey: ['/api/users', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const response = await apiRequest('GET', `/api/users/${user.id}`);
+      const response = await apiRequest(`/api/users/${user.id}`, 'GET');
       return response.json();
     },
     enabled: !!user?.id,
@@ -107,7 +107,7 @@ export default function Profile() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('PUT', `/api/users/${user?.id}`, data);
+      const response = await apiRequest(`/api/users/${user?.id}`, 'PUT', data);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao actualizar perfil');
@@ -135,7 +135,7 @@ export default function Profile() {
   // Delete account mutation
   const deleteAccountMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('DELETE', `/api/users/${user?.id}`);
+      const response = await apiRequest(`/api/users/${user?.id}`, 'DELETE');
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao eliminar conta');

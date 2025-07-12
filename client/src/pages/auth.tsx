@@ -189,7 +189,7 @@ export default function Auth() {
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       // Use our local API for login
-      const response = await apiRequest('POST', '/api/auth/login', data);
+      const response = await apiRequest('/api/auth/login', 'POST', data);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro no login');
@@ -221,7 +221,7 @@ export default function Auth() {
   const registerMutation = useMutation({
     mutationFn: async (data: InsertUser) => {
       // Use our local API for registration instead of Supabase
-      const response = await apiRequest('POST', '/api/auth/register', data);
+      const response = await apiRequest('/api/auth/register', 'POST', data);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro no registo');
@@ -261,7 +261,7 @@ export default function Auth() {
           });
         } else if (authMethod === 'simple') {
           // Use simple login endpoint
-          const response = await apiRequest('POST', '/api/auth/simple-login', {
+          const response = await apiRequest('/api/auth/simple-login', 'POST', {
             first_name: data.first_name!,
             last_name: data.last_name!,
             password: data.password!
@@ -335,7 +335,7 @@ export default function Auth() {
             password: formData.password!
           };
           
-          const response = await apiRequest('POST', '/api/auth/simple-register', simpleData);
+          const response = await apiRequest('/api/auth/simple-register', 'POST', simpleData);
           
           if (!response.ok) {
             const errorData = await response.json();
