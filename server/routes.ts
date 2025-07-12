@@ -98,41 +98,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simple register endpoint (name + password + basic info)
+  // Simple register endpoint (name + password + complete info)
   app.post("/api/auth/simple-register", async (req, res) => {
     try {
-      const { first_name, last_name, password } = req.body;
+      const userData = req.body;
       
-      if (!first_name || !last_name || !password) {
+      if (!userData.first_name || !userData.last_name || !userData.password) {
         return res.status(400).json({ error: "Nome e palavra-passe são obrigatórios" });
       }
 
-      // Create temporary email for simple registration
-      const tempEmail = `${first_name.toLowerCase()}.${last_name.toLowerCase()}@temp.com`;
+      // Create temporary email for simple registration if not provided
+      const tempEmail = userData.email || `${userData.first_name.toLowerCase()}.${userData.last_name.toLowerCase()}@temp.com`;
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(tempEmail);
+      // Check if user already exists by name combination
+      const allUsers = await storage.getAllUsers();
+      const existingUser = allUsers.find(u => 
+        u.first_name?.toLowerCase() === userData.first_name.toLowerCase() && 
+        u.last_name?.toLowerCase() === userData.last_name.toLowerCase()
+      );
+      
       if (existingUser) {
-        return res.status(409).json({ error: "Utilizador já existe" });
+        return res.status(409).json({ error: "Utilizador já existe com este nome" });
       }
 
-      // Create user with minimal required data
-      const userData = {
-        first_name,
-        last_name,
+      // Use provided data or defaults
+      const completeUserData = {
+        first_name: userData.first_name,
+        last_name: userData.last_name,
         email: tempEmail,
-        password,
-        phone: "900000000", // Default phone
-        date_of_birth: "1990-01-01", // Default birth date
-        province: "Luanda", // Default province
-        municipality: "Luanda", // Default municipality
-        neighborhood: "Centro", // Default neighborhood
-        contract_type: "diarista", // Default contract type
-        services: ["limpeza"], // Default service
-        availability: "Disponível" // Default availability
+        password: userData.password,
+        phone: userData.phone || "+244 900 000 000", // Use provided or default phone
+        date_of_birth: userData.date_of_birth || "1990-01-01", // Use provided or default birth date
+        province: userData.province || "Luanda", // Use provided or default province
+        municipality: userData.municipality || "Luanda", // Use provided or default municipality
+        neighborhood: userData.neighborhood || "Centro", // Use provided or default neighborhood
+        contract_type: userData.contract_type || "diarista", // Use provided or default contract type
+        services: userData.services || ["limpeza"], // Use provided or default service
+        availability: userData.availability || "Disponível", // Use provided or default availability
+        about_me: userData.about_me || null,
+        address_complement: userData.address_complement || null,
+        profile_url: userData.profile_url || null
       };
 
-      const result = await storage.createUserWithAuth(userData);
+      const result = await storage.createUserWithAuth(completeUserData);
 
       // Set session cookie
       res.cookie('session_token', result.sessionToken, {

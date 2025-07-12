@@ -328,11 +328,22 @@ export default function Auth() {
       } else {
         // Handle registration
         if (authMethod === 'simple') {
-          // Use simple registration endpoint
+          // Use simple registration endpoint with complete data
           const simpleData = {
             first_name: formData.first_name!,
             last_name: formData.last_name!,
-            password: formData.password!
+            password: formData.password!,
+            phone: formData.phone || "+244 900 000 000",
+            date_of_birth: formData.date_of_birth || "1990-01-01",
+            province: formData.province || "Luanda",
+            municipality: formData.municipality || "Luanda",
+            neighborhood: formData.neighborhood || "Centro",
+            contract_type: formData.contract_type || "diarista",
+            services: formData.services || ["limpeza"],
+            availability: formData.availability || "Disponível",
+            about_me: formData.about_me || null,
+            address_complement: formData.address_complement || null,
+            profile_url: formData.profile_url || null
           };
           
           const response = await apiRequest('/api/auth/simple-register', 'POST', simpleData);

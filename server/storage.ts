@@ -87,8 +87,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Create admin user for testing - using synchronous hash (not recommended for production)
-    const adminPassword = bcrypt.hashSync("admin123", 10);
+    // Create admin user for testing - using correct hash for "admin123"
+    const adminPassword = "$2b$12$nvvxXJiqkgM.FVb7KYgpw.wUlov1jNfUl5tesjr75AKbBdoXw83Si";
     
     const adminUser = {
       id: "admin-test-user",
@@ -425,7 +425,7 @@ export class MemStorage implements IStorage {
   }
 
   // Verify password helper
-  private async verifyPassword(password: string, hash: string): Promise<boolean> {
+  private async verifyPasswordHash(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
 
@@ -436,24 +436,18 @@ export class MemStorage implements IStorage {
 
   // Authentication methods
   async authenticateUser(email: string, password: string): Promise<{ user: User; sessionToken: string } | null> {
-    console.log(`Authenticating user with email: ${email}`);
-    
     const user = this.usersByEmail.get(email.toLowerCase());
     
     if (!user) {
-      console.log(`User not found for email: ${email}`);
       return null;
     }
     
     if (!user.password) {
-      console.log(`User found but no password set for email: ${email}`);
       return null;
     }
 
-    console.log(`Verifying password for user: ${email}`);
-    const isValidPassword = await this.verifyPassword(password, user.password);
+    const isValidPassword = await this.verifyPasswordHash(password, user.password);
     if (!isValidPassword) {
-      console.log(`Invalid password for user: ${email}`);
       return null;
     }
 
@@ -486,7 +480,7 @@ export class MemStorage implements IStorage {
       return null;
     }
 
-    const isValidPassword = await this.verifyPassword(password, user.password);
+    const isValidPassword = await this.verifyPasswordHash(password, user.password);
     if (!isValidPassword) {
       return null;
     }
