@@ -125,7 +125,61 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Modificações dos Termos</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Interrupções de Serviço e Perda de Dados</h2>
+            <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+              <p className="text-red-800 font-semibold mb-2">AVISO IMPORTANTE:</p>
+              <p className="text-red-700 leading-relaxed">
+                O serviço pode ser interrompido a qualquer momento devido a falhas no servidor, 
+                manutenção ou outros problemas técnicos. Todos os dados dos utilizadores podem ser 
+                perdidos durante estas interrupções, uma vez que são armazenados temporariamente 
+                na memória RAM do servidor.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">8.1 Armazenamento Temporário</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Os dados dos utilizadores são armazenados temporariamente na memória RAM do servidor 
+                  e não são guardados de forma permanente. Isto significa que qualquer falha do servidor, 
+                  reinicialização ou interrupção do serviço resultará na perda total dos dados.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">8.2 Responsabilidade dos Utilizadores</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Os utilizadores são responsáveis por manter cópias das suas informações importantes 
+                  e contactos obtidos através da plataforma. O Jikulumessu não se responsabiliza pela 
+                  perda de dados resultante de interrupções do serviço.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">8.3 Limitação de Responsabilidade</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  O Jikulumessu não garante a disponibilidade contínua do serviço nem a preservação 
+                  dos dados. A utilização da plataforma é por sua conta e risco.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Plataformas Terceiras</h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              O Jikulumessu utiliza plataformas terceiras para hospedagem e infraestrutura. 
+              Não temos controlo sobre as políticas de dados destas plataformas:
+            </p>
+            <ul className="space-y-2 text-gray-600 mb-4">
+              <li>• <strong>Replit:</strong> Plataforma de hospedagem - consulte as políticas de privacidade em replit.com</li>
+              <li>• <strong>Supabase:</strong> Infraestrutura de base de dados - consulte as políticas de privacidade em supabase.com</li>
+            </ul>
+            <p className="text-gray-600 leading-relaxed">
+              Recomendamos que consulte as políticas de privacidade e termos de serviço destas plataformas 
+              para compreender como podem processar os seus dados.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Modificações dos Termos</h2>
             <p className="text-gray-600 leading-relaxed">
               Reservamo-nos o direito de modificar estes termos a qualquer momento. As alterações serão 
               comunicadas através da plataforma e entrarão em vigor 30 dias após a publicação.
@@ -133,7 +187,7 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Rescisão</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Rescisão</h2>
             <p className="text-gray-600 leading-relaxed">
               Podemos suspender ou encerrar a sua conta a qualquer momento por violação destes termos. 
               Pode também encerrar a sua conta a qualquer momento através das configurações do perfil.
@@ -141,7 +195,7 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Lei Aplicável</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">12. Lei Aplicável</h2>
             <p className="text-gray-600 leading-relaxed">
               Estes termos são regidos pelas leis da República de Angola. Qualquer disputa será resolvida 
               nos tribunais competentes de Angola.
@@ -149,7 +203,7 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Contacto</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">13. Contacto</h2>
             <p className="text-gray-600 leading-relaxed">
               Para questões sobre estes Termos de Serviço, contacte-nos através do email: 
               <a href="mailto:d2413175@gmail.com" className="text-blue-600 hover:text-blue-800">contacto@jikulumessu.ao</a>

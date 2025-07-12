@@ -113,16 +113,67 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Retenção de Dados</h2>
-            <p className="text-gray-600 leading-relaxed">
-              Mantemos os seus dados pessoais apenas pelo tempo necessário para cumprir os fins para os 
-              quais foram recolhidos, incluindo requisitos legais, contabilísticos ou de relatório. 
-              Quando eliminar a sua conta, os seus dados serão permanentemente removidos dentro de 30 dias.
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Armazenamento Temporário e Perda de Dados</h2>
+            <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+              <p className="text-red-800 font-semibold mb-2">AVISO CRÍTICO SOBRE DADOS:</p>
+              <p className="text-red-700 leading-relaxed">
+                Os seus dados são armazenados temporariamente na memória RAM do servidor e podem ser 
+                perdidos a qualquer momento devido a falhas técnicas, manutenção ou interrupções do serviço.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">7.1 Natureza Temporária dos Dados</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Todos os dados dos utilizadores são armazenados temporariamente na memória RAM 
+                  e não são guardados permanentemente numa base de dados. Isto significa que 
+                  qualquer reinicialização do servidor, falha técnica ou manutenção resultará 
+                  na perda completa dos dados.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">7.2 Backup e Recuperação</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Não é possível fazer backup ou recuperar dados perdidos. Os utilizadores 
+                  devem manter cópias das suas informações importantes e contactos obtidos 
+                  através da plataforma.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Plataformas Terceiras e Processamento de Dados</h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              O Jikulumessu utiliza as seguintes plataformas terceiras que podem processar 
+              os seus dados conforme as suas próprias políticas:
+            </p>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">8.1 Replit</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Plataforma de hospedagem que fornece a infraestrutura onde o Jikulumessu é executado. 
+                  Consulte a política de privacidade da Replit em: 
+                  <a href="https://replit.com/privacy" className="text-blue-600 hover:text-blue-800 ml-1">replit.com/privacy</a>
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">8.2 Supabase</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Plataforma de base de dados utilizada para infraestrutura (quando disponível). 
+                  Consulte a política de privacidade da Supabase em: 
+                  <a href="https://supabase.com/privacy" className="text-blue-600 hover:text-blue-800 ml-1">supabase.com/privacy</a>
+                </p>
+              </div>
+            </div>
+            <p className="text-gray-600 leading-relaxed mt-4">
+              Não temos controlo sobre como estas plataformas processam os dados. Recomendamos 
+              que consulte as suas políticas de privacidade para informações detalhadas.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Cookies e Tecnologias Similares</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Cookies e Tecnologias Similares</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
               Utilizamos cookies e tecnologias similares para:
             </p>
@@ -138,7 +189,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Transferências Internacionais</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Transferências Internacionais</h2>
             <p className="text-gray-600 leading-relaxed">
               Os seus dados são processados principalmente em Angola. Se houver necessidade de transferir 
               dados para fora do país, garantimos que existem salvaguardas adequadas para proteger a 
@@ -147,7 +198,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Menores de Idade</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Menores de Idade</h2>
             <p className="text-gray-600 leading-relaxed">
               A nossa plataforma não é destinada a menores de 18 anos. Não recolhemos intencionalmente 
               informações de menores. Se tomamos conhecimento de que recolhemos dados de um menor, 
@@ -156,7 +207,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Alterações à Política</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">12. Alterações à Política</h2>
             <p className="text-gray-600 leading-relaxed">
               Podemos actualizar esta Política de Privacidade periodicamente. Notificaremos sobre 
               alterações significativas através da plataforma ou email. Recomendamos que reveja 
@@ -165,7 +216,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">12. Contacto</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">13. Contacto</h2>
             <p className="text-gray-600 leading-relaxed">
               Para questões sobre esta Política de Privacidade ou para exercer os seus direitos, 
               contacte-nos através do email: <a href="mailto:d2413175@gmail.com" className="text-blue-600 hover:text-blue-800">contacto@jikulumessu.ao</a>

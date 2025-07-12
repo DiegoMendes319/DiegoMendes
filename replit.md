@@ -67,6 +67,13 @@ Jikulumessu is a full-stack web application designed to connect people with qual
   - Created dedicated login page with email, Google, and simple authentication methods
   - Simplified registration page to registration-only functionality
   - Updated tutorial to reflect new navigation structure
+✓ **Auto-scroll Review Modal (Janeiro 2025)**: Added automatic smooth scrolling to identification section when unauthenticated users click "Avaliar" - eliminates manual scrolling need
+✓ **Critical Service Disclaimers (Janeiro 2025)**: 
+  - Added comprehensive service interruption warnings to Terms of Service
+  - Added data loss disclaimers due to temporary RAM storage
+  - Added third-party platform policies section mentioning Replit and Supabase
+  - Updated Privacy Policy with critical data storage warnings
+  - Clearly stated all user data is temporarily stored and can be lost during server failures
 
 ## User Preferences
 
