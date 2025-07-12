@@ -25,6 +25,7 @@ export default function AdminPage() {
   const [newSettingKey, setNewSettingKey] = useState("");
   const [newSettingValue, setNewSettingValue] = useState("");
   const [editingSettings, setEditingSettings] = useState({});
+  const [settingsValues, setSettingsValues] = useState({});
 
   // Check if user is admin
   const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
@@ -69,6 +70,17 @@ export default function AdminPage() {
     queryKey: ['/api/admin/analytics'],
     enabled: !!isAdmin,
   });
+
+  // Initialize settings values when data is loaded
+  useEffect(() => {
+    if (settings) {
+      const initialValues = {};
+      settings.forEach(setting => {
+        initialValues[setting.key] = setting.value;
+      });
+      setSettingsValues(initialValues);
+    }
+  }, [settings]);
 
   // Update user role mutation
   const updateUserRoleMutation = useMutation({
@@ -121,9 +133,16 @@ export default function AdminPage() {
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
       return await apiRequest(`/api/admin/settings/${key}`, 'PATCH', { value });
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
+      
+      // Update local state immediately
+      setSettingsValues(prev => ({
+        ...prev,
+        [variables.key]: variables.value
+      }));
+      
       toast({
         title: "Definição atualizada",
         description: "A definição do site foi atualizada com sucesso.",
@@ -513,17 +532,28 @@ export default function AdminPage() {
                           <div className="flex items-center gap-3 w-full">
                             <input
                               type="color"
-                              value={setting.value}
+                              value={settingsValues[setting.key] || setting.value}
                               onChange={(e) => {
+                                const newValue = e.target.value;
+                                setSettingsValues(prev => ({
+                                  ...prev,
+                                  [setting.key]: newValue
+                                }));
                                 updateSettingMutation.mutate({
                                   key: setting.key,
-                                  value: e.target.value
+                                  value: newValue
                                 });
                               }}
                               className="w-12 h-10 border rounded cursor-pointer"
                             />
                             <Input
-                              value={setting.value}
+                              value={settingsValues[setting.key] || setting.value}
+                              onChange={(e) => {
+                                setSettingsValues(prev => ({
+                                  ...prev,
+                                  [setting.key]: e.target.value
+                                }));
+                              }}
                               onBlur={(e) => {
                                 if (e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) {
                                   updateSettingMutation.mutate({
@@ -548,23 +578,34 @@ export default function AdminPage() {
                           <div className="flex items-center gap-3 w-full">
                             <input
                               type="checkbox"
-                              checked={setting.value === 'true'}
+                              checked={(settingsValues[setting.key] || setting.value) === 'true'}
                               onChange={(e) => {
+                                const newValue = e.target.checked ? 'true' : 'false';
+                                setSettingsValues(prev => ({
+                                  ...prev,
+                                  [setting.key]: newValue
+                                }));
                                 updateSettingMutation.mutate({
                                   key: setting.key,
-                                  value: e.target.checked ? 'true' : 'false'
+                                  value: newValue
                                 });
                               }}
                               className="w-5 h-5"
                             />
                             <span className="text-sm">
-                              {setting.value === 'true' ? 'Activado' : 'Desactivado'}
+                              {(settingsValues[setting.key] || setting.value) === 'true' ? 'Activado' : 'Desactivado'}
                             </span>
                           </div>
                         ) : setting.type === 'number' ? (
                           <Input
                             type="number"
-                            value={setting.value}
+                            value={settingsValues[setting.key] || setting.value}
+                            onChange={(e) => {
+                              setSettingsValues(prev => ({
+                                ...prev,
+                                [setting.key]: e.target.value
+                              }));
+                            }}
                             onBlur={(e) => {
                               if (e.target.value !== setting.value) {
                                 updateSettingMutation.mutate({
@@ -586,7 +627,13 @@ export default function AdminPage() {
                         ) : setting.type === 'email' ? (
                           <Input
                             type="email"
-                            value={setting.value}
+                            value={settingsValues[setting.key] || setting.value}
+                            onChange={(e) => {
+                              setSettingsValues(prev => ({
+                                ...prev,
+                                [setting.key]: e.target.value
+                              }));
+                            }}
                             onBlur={(e) => {
                               if (e.target.value !== setting.value) {
                                 updateSettingMutation.mutate({
@@ -607,7 +654,13 @@ export default function AdminPage() {
                           />
                         ) : (
                           <Input
-                            value={setting.value}
+                            value={settingsValues[setting.key] || setting.value}
+                            onChange={(e) => {
+                              setSettingsValues(prev => ({
+                                ...prev,
+                                [setting.key]: e.target.value
+                              }));
+                            }}
                             onBlur={(e) => {
                               if (e.target.value !== setting.value) {
                                 updateSettingMutation.mutate({
