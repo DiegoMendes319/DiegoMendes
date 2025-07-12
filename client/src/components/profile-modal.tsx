@@ -63,10 +63,15 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                   <Calendar className="h-4 w-4 mr-2 text-[var(--angola-red)]" />
                   {user.age} anos
                 </p>
-                <p className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-2 text-[var(--angola-red)]" />
-                  {user.province}, {user.municipality}, {user.neighborhood}
-                </p>
+                <div className="flex items-start">
+                  <MapPin className="h-4 w-4 mr-2 text-[var(--angola-red)] mt-0.5" />
+                  <div>
+                    <p>{user.province}, {user.municipality}, {user.neighborhood}</p>
+                    {user.address_complement && (
+                      <p className="text-xs text-gray-500 mt-1">{user.address_complement}</p>
+                    )}
+                  </div>
+                </div>
                 <p className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-[var(--angola-red)]" />
                   Membro desde {new Date(user.created_at).getFullYear()}

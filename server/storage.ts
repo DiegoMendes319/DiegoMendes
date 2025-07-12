@@ -80,7 +80,7 @@ export class MemStorage implements IStorage {
       facebook_url: "https://facebook.com/maria.silva",
       instagram_url: null,
       tiktok_url: null,
-      address_complement: null,
+      address_complement: "Rua 15 de Outubro, Casa 34, próximo ao Mercado do Maianga",
       about_me: null,
       password: null,
       rating: 4.5,

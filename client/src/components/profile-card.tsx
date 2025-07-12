@@ -34,10 +34,20 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
           )}
         </div>
         
-        <p className="text-gray-600 mb-3 flex items-center">
-          <MapPin className="h-4 w-4 mr-1 text-[var(--angola-red)]" />
-          {user.province}, {user.municipality}
-        </p>
+        <div className="text-gray-600 mb-3">
+          <p className="flex items-center">
+            <MapPin className="h-4 w-4 mr-1 text-[var(--angola-red)]" />
+            {user.province}, {user.municipality}
+          </p>
+          {user.neighborhood && (
+            <p className="text-sm text-gray-500 ml-5">{user.neighborhood}</p>
+          )}
+          {user.address_complement && (
+            <p className="text-sm text-gray-500 ml-5 mt-1">
+              {user.address_complement}
+            </p>
+          )}
+        </div>
         
         <div className="flex flex-wrap gap-2 mb-4">
           {user.services.slice(0, 2).map((service) => (
