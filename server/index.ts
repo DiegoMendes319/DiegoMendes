@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -35,6 +36,42 @@ app.use((req, res, next) => {
     }
   });
 
+  next();
+});
+
+// Maintenance mode middleware
+app.use(async (req, res, next) => {
+  // Skip maintenance check for API routes, admin routes, and static assets
+  if (req.path.startsWith('/api') || req.path.startsWith('/@') || req.path.startsWith('/src') || req.path.includes('.')) {
+    return next();
+  }
+
+  try {
+    const maintenanceSetting = await storage.getSiteSetting('maintenance_mode');
+    const isMaintenanceMode = maintenanceSetting?.value === 'true';
+    
+    if (isMaintenanceMode) {
+      // Check if user is admin
+      const sessionToken = req.cookies?.session_token;
+      if (sessionToken) {
+        const user = await storage.validateSession(sessionToken);
+        if (user) {
+          const isAdmin = await storage.isAdmin(user.id);
+          if (isAdmin) {
+            return next(); // Allow admin access
+          }
+        }
+      }
+      
+      // Redirect to maintenance page for non-admin users
+      if (req.path !== '/maintenance') {
+        return res.redirect('/maintenance');
+      }
+    }
+  } catch (error) {
+    console.error('Error checking maintenance mode:', error);
+  }
+  
   next();
 });
 
