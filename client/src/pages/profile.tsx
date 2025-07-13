@@ -188,6 +188,10 @@ export default function Profile() {
     updateProfileMutation.mutate(formData);
   };
 
+  const handleSaveChanges = () => {
+    updateProfileMutation.mutate(formData);
+  };
+
   const handleDeleteAccount = () => {
     deleteAccountMutation.mutate();
     setDeleteDialogOpen(false);
@@ -382,6 +386,19 @@ export default function Profile() {
                   <Edit className="h-4 w-4 mr-2" />
                   {editMode ? 'Cancelar' : 'Editar Perfil'}
                 </Button>
+                
+                {/* Save Changes Button - appears only in edit mode */}
+                {editMode && (
+                  <Button
+                    onClick={handleSaveChanges}
+                    disabled={updateProfileMutation.isPending}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {updateProfileMutation.isPending ? 'A guardar...' : 'Guardar Alterações'}
+                  </Button>
+                )}
+                
                 <Button
                   variant="outline"
                   onClick={() => setLocation('/change-password')}

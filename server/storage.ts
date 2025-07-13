@@ -143,7 +143,7 @@ export class MemStorage implements IStorage {
       contract_type: "diarista",
       availability: "Segunda a Sexta, 8h às 18h",
       about_me: "Administrador principal da plataforma Jikulumessu. Responsável pela gestão e manutenção do sistema, suporte aos utilizadores e desenvolvimento de novas funcionalidades.",
-      profile_url: "https://i.pravatar.cc/300?u=admin",
+      profile_url: null,
       facebook_url: "https://facebook.com/jikulumessu",
       instagram_url: "https://instagram.com/jikulumessu",
       whatsapp_url: "https://wa.me/244900000000",
@@ -1073,7 +1073,7 @@ export class MemStorage implements IStorage {
         return {
           ...conv,
           participant_name: otherParticipant?.name || 'Utilizador',
-          participant_profile_image: otherParticipant?.profile_image || null,
+          participant_profile_image: otherParticipant?.profile_url || null,
           last_message: lastMessage?.content || null,
           last_message_time: lastMessage?.created_at || conv.updated_at,
           unread_count: unreadCount
