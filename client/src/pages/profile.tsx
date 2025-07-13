@@ -35,6 +35,7 @@ import {
   Lock,
   MessageCircle
 } from "lucide-react";
+import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 import { serviceOptions } from "@/lib/service-options";
 
@@ -612,7 +613,10 @@ export default function Profile() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="facebook_url">Facebook</Label>
+                  <Label htmlFor="facebook_url" className="flex items-center gap-2">
+                    <FaFacebook className="h-5 w-5 text-blue-600" />
+                    Facebook
+                  </Label>
                   <Input
                     id="facebook_url"
                     value={formData.facebook_url}
@@ -622,7 +626,10 @@ export default function Profile() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="instagram_url">Instagram</Label>
+                  <Label htmlFor="instagram_url" className="flex items-center gap-2">
+                    <FaInstagram className="h-5 w-5 text-pink-600" />
+                    Instagram
+                  </Label>
                   <Input
                     id="instagram_url"
                     value={formData.instagram_url}
@@ -632,7 +639,10 @@ export default function Profile() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="whatsapp_url">WhatsApp</Label>
+                  <Label htmlFor="whatsapp_url" className="flex items-center gap-2">
+                    <FaWhatsapp className="h-5 w-5 text-green-600" />
+                    WhatsApp
+                  </Label>
                   <Input
                     id="whatsapp_url"
                     value={formData.whatsapp_url}

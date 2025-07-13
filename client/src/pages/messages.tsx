@@ -491,7 +491,7 @@ export default function MessagesPage() {
         )}
       </div>
 
-      <div className={`${isMobile ? 'h-[calc(100vh-80px)]' : 'flex h-[calc(100vh-120px)]'} bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700`}>
+      <div className={`${isMobile ? 'h-[calc(100vh-140px)]' : 'flex h-[calc(100vh-160px)]'} bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700`}>
         {/* Conversations List - Responsive */}
         <div className={`${
           isMobile 
@@ -711,11 +711,11 @@ export default function MessagesPage() {
               
 
               
-              {/* Message Input - Mobile Enhanced */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                <div className="flex items-end space-x-2">
-                  <Textarea
-                    placeholder="Escreva sua mensagem..."
+              {/* WhatsApp-style Message Input */}
+              <div className="p-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-3 bg-gray-50 dark:bg-gray-800 rounded-full px-4 py-2 shadow-sm">
+                  <Input
+                    placeholder="Escreva uma mensagem..."
                     value={messageContent}
                     onChange={(e) => {
                       try {
@@ -724,14 +724,13 @@ export default function MessagesPage() {
                         console.error('Error in message input:', error);
                       }
                     }}
-                    className="flex-1 min-h-[44px] max-h-32 resize-none"
+                    className="flex-1 border-none bg-transparent focus:ring-0 focus:outline-none shadow-none text-sm"
                     onKeyDown={(e) => {
                       try {
-                        if (e.key === 'Enter' && e.shiftKey) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
                           handleSendMessage();
                         }
-                        // Allow normal Enter for line breaks
                       } catch (error) {
                         console.error('Error in keydown handler:', error);
                       }
@@ -751,7 +750,7 @@ export default function MessagesPage() {
                       }
                     }}
                     disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                    className="h-11 px-4"
+                    className="h-8 w-8 p-0 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
