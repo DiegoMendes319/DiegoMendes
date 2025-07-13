@@ -247,6 +247,184 @@ export default function AdminPage() {
     }
   };
 
+  // Função para obter descrição da definição
+  const getSettingDescription = (key: string) => {
+    const descriptions = {
+      'site_title': 'O título principal do site que aparece no navegador e nos resultados de pesquisa',
+      'site_description': 'Descrição breve do site para SEO e redes sociais',
+      'contact_email': 'Email principal para contacto público',
+      'contact_phone': 'Número de telefone para contacto',
+      'maintenance_mode': 'Activar/desactivar modo de manutenção (true/false)',
+      'max_upload_size': 'Tamanho máximo permitido para uploads em MB',
+      'registration_enabled': 'Permitir que novos utilizadores se registem (true/false)',
+      'review_moderation': 'Activar moderação de avaliações antes de publicar (true/false)',
+      'welcome_message': 'Mensagem mostrada aos novos utilizadores',
+      'terms_version': 'Versão atual dos termos de serviço',
+      'privacy_version': 'Versão atual da política de privacidade',
+      'featured_services': 'Lista de serviços em destaque separados por vírgula',
+      'social_facebook': 'URL da página do Facebook',
+      'social_instagram': 'URL da página do Instagram',
+      'analytics_enabled': 'Activar sistema de análise de dados (true/false)',
+      'notification_email': 'Email para receber notificações do sistema',
+    };
+    return descriptions[key] || 'Definição personalizada do sistema';
+  };
+
+  // Função para obter exemplo da definição
+  const getSettingExample = (key: string) => {
+    const examples = {
+      'site_title': 'Jikulumessu - Portal de Serviços',
+      'site_description': 'Plataforma para conectar pessoas com prestadores de serviços em Angola',
+      'contact_email': 'contacto@jikulumessu.ao',
+      'contact_phone': '+244 900 000 000',
+      'maintenance_mode': 'false',
+      'max_upload_size': '10',
+      'registration_enabled': 'true',
+      'review_moderation': 'false',
+      'welcome_message': 'Bem-vindo ao Jikulumessu! Encontre os melhores serviços aqui.',
+      'terms_version': '1.0',
+      'privacy_version': '1.0',
+      'featured_services': 'limpeza, jardinagem, segurança, transporte',
+      'social_facebook': 'https://facebook.com/jikulumessu',
+      'social_instagram': 'https://instagram.com/jikulumessu',
+      'analytics_enabled': 'true',
+      'notification_email': 'admin@jikulumessu.ao',
+    };
+    return examples[key] || 'valor_exemplo';
+  };
+
+  // Função para obter input apropriado
+  const getSettingInput = (key: string) => {
+    const booleanKeys = ['maintenance_mode', 'registration_enabled', 'review_moderation', 'analytics_enabled'];
+    const textareaKeys = ['site_description', 'welcome_message', 'featured_services'];
+    
+    if (booleanKeys.includes(key)) {
+      return (
+        <Select value={newSettingValue} onValueChange={setNewSettingValue}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Activado</SelectItem>
+            <SelectItem value="false">Desactivado</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    } else if (textareaKeys.includes(key)) {
+      return (
+        <Textarea
+          value={newSettingValue}
+          onChange={(e) => setNewSettingValue(e.target.value)}
+          placeholder={getSettingExample(key)}
+          rows={3}
+        />
+      );
+    } else {
+      return (
+        <Input
+          value={newSettingValue}
+          onChange={(e) => setNewSettingValue(e.target.value)}
+          placeholder={getSettingExample(key)}
+        />
+      );
+    }
+  };
+
+  // Função para obter nome amigável da definição
+  const getSettingFriendlyName = (key: string) => {
+    const names = {
+      'site_title': 'Título do Site',
+      'site_description': 'Descrição do Site',
+      'contact_email': 'Email de Contacto',
+      'contact_phone': 'Telefone de Contacto',
+      'maintenance_mode': 'Modo de Manutenção',
+      'max_upload_size': 'Tamanho Máximo de Upload (MB)',
+      'registration_enabled': 'Permitir Novos Registos',
+      'review_moderation': 'Moderação de Avaliações',
+      'welcome_message': 'Mensagem de Boas-vindas',
+      'terms_version': 'Versão dos Termos',
+      'privacy_version': 'Versão da Política de Privacidade',
+      'featured_services': 'Serviços em Destaque',
+      'social_facebook': 'Facebook URL',
+      'social_instagram': 'Instagram URL',
+      'analytics_enabled': 'Análise de Dados Activada',
+      'notification_email': 'Email para Notificações',
+    };
+    return names[key] || key;
+  };
+
+  // Função para obter input de edição
+  const getSettingEditInput = (key: string, currentValue: string) => {
+    const booleanKeys = ['maintenance_mode', 'registration_enabled', 'review_moderation', 'analytics_enabled'];
+    const textareaKeys = ['site_description', 'welcome_message', 'featured_services'];
+    
+    if (booleanKeys.includes(key)) {
+      return (
+        <Select 
+          value={settingsValues[key] || currentValue} 
+          onValueChange={(value) => {
+            setSettingsValues(prev => ({ ...prev, [key]: value }));
+            updateSettingMutation.mutate({ key, value });
+            setEditingSettings(prev => ({ ...prev, [key]: false }));
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Activado</SelectItem>
+            <SelectItem value="false">Desactivado</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    } else if (textareaKeys.includes(key)) {
+      return (
+        <Textarea
+          value={settingsValues[key] || currentValue}
+          onChange={(e) => {
+            setSettingsValues(prev => ({ ...prev, [key]: e.target.value }));
+          }}
+          onBlur={() => {
+            if (settingsValues[key] !== currentValue) {
+              updateSettingMutation.mutate({ key, value: settingsValues[key] });
+            }
+            setEditingSettings(prev => ({ ...prev, [key]: false }));
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+              updateSettingMutation.mutate({ key, value: e.target.value });
+              setEditingSettings(prev => ({ ...prev, [key]: false }));
+            }
+          }}
+          placeholder={getSettingExample(key)}
+          rows={3}
+        />
+      );
+    } else {
+      return (
+        <Input
+          value={settingsValues[key] || currentValue}
+          onChange={(e) => {
+            setSettingsValues(prev => ({ ...prev, [key]: e.target.value }));
+          }}
+          onBlur={() => {
+            if (settingsValues[key] !== currentValue) {
+              updateSettingMutation.mutate({ key, value: settingsValues[key] });
+            }
+            setEditingSettings(prev => ({ ...prev, [key]: false }));
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.value !== currentValue) {
+              updateSettingMutation.mutate({ key, value: e.target.value });
+              setEditingSettings(prev => ({ ...prev, [key]: false }));
+            }
+          }}
+          placeholder={getSettingExample(key)}
+        />
+      );
+    }
+  };
+
 
 
   return (
@@ -512,29 +690,55 @@ export default function AdminPage() {
                         Nova Definição
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>Adicionar Nova Definição</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="setting-key">Chave</Label>
-                          <Input
-                            id="setting-key"
-                            value={newSettingKey}
-                            onChange={(e) => setNewSettingKey(e.target.value)}
-                            placeholder="site_title"
-                          />
+                          <Label htmlFor="setting-key">Escolha uma definição</Label>
+                          <Select value={newSettingKey} onValueChange={setNewSettingKey}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma definição..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="site_title">Título do Site</SelectItem>
+                              <SelectItem value="site_description">Descrição do Site</SelectItem>
+                              <SelectItem value="contact_email">Email de Contacto</SelectItem>
+                              <SelectItem value="contact_phone">Telefone de Contacto</SelectItem>
+                              <SelectItem value="maintenance_mode">Modo de Manutenção</SelectItem>
+                              <SelectItem value="max_upload_size">Tamanho Máximo de Upload (MB)</SelectItem>
+                              <SelectItem value="registration_enabled">Permitir Novos Registos</SelectItem>
+                              <SelectItem value="review_moderation">Moderação de Avaliações</SelectItem>
+                              <SelectItem value="welcome_message">Mensagem de Boas-vindas</SelectItem>
+                              <SelectItem value="terms_version">Versão dos Termos</SelectItem>
+                              <SelectItem value="privacy_version">Versão da Política de Privacidade</SelectItem>
+                              <SelectItem value="featured_services">Serviços em Destaque</SelectItem>
+                              <SelectItem value="social_facebook">Facebook URL</SelectItem>
+                              <SelectItem value="social_instagram">Instagram URL</SelectItem>
+                              <SelectItem value="analytics_enabled">Análise de Dados Activada</SelectItem>
+                              <SelectItem value="notification_email">Email para Notificações</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
+                        
+                        {/* Descrição da definição selecionada */}
+                        {newSettingKey && (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm text-blue-800 font-medium">
+                              {getSettingDescription(newSettingKey)}
+                            </p>
+                            <p className="text-xs text-blue-600 mt-1">
+                              Exemplo: {getSettingExample(newSettingKey)}
+                            </p>
+                          </div>
+                        )}
+                        
                         <div>
                           <Label htmlFor="setting-value">Valor</Label>
-                          <Textarea
-                            id="setting-value"
-                            value={newSettingValue}
-                            onChange={(e) => setNewSettingValue(e.target.value)}
-                            placeholder="Jikulumessu - Portal de Serviços"
-                          />
+                          {getSettingInput(newSettingKey)}
                         </div>
+                        
                         <div className="flex gap-2">
                           <Button
                             onClick={() => {
@@ -549,7 +753,11 @@ export default function AdminPage() {
                           >
                             Guardar
                           </Button>
-                          <Button variant="outline" onClick={() => setIsSettingsDialogOpen(false)}>
+                          <Button variant="outline" onClick={() => {
+                            setIsSettingsDialogOpen(false);
+                            setNewSettingKey('');
+                            setNewSettingValue('');
+                          }}>
                             Cancelar
                           </Button>
                         </div>
