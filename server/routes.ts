@@ -99,8 +99,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Simple register endpoint (name + password + complete info)
+  // Site colors endpoint
+  app.get("/api/site-colors", async (req, res) => {
+    try {
+      const settings = await storage.getSiteSettings();
+      const colors = {};
+      
+      settings.forEach(setting => {
+        if (setting.key.includes('_color')) {
+          colors[setting.key] = setting.value;
+        }
+      });
+      
+      res.json(colors);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   app.post("/api/auth/simple-register", async (req, res) => {
     try {
+      // Verificar se registos estão habilitados
+      const registrationSetting = await storage.getSiteSetting('registration_enabled');
+      if (registrationSetting && registrationSetting.value === 'false') {
+        return res.status(403).json({ 
+          error: "Registos temporariamente desativados", 
+          message: "De momento, não estamos a permitir novos registos. Estaremos disponíveis em breve."
+        });
+      }
+
       const userData = req.body;
       
       if (!userData.first_name || !userData.last_name || !userData.password) {
@@ -170,6 +197,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/register", async (req, res) => {
     try {
+      // Verificar se registos estão habilitados
+      const registrationSetting = await storage.getSiteSetting('registration_enabled');
+      if (registrationSetting && registrationSetting.value === 'false') {
+        return res.status(403).json({ 
+          error: "Registos temporariamente desativados", 
+          message: "De momento, não estamos a permitir novos registos. Estaremos disponíveis em breve."
+        });
+      }
+
       const userData = req.body;
       
       // Validate required fields
@@ -985,7 +1021,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const maintenanceSetting = await storage.getSiteSetting('maintenance_mode');
       const isEnabled = maintenanceSetting?.value === 'true';
-      res.json({ enabled: isEnabled });
+      
+      // Check if user is admin to bypass maintenance mode
+      const sessionToken = req.cookies?.session_token;
+      let isAdmin = false;
+      
+      if (sessionToken) {
+        const user = await storage.validateSession(sessionToken);
+        if (user) {
+          isAdmin = await storage.isAdmin(user.id);
+        }
+      }
+      
+      res.json({ 
+        enabled: isEnabled && !isAdmin, // If user is admin, maintenance mode is disabled for them
+        isAdmin: isAdmin
+      });
     } catch (error) {
       console.error('Error checking maintenance mode:', error);
       res.json({ enabled: false });

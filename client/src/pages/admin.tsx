@@ -266,6 +266,26 @@ export default function AdminPage() {
       'social_instagram': 'URL da página do Instagram',
       'analytics_enabled': 'Activar sistema de análise de dados (true/false)',
       'notification_email': 'Email para receber notificações do sistema',
+      'primary_color': 'Cor principal do site e elementos principais',
+      'secondary_color': 'Cor secundária para elementos complementares',
+      'accent_color': 'Cor de destaque para elementos importantes',
+      'background_color': 'Cor de fundo principal do site',
+      'text_color': 'Cor principal do texto',
+      'header_color': 'Cor do cabeçalho/navbar',
+      'footer_color': 'Cor do rodapé',
+      'button_color': 'Cor dos botões principais',
+      'link_color': 'Cor dos links',
+      'border_color': 'Cor das bordas e separadores',
+      'success_color': 'Cor para mensagens de sucesso',
+      'warning_color': 'Cor para mensagens de aviso',
+      'error_color': 'Cor para mensagens de erro',
+      'info_color': 'Cor para mensagens informativas',
+      'card_background': 'Cor de fundo dos cartões',
+      'sidebar_color': 'Cor da barra lateral',
+      'menu_color': 'Cor do menu de navegação',
+      'hover_color': 'Cor quando o cursor passa sobre elementos',
+      'active_color': 'Cor para elementos ativos/selecionados',
+      'disabled_color': 'Cor para elementos desativados',
     };
     return descriptions[key] || 'Definição personalizada do sistema';
   };
@@ -289,6 +309,26 @@ export default function AdminPage() {
       'social_instagram': 'https://instagram.com/jikulumessu',
       'analytics_enabled': 'true',
       'notification_email': 'admin@jikulumessu.ao',
+      'primary_color': '#DC2626',
+      'secondary_color': '#000000',
+      'accent_color': '#FCD34D',
+      'background_color': '#FFFFFF',
+      'text_color': '#111827',
+      'header_color': '#DC2626',
+      'footer_color': '#374151',
+      'button_color': '#DC2626',
+      'link_color': '#2563EB',
+      'border_color': '#D1D5DB',
+      'success_color': '#059669',
+      'warning_color': '#D97706',
+      'error_color': '#DC2626',
+      'info_color': '#0EA5E9',
+      'card_background': '#F9FAFB',
+      'sidebar_color': '#F3F4F6',
+      'menu_color': '#FFFFFF',
+      'hover_color': '#F3F4F6',
+      'active_color': '#EF4444',
+      'disabled_color': '#9CA3AF',
     };
     return examples[key] || 'valor_exemplo';
   };
@@ -297,8 +337,26 @@ export default function AdminPage() {
   const getSettingInput = (key: string) => {
     const booleanKeys = ['maintenance_mode', 'registration_enabled', 'review_moderation', 'analytics_enabled'];
     const textareaKeys = ['site_description', 'welcome_message', 'featured_services'];
+    const colorKeys = ['primary_color', 'secondary_color', 'accent_color', 'background_color', 'text_color', 'header_color', 'footer_color', 'button_color', 'link_color', 'border_color', 'success_color', 'warning_color', 'error_color', 'info_color', 'card_background', 'sidebar_color', 'menu_color', 'hover_color', 'active_color', 'disabled_color'];
     
-    if (booleanKeys.includes(key)) {
+    if (colorKeys.includes(key)) {
+      return (
+        <div className="flex items-center gap-3">
+          <input
+            type="color"
+            value={newSettingValue || getSettingExample(key)}
+            onChange={(e) => setNewSettingValue(e.target.value)}
+            className="w-12 h-10 border rounded cursor-pointer"
+          />
+          <Input
+            value={newSettingValue}
+            onChange={(e) => setNewSettingValue(e.target.value)}
+            placeholder={getSettingExample(key)}
+            className="flex-1"
+          />
+        </div>
+      );
+    } else if (booleanKeys.includes(key)) {
       return (
         <Select value={newSettingValue} onValueChange={setNewSettingValue}>
           <SelectTrigger>
@@ -357,8 +415,45 @@ export default function AdminPage() {
   const getSettingEditInput = (key: string, currentValue: string) => {
     const booleanKeys = ['maintenance_mode', 'registration_enabled', 'review_moderation', 'analytics_enabled'];
     const textareaKeys = ['site_description', 'welcome_message', 'featured_services'];
+    const colorKeys = ['primary_color', 'secondary_color', 'accent_color', 'background_color', 'text_color', 'header_color', 'footer_color', 'button_color', 'link_color', 'border_color', 'success_color', 'warning_color', 'error_color', 'info_color', 'card_background', 'sidebar_color', 'menu_color', 'hover_color', 'active_color', 'disabled_color'];
     
-    if (booleanKeys.includes(key)) {
+    if (colorKeys.includes(key)) {
+      return (
+        <div className="flex items-center gap-3">
+          <input
+            type="color"
+            value={settingsValues[key] || currentValue}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setSettingsValues(prev => ({ ...prev, [key]: newValue }));
+              updateSettingMutation.mutate({ key, value: newValue });
+              setEditingSettings(prev => ({ ...prev, [key]: false }));
+            }}
+            className="w-12 h-10 border rounded cursor-pointer"
+          />
+          <Input
+            value={settingsValues[key] || currentValue}
+            onChange={(e) => {
+              setSettingsValues(prev => ({ ...prev, [key]: e.target.value }));
+            }}
+            onBlur={() => {
+              if (settingsValues[key] !== currentValue) {
+                updateSettingMutation.mutate({ key, value: settingsValues[key] });
+              }
+              setEditingSettings(prev => ({ ...prev, [key]: false }));
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.target.value !== currentValue) {
+                updateSettingMutation.mutate({ key, value: e.target.value });
+                setEditingSettings(prev => ({ ...prev, [key]: false }));
+              }
+            }}
+            placeholder={getSettingExample(key)}
+            className="flex-1"
+          />
+        </div>
+      );
+    } else if (booleanKeys.includes(key)) {
       return (
         <Select 
           value={settingsValues[key] || currentValue} 
@@ -704,20 +799,35 @@ export default function AdminPage() {
                             <SelectContent>
                               <SelectItem value="site_title">Título do Site</SelectItem>
                               <SelectItem value="site_description">Descrição do Site</SelectItem>
-                              <SelectItem value="contact_email">Email de Contacto</SelectItem>
-                              <SelectItem value="contact_phone">Telefone de Contacto</SelectItem>
                               <SelectItem value="maintenance_mode">Modo de Manutenção</SelectItem>
-                              <SelectItem value="max_upload_size">Tamanho Máximo de Upload (MB)</SelectItem>
                               <SelectItem value="registration_enabled">Permitir Novos Registos</SelectItem>
                               <SelectItem value="review_moderation">Moderação de Avaliações</SelectItem>
                               <SelectItem value="welcome_message">Mensagem de Boas-vindas</SelectItem>
                               <SelectItem value="terms_version">Versão dos Termos</SelectItem>
                               <SelectItem value="privacy_version">Versão da Política de Privacidade</SelectItem>
                               <SelectItem value="featured_services">Serviços em Destaque</SelectItem>
-                              <SelectItem value="social_facebook">Facebook URL</SelectItem>
-                              <SelectItem value="social_instagram">Instagram URL</SelectItem>
                               <SelectItem value="analytics_enabled">Análise de Dados Activada</SelectItem>
                               <SelectItem value="notification_email">Email para Notificações</SelectItem>
+                              <SelectItem value="primary_color">Cor Primária</SelectItem>
+                              <SelectItem value="secondary_color">Cor Secundária</SelectItem>
+                              <SelectItem value="accent_color">Cor de Destaque</SelectItem>
+                              <SelectItem value="background_color">Cor de Fundo</SelectItem>
+                              <SelectItem value="text_color">Cor do Texto</SelectItem>
+                              <SelectItem value="header_color">Cor do Cabeçalho</SelectItem>
+                              <SelectItem value="footer_color">Cor do Rodapé</SelectItem>
+                              <SelectItem value="button_color">Cor dos Botões</SelectItem>
+                              <SelectItem value="link_color">Cor dos Links</SelectItem>
+                              <SelectItem value="border_color">Cor das Bordas</SelectItem>
+                              <SelectItem value="success_color">Cor de Sucesso</SelectItem>
+                              <SelectItem value="warning_color">Cor de Aviso</SelectItem>
+                              <SelectItem value="error_color">Cor de Erro</SelectItem>
+                              <SelectItem value="info_color">Cor de Informação</SelectItem>
+                              <SelectItem value="card_background">Fundo dos Cartões</SelectItem>
+                              <SelectItem value="sidebar_color">Cor da Barra Lateral</SelectItem>
+                              <SelectItem value="menu_color">Cor do Menu</SelectItem>
+                              <SelectItem value="hover_color">Cor de Hover</SelectItem>
+                              <SelectItem value="active_color">Cor Ativa</SelectItem>
+                              <SelectItem value="disabled_color">Cor Desativada</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

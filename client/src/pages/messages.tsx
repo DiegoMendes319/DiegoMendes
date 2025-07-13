@@ -55,22 +55,37 @@ export default function MessagesPage() {
   
   // Error boundary state
   const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   
-  // Catch errors
+  // Mobile-specific error handling
   useEffect(() => {
     const handleError = (error: any) => {
       console.error('MessagesPage error:', error);
       setHasError(true);
+      setErrorMessage(error.message || 'Erro desconhecido');
     };
     
+    const handleUnhandledRejection = (event: any) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      setHasError(true);
+      setErrorMessage('Erro de conexão');
+    };
+    
+    // Add multiple error listeners for better mobile compatibility
     window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
   }, []);
   
   // Reset error state
   const resetError = () => {
     setHasError(false);
-    window.location.reload();
+    setErrorMessage('');
+    queryClient.clear(); // Clear all cached queries
   };
   
   // Error fallback UI
@@ -221,10 +236,23 @@ export default function MessagesPage() {
 
   // Auto-resize removed to prevent crashes
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages - Mobile-safe version
   useEffect(() => {
-    if (messagesEndRef.current && messages && messages.length > 0) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    try {
+      if (messagesEndRef.current && messages && messages.length > 0) {
+        // Use setTimeout for mobile compatibility
+        setTimeout(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'end',
+              inline: 'nearest'
+            });
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error scrolling to bottom:', error);
     }
   }, [messages]);
 
@@ -232,15 +260,24 @@ export default function MessagesPage() {
     if (!selectedConversation || !messageContent.trim()) return;
     
     try {
+      const formattedContent = formatMessageContent(messageContent.trim());
+      
       await sendMessageMutation.mutateAsync({
         conversationId: selectedConversation,
-        content: messageContent.trim(),
+        content: formattedContent,
       });
       
       setMessageContent('');
+      setIsBold(false);
+      setReplyingToMessage(null);
       
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar a mensagem",
+        variant: "destructive"
+      });
     }
   };
 
@@ -333,9 +370,28 @@ export default function MessagesPage() {
     (conv: Conversation) => conv.id === selectedConversation
   );
 
+  // Handle error state with better mobile UX
+  if (hasError) {
+    return (
+      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-red-600 dark:text-red-400 text-lg font-medium">
+            Erro na página de mensagens
+          </div>
+          <div className="text-gray-600 dark:text-gray-400 text-sm">
+            {errorMessage || 'Ocorreu um erro inesperado'}
+          </div>
+          <Button onClick={resetError} className="mt-4">
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (conversationsLoading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
         <div className="text-center">Carregando conversas...</div>
       </div>
     );
@@ -543,25 +599,36 @@ export default function MessagesPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {messages.map((message: Message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg message-bubble ${
-                            message.sender_id === user?.id ? 'sent' : 'received'
-                          }`}
-                        >
-                          <div className="whitespace-pre-wrap break-words">
-                            {message.content}
+                    {messages.map((message: Message) => {
+                      try {
+                        return (
+                          <div
+                            key={message.id}
+                            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div
+                              className={`max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg message-bubble ${
+                                message.sender_id === user?.id ? 'sent' : 'received'
+                              }`}
+                            >
+                              <div className="whitespace-pre-wrap break-words">
+                                {message.content || 'Mensagem sem conteúdo'}
+                              </div>
+                              <div className="text-xs opacity-75 mt-1">
+                                {formatMessageTime(message.created_at)}
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-xs opacity-75 mt-1">
-                            {formatMessageTime(message.created_at)}
+                        );
+                      } catch (error) {
+                        console.error('Error rendering message:', error);
+                        return (
+                          <div key={message.id} className="text-red-500 text-sm p-2">
+                            Erro ao exibir mensagem
                           </div>
-                        </div>
-                      </div>
-                    ))}
+                        );
+                      }
+                    })}
                     <div ref={messagesEndRef} />
                   </div>
                 )}
@@ -569,24 +636,45 @@ export default function MessagesPage() {
               
 
               
-              {/* Message Input */}
+              {/* Message Input - Mobile Enhanced */}
               <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                 <div className="flex items-end space-x-2">
                   <Textarea
                     placeholder="Escreva sua mensagem..."
                     value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
+                    onChange={(e) => {
+                      try {
+                        setMessageContent(e.target.value);
+                      } catch (error) {
+                        console.error('Error in message input:', error);
+                      }
+                    }}
                     className="flex-1 min-h-[44px] max-h-32 resize-none"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
+                      try {
+                        if (e.key === 'Enter' && e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                        // Allow normal Enter for line breaks
+                      } catch (error) {
+                        console.error('Error in keydown handler:', error);
                       }
-                      // Allow normal Enter for line breaks
                     }}
                   />
                   <Button
-                    onClick={handleSendMessage}
+                    onClick={() => {
+                      try {
+                        handleSendMessage();
+                      } catch (error) {
+                        console.error('Error in send button:', error);
+                        toast({
+                          title: "Erro",
+                          description: "Erro ao enviar mensagem",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
                     disabled={!messageContent.trim() || sendMessageMutation.isPending}
                     className="h-11 px-4"
                   >

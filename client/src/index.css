@@ -813,3 +813,58 @@
     }
   }
 }
+
+/* Custom Color Variables for Dynamic Theming */
+:root {
+  --color-primary: #DC2626;
+  --color-secondary: #000000;
+  --color-accent: #FCD34D;
+  --color-background: #FFFFFF;
+  --color-text: #111827;
+  --color-header: #DC2626;
+  --color-footer: #374151;
+  --color-button: #DC2626;
+  --color-link: #2563EB;
+  --color-border: #D1D5DB;
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-info: #0EA5E9;
+  --color-card-bg: #F9FAFB;
+  --color-sidebar: #F3F4F6;
+  --color-menu: #FFFFFF;
+  --color-hover: #F3F4F6;
+  --color-active: #EF4444;
+  --color-disabled: #9CA3AF;
+}
+
+/* Dynamic color classes */
+.dynamic-primary { color: var(--color-primary); }
+.dynamic-bg-primary { background-color: var(--color-primary); }
+.dynamic-secondary { color: var(--color-secondary); }
+.dynamic-bg-secondary { background-color: var(--color-secondary); }
+.dynamic-accent { color: var(--color-accent); }
+.dynamic-bg-accent { background-color: var(--color-accent); }
+.dynamic-text { color: var(--color-text); }
+.dynamic-bg-text { background-color: var(--color-text); }
+.dynamic-header { color: var(--color-header); }
+.dynamic-bg-header { background-color: var(--color-header); }
+.dynamic-footer { color: var(--color-footer); }
+.dynamic-bg-footer { background-color: var(--color-footer); }
+.dynamic-button { color: var(--color-button); }
+.dynamic-bg-button { background-color: var(--color-button); }
+.dynamic-link { color: var(--color-link); }
+.dynamic-border { border-color: var(--color-border); }
+.dynamic-success { color: var(--color-success); }
+.dynamic-bg-success { background-color: var(--color-success); }
+.dynamic-warning { color: var(--color-warning); }
+.dynamic-bg-warning { background-color: var(--color-warning); }
+.dynamic-error { color: var(--color-error); }
+.dynamic-bg-error { background-color: var(--color-error); }
+.dynamic-info { color: var(--color-info); }
+.dynamic-bg-info { background-color: var(--color-info); }
+.dynamic-card-bg { background-color: var(--color-card-bg); }
+.dynamic-hover:hover { background-color: var(--color-hover); }
+.dynamic-active { background-color: var(--color-active); }
+.dynamic-disabled { color: var(--color-disabled); }
+

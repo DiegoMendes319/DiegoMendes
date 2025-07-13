@@ -26,9 +26,16 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import Security from "@/pages/security";
 import Messages from "@/pages/messages";
+import { useEffect } from "react";
+import { loadSiteColors } from "@/utils/colorSystem";
 
 function Router() {
   useScrollToTop(); // Automatically scroll to top on route changes
+  
+  // Load site colors on app startup
+  useEffect(() => {
+    loadSiteColors();
+  }, []);
   
   // Check if maintenance mode is active
   const { data: maintenanceMode } = useQuery({
