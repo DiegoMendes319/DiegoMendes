@@ -28,8 +28,14 @@ const toastVariants = cva(
     variants: {
       variant: {
         default: "border bg-background text-foreground",
-        destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        // Cores da Bandeira de Angola
+        success: "border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-100",
+        error: "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100",
+        warning: "border-orange-400 bg-orange-50 dark:bg-orange-900/20 text-orange-900 dark:text-orange-100",
+        info: "border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100",
+        neutral: "border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
+        // Manter compatibilidade com componentes existentes
+        destructive: "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100",
       },
     },
     defaultVariants: {
@@ -75,7 +81,15 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100",
+      // Cores da Bandeira de Angola
+      "group-[.success]:text-yellow-600 group-[.success]:hover:text-yellow-800 group-[.success]:focus:ring-yellow-400",
+      "group-[.error]:text-red-600 group-[.error]:hover:text-red-800 group-[.error]:focus:ring-red-400",
+      "group-[.warning]:text-orange-600 group-[.warning]:hover:text-orange-800 group-[.warning]:focus:ring-orange-400",
+      "group-[.info]:text-blue-600 group-[.info]:hover:text-blue-800 group-[.info]:focus:ring-blue-400",
+      "group-[.neutral]:text-gray-600 group-[.neutral]:hover:text-gray-800 group-[.neutral]:focus:ring-gray-400",
+      // Manter compatibilidade com destructive
+      "group-[.destructive]:text-red-600 group-[.destructive]:hover:text-red-800 group-[.destructive]:focus:ring-red-400",
       className
     )}
     toast-close=""

@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
 interface ProfileModalProps {
@@ -37,35 +37,32 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
     onSuccess: (conversation) => {
       setLocation('/messages');
       onClose();
-      toast({
+      toastAngola.success({
         title: "Conversa iniciada",
         description: "Pode agora comunicar com este utilizador.",
       });
     },
     onError: () => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível iniciar a conversa.",
-        variant: "destructive",
       });
     },
   });
 
   const handleSendMessage = () => {
     if (!currentUser) {
-      toast({
+      toastAngola.error({
         title: "Autenticação necessária",
         description: "Faça login para enviar mensagens.",
-        variant: "destructive",
       });
       return;
     }
 
     if (currentUser.id === user.id) {
-      toast({
+      toastAngola.error({
         title: "Ação não permitida",
         description: "Não pode enviar mensagens para si mesmo.",
-        variant: "destructive",
       });
       return;
     }

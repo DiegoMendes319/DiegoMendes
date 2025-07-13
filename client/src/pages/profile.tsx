@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -128,7 +128,7 @@ export default function Profile() {
       return response.json();
     },
     onSuccess: () => {
-      toast({
+      toastAngola.success({
         title: "Perfil actualizado!",
         description: "As suas informações foram guardadas com sucesso.",
       });
@@ -137,10 +137,9 @@ export default function Profile() {
       refreshUser();
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro ao actualizar",
         description: error.message,
-        variant: "destructive",
       });
     },
   });
@@ -156,7 +155,7 @@ export default function Profile() {
       return response.json();
     },
     onSuccess: () => {
-      toast({
+      toastAngola.neutral({
         title: "Conta eliminada",
         description: "A sua conta foi eliminada com sucesso.",
       });
@@ -164,10 +163,9 @@ export default function Profile() {
       setLocation("/");
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro ao eliminar conta",
         description: error.message,
-        variant: "destructive",
       });
     },
   });
@@ -175,7 +173,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       await logout();
-      toast({
+      toastAngola.neutral({
         title: "Logout realizado",
         description: "Até à próxima!",
       });
@@ -204,10 +202,9 @@ export default function Profile() {
 
     // Check file type
     if (!file.type.startsWith('image/')) {
-      toast({
+      toastAngola.error({
         title: "Tipo de ficheiro inválido",
         description: "Por favor seleccione uma imagem válida",
-        variant: "destructive",
       });
       return;
     }
@@ -251,17 +248,16 @@ export default function Profile() {
         profile_url: optimizedBase64
       }));
 
-      toast({
+      toastAngola.success({
         title: "Imagem carregada",
         description: "A imagem foi optimizada e adicionada ao perfil. Clique em 'Guardar' para actualizar.",
       });
     };
     
     img.onerror = () => {
-      toast({
+      toastAngola.error({
         title: "Erro ao carregar imagem",
         description: "Não foi possível processar a imagem. Tente outra.",
-        variant: "destructive",
       });
     };
     

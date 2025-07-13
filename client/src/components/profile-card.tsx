@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import type { User } from "@/types/user";
 
 interface ProfileCardProps {
@@ -31,16 +31,15 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
     },
     onSuccess: (conversation) => {
       setLocation('/messages');
-      toast({
+      toastAngola.success({
         title: "Conversa iniciada",
         description: "Pode agora comunicar com este utilizador.",
       });
     },
     onError: () => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível iniciar a conversa.",
-        variant: "destructive",
       });
     },
   });
@@ -49,19 +48,17 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
     e.stopPropagation();
     
     if (!currentUser) {
-      toast({
+      toastAngola.error({
         title: "Autenticação necessária",
         description: "Faça login para enviar mensagens.",
-        variant: "destructive",
       });
       return;
     }
 
     if (currentUser.id === user.id) {
-      toast({
+      toastAngola.error({
         title: "Ação não permitida",
         description: "Não pode enviar mensagens para si mesmo.",
-        variant: "destructive",
       });
       return;
     }

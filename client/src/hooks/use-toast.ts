@@ -188,4 +188,13 @@ function useToast() {
   }
 }
 
+// Funções auxiliares para cores da Bandeira de Angola
+export const toastAngola = {
+  success: (props: Omit<Toast, "variant">) => toast({ ...props, variant: "success" }),
+  error: (props: Omit<Toast, "variant">) => toast({ ...props, variant: "error" }),
+  warning: (props: Omit<Toast, "variant">) => toast({ ...props, variant: "warning" }),
+  info: (props: Omit<Toast, "variant">) => toast({ ...props, variant: "info" }),
+  neutral: (props: Omit<Toast, "variant">) => toast({ ...props, variant: "neutral" }),
+}
+
 export { useToast, toast }

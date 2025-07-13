@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { MessageCircle, Send, Search, Plus, ArrowLeft, Menu, Trash2, Reply, Check, CheckCheck, Bold, Type, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast, toastAngola } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
 interface Conversation {
@@ -196,17 +196,16 @@ export default function MessagesPage() {
       setMessageContent('');
       
       // Success toast
-      toast({
+      toastAngola.success({
         title: "Mensagem enviada",
         description: "Mensagem enviada com sucesso!",
       });
     },
     onError: (error) => {
       console.error('Erro ao enviar mensagem:', error);
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível enviar a mensagem.",
-        variant: "destructive",
       });
     },
   });
@@ -222,10 +221,9 @@ export default function MessagesPage() {
       setIsNewChatOpen(false);
     },
     onError: () => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível iniciar a conversa.",
-        variant: "destructive",
       });
     },
   });
@@ -779,10 +777,9 @@ export default function MessagesPage() {
                         handleSendMessage();
                       } catch (error) {
                         console.error('Error in send button:', error);
-                        toast({
+                        toastAngola.error({
                           title: "Erro",
                           description: "Erro ao enviar mensagem",
-                          variant: "destructive"
                         });
                       }
                     }}

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import LocationSelector from "@/components/location-selector";
 import { UserPlus, LogIn, Home, Mail, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -198,7 +198,7 @@ export default function Auth() {
     },
     onSuccess: (data) => {
       console.log('Login successful:', data);
-      toast({
+      toastAngola.success({
         title: "Login realizado com sucesso!",
         description: `Bem-vindo de volta, ${data.user?.name || ''}!`,
       });
@@ -210,10 +210,9 @@ export default function Auth() {
     },
     onError: (error) => {
       console.error('Login error:', error);
-      toast({
+      toastAngola.error({
         title: "Erro no login",
         description: error.message || "Email ou palavra-passe incorretos.",
-        variant: "destructive",
       });
     },
   });
@@ -230,7 +229,7 @@ export default function Auth() {
     },
     onSuccess: (data) => {
       console.log('Registration successful:', data);
-      toast({
+      toastAngola.success({
         title: "Registo realizado com sucesso!",
         description: `Bem-vindo ${data.user?.name || 'ao Jikulumessu'}!`,
       });
@@ -242,10 +241,9 @@ export default function Auth() {
     },
     onError: (error) => {
       console.error('Registration error:', error);
-      toast({
+      toastAngola.error({
         title: "Erro no registo",
         description: error.message || "Erro ao criar conta. Tente novamente.",
-        variant: "destructive",
       });
     },
   });

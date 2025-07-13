@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import RatingStars from "./rating-stars";
@@ -67,7 +67,7 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
       return response.json();
     },
     onSuccess: () => {
-      toast({
+      toastAngola.success({
         title: "Avaliação enviada!",
         description: "Obrigado pelo seu feedback.",
       });
@@ -84,10 +84,9 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
       handleClose();
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro ao enviar avaliação",
         description: error.message,
-        variant: "destructive"
       });
     }
   });
@@ -100,10 +99,9 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
     }
 
     if (!serviceType) {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Por favor selecione o tipo de serviço.",
-        variant: "destructive"
       });
       return;
     }
@@ -126,19 +124,17 @@ export default function ReviewModal({ user, isOpen, onClose, currentUserId }: Re
 
   const handleIdentificationSubmit = () => {
     if (!reviewerFirstName.trim() || !reviewerLastName.trim()) {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Por favor preencha o primeiro e último nome.",
-        variant: "destructive"
       });
       return;
     }
 
     if (!serviceType) {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Por favor selecione o tipo de serviço.",
-        variant: "destructive"
       });
       return;
     }

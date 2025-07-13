@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { Mail, User, Eye, EyeOff, ArrowLeft, LogIn } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
@@ -81,7 +81,7 @@ export default function Login() {
       throw new Error('Método de login inválido');
     },
     onSuccess: async (data) => {
-      toast({
+      toastAngola.success({
         title: "Login realizado com sucesso!",
         description: `Bem-vindo de volta, ${data.user?.name || ''}!`,
       });
@@ -91,19 +91,17 @@ export default function Login() {
       window.location.href = "/profile";
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro no login",
         description: error.message || "Credenciais incorretas.",
-        variant: "destructive",
       });
     },
   });
 
   const handleGoogleAuth = async () => {
-    toast({
+    toastAngola.info({
       title: "Funcionalidade em Desenvolvimento",
       description: "O login via Google estará disponível em breve.",
-      variant: "default",
     });
   };
 

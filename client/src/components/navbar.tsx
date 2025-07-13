@@ -8,7 +8,7 @@ import ThemeToggle from "./theme-toggle";
 import FeedbackModal from "./feedback-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { useSiteSettings } from "@/hooks/use-site-settings";
 import { useQuery } from "@tanstack/react-query";
 
@@ -55,7 +55,7 @@ export default function Navbar() {
       });
       
       if (response.ok) {
-        toast({
+        toastAngola.success({
           title: "Logout realizado com sucesso",
           description: "Até breve!",
         });
@@ -68,10 +68,9 @@ export default function Navbar() {
         throw new Error('Erro ao fazer logout');
       }
     } catch (error) {
-      toast({
+      toastAngola.error({
         title: "Erro no logout",
         description: "Tente novamente",
-        variant: "destructive",
       });
     }
   };

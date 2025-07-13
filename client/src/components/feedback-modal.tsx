@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, toastAngola } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Send, MessageCircle, AlertTriangle, Heart, Lightbulb, Bug, User } from "lucide-react";
@@ -75,19 +75,17 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     e.preventDefault();
     
     if (!selectedCategory || !message.trim()) {
-      toast({
+      toastAngola.error({
         title: "Campos obrigatórios",
         description: "Por favor, selecione uma categoria e escreva uma mensagem.",
-        variant: "destructive",
       });
       return;
     }
 
     if (!user && (!firstName.trim() || !lastName.trim())) {
-      toast({
+      toastAngola.error({
         title: "Identificação necessária",
         description: "Por favor, forneça o seu nome e apelido.",
-        variant: "destructive",
       });
       return;
     }
@@ -117,7 +115,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             });
             
             if (messageResponse.ok) {
-              toast({
+              toastAngola.success({
                 title: "Feedback enviado",
                 description: "A sua mensagem foi enviada ao administrador.",
               });
@@ -146,7 +144,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           user_id: null
         });
         
-        toast({
+        toastAngola.success({
           title: "Feedback enviado",
           description: "Obrigado pelo seu feedback. Será analisado em breve.",
         });
@@ -160,10 +158,9 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       }
     } catch (error) {
       console.error('Erro ao enviar feedback:', error);
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível enviar o feedback. Tente novamente.",
-        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);

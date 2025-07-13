@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Users, Settings, Activity, BarChart3, User, UserCheck, UserX, Eye, Edit, Trash2, Clock, MapPin, Star, AlertTriangle, MessageCircle, CheckCircle, Trash, TrendingUp, Calendar } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { toast } from "@/hooks/use-toast";
+import { toast, toastAngola } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
@@ -95,16 +95,15 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
-      toast({
+      toastAngola.success({
         title: "Papel atualizado",
         description: "O papel do utilizador foi atualizado com sucesso.",
       });
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível atualizar o papel do utilizador.",
-        variant: "destructive",
       });
     },
   });
@@ -118,16 +117,15 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
-      toast({
+      toastAngola.success({
         title: "Status atualizado",
         description: "O status do utilizador foi atualizado com sucesso.",
       });
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível atualizar o status do utilizador.",
-        variant: "destructive",
       });
     },
   });
@@ -139,16 +137,15 @@ export default function AdminPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
-      toast({
+      toastAngola.success({
         title: "Definição atualizada",
         description: "A definição foi atualizada com sucesso.",
       });
     },
     onError: (error) => {
-      toast({
+      toastAngola.error({
         title: "Erro",
         description: "Não foi possível atualizar a definição.",
-        variant: "destructive",
       });
     },
   });
