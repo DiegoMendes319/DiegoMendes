@@ -2,9 +2,14 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, Eye } from "lucide-react";
+import { MapPin, Star, Calendar, Eye, MessageCircle } from "lucide-react";
 import RatingStars from "./rating-stars";
 import FullSizeImageModal from "./full-size-image-modal";
+import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { User } from "@/types/user";
 
 interface ProfileCardProps {
@@ -14,6 +19,54 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ user, onClick }: ProfileCardProps) {
   const [showFullImage, setShowFullImage] = useState(false);
+  const { user: currentUser } = useAuth();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  // Start conversation mutation
+  const startConversationMutation = useMutation({
+    mutationFn: async (participantId: string) => {
+      return await apiRequest('/api/messages/conversations', 'POST', { participant_id: participantId });
+    },
+    onSuccess: (conversation) => {
+      setLocation('/messages');
+      toast({
+        title: "Conversa iniciada",
+        description: "Pode agora comunicar com este utilizador.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar a conversa.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMessage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!currentUser) {
+      toast({
+        title: "Autenticação necessária",
+        description: "Faça login para enviar mensagens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentUser.id === user.id) {
+      toast({
+        title: "Ação não permitida",
+        description: "Não pode enviar mensagens para si mesmo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    startConversationMutation.mutate(user.id);
+  };
   
   return (
     <Card className="profile-card overflow-hidden fade-in">
@@ -83,13 +136,24 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
           {user.availability}
         </p>
         
-        <Button 
-          onClick={onClick}
-          className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-        >
-          <Eye className="h-4 w-4 mr-2" />
-          Ver Detalhes
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            onClick={onClick}
+            className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Ver Detalhes
+          </Button>
+          <Button 
+            onClick={handleSendMessage}
+            disabled={startConversationMutation.isPending}
+            variant="outline"
+            className="flex-1 sm:flex-none border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)] hover:text-white"
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Mensagem
+          </Button>
+        </div>
       </CardContent>
       
       {showFullImage && user.profile_url && (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, Send, Search, Plus } from 'lucide-react';
+import { MessageCircle, Send, Search, Plus, ArrowLeft, Menu } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -55,6 +55,20 @@ export default function MessagesPage() {
   const [messageContent, setMessageContent] = useState('');
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+  const [showConversationList, setShowConversationList] = useState(true);
+
+  // Check if screen is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Redirect if not logged in
   if (!user) {
@@ -131,6 +145,20 @@ export default function MessagesPage() {
     startConversationMutation.mutate(participantId);
   };
 
+  const selectConversation = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+    if (isMobile) {
+      setShowConversationList(false);
+    }
+  };
+
+  const backToConversations = () => {
+    if (isMobile) {
+      setShowConversationList(true);
+      setSelectedConversation(null);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -171,62 +199,93 @@ export default function MessagesPage() {
 
   return (
     <div className="container mx-auto p-4 h-screen">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Mensagens</h1>
-        <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Conversa
+        {isMobile && selectedConversation && !showConversationList ? (
+          <div className="flex items-center">
+            <Button variant="ghost" size="sm" onClick={backToConversations} className="mr-2">
+              <ArrowLeft className="h-4 w-4" />
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Iniciar Nova Conversa</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Pesquisar utilizadores..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <ScrollArea className="h-96">
-                <div className="space-y-2">
-                  {filteredParticipants.map((participant) => (
-                    <div
-                      key={participant.id}
-                      className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
-                      onClick={() => handleStartConversation(participant.id)}
-                    >
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={participant.profile_image || participant.profile_url} />
-                        <AvatarFallback>
-                          {participant.first_name?.[0]}{participant.last_name?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="font-medium">{participant.name}</div>
-                        <div className="text-sm text-gray-500">{participant.email}</div>
-                      </div>
-                    </div>
-                  ))}
+            <div className="flex items-center">
+              <Avatar className="h-8 w-8 mr-3">
+                <AvatarImage src={selectedConversationData?.participant_profile_image} />
+                <AvatarFallback>
+                  {selectedConversationData?.participant_name?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium text-gray-900">
+                  {selectedConversationData?.participant_name || 'Utilizador'}
                 </div>
-              </ScrollArea>
+              </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </div>
+        ) : (
+          <h1 className="text-2xl font-bold">Mensagens</h1>
+        )}
+        
+        {(!isMobile || showConversationList) && (
+          <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                {isMobile ? 'Nova' : 'Nova Conversa'}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Iniciar Nova Conversa</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Pesquisar utilizadores..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <ScrollArea className="h-96">
+                  <div className="space-y-2">
+                    {filteredParticipants.map((participant) => (
+                      <div
+                        key={participant.id}
+                        className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
+                        onClick={() => handleStartConversation(participant.id)}
+                      >
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={participant.profile_image || participant.profile_url} />
+                          <AvatarFallback>
+                            {participant.first_name?.[0]}{participant.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="font-medium">{participant.name}</div>
+                          <div className="text-sm text-gray-500">{participant.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
-      <div className="flex h-[calc(100vh-120px)] bg-white rounded-lg shadow-sm border">
-        {/* Conversations List - WhatsApp style */}
-        <div className="w-1/3 border-r border-gray-200">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Conversas</h2>
-          </div>
+      <div className={`${isMobile ? 'h-[calc(100vh-80px)]' : 'flex h-[calc(100vh-120px)]'} bg-white rounded-lg shadow-sm border`}>
+        {/* Conversations List - Responsive */}
+        <div className={`${
+          isMobile 
+            ? showConversationList ? 'block' : 'hidden'
+            : 'w-1/3 border-r border-gray-200'
+        }`}>
+          {!isMobile && (
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Conversas</h2>
+            </div>
+          )}
           <ScrollArea className="h-full">
             {conversations?.length === 0 ? (
               <div className="text-center text-gray-500 py-8">
@@ -238,11 +297,11 @@ export default function MessagesPage() {
                   <div
                     key={conversation.id}
                     className={`flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${
-                      selectedConversation === conversation.id
+                      selectedConversation === conversation.id && !isMobile
                         ? 'bg-blue-50 border-blue-200'
                         : ''
                     }`}
-                    onClick={() => setSelectedConversation(conversation.id)}
+                    onClick={() => selectConversation(conversation.id)}
                   >
                     <Avatar className="h-12 w-12 mr-3">
                       <AvatarImage src={conversation.participant_profile_image} />
@@ -277,27 +336,33 @@ export default function MessagesPage() {
           </ScrollArea>
         </div>
 
-        {/* Messages Area - WhatsApp style */}
-        <div className="flex-1 flex flex-col">
+        {/* Messages Area - Responsive */}
+        <div className={`${
+          isMobile
+            ? !showConversationList ? 'block' : 'hidden'
+            : 'flex-1'
+        } flex flex-col h-full`}>
           {selectedConversation ? (
             <>
-              {/* Chat Header */}
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <div className="flex items-center">
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={selectedConversationData?.participant_profile_image} />
-                    <AvatarFallback>
-                      {selectedConversationData?.participant_name?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {selectedConversationData?.participant_name || 'Utilizador'}
+              {/* Chat Header - Desktop only */}
+              {!isMobile && (
+                <div className="p-4 border-b border-gray-200 bg-gray-50">
+                  <div className="flex items-center">
+                    <Avatar className="h-10 w-10 mr-3">
+                      <AvatarImage src={selectedConversationData?.participant_profile_image} />
+                      <AvatarFallback>
+                        {selectedConversationData?.participant_name?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {selectedConversationData?.participant_name || 'Utilizador'}
+                      </div>
+                      <div className="text-sm text-gray-500">Online</div>
                     </div>
-                    <div className="text-sm text-gray-500">Online</div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Messages */}
               <div className="flex-1 overflow-hidden">
