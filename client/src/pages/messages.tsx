@@ -182,11 +182,13 @@ export default function MessagesPage() {
     }
   };
 
-  // Auto-resize textarea
+  // Auto-resize textarea - optimized for mobile
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = '20px';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const maxHeight = 80; // Max height for mobile
+      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
     }
   }, [messageContent]);
 
@@ -561,66 +563,66 @@ export default function MessagesPage() {
                 </ScrollArea>
               </div>
               
-              {/* Message Input */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
-                {/* Reply indicator */}
+              {/* Message Input - WhatsApp-like compact design */}
+              <div className="message-input-mobile">
+                {/* Reply indicator - more compact */}
                 {replyingToMessage && (
-                  <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                  <div className="mb-2 p-2 bg-blue-50 border-l-2 border-blue-500 rounded-r-md">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Reply className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm font-medium text-blue-700">
-                          Responder a mensagem
+                        <Reply className="h-3 w-3 text-blue-500" />
+                        <span className="text-xs font-medium text-blue-700">
+                          Responder
                         </span>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setReplyingToMessage(null)}
-                        className="h-6 w-6 p-0"
+                        className="h-4 w-4 p-0"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-2 w-2" />
                       </Button>
                     </div>
-                    <div className="text-sm text-gray-600 mt-1 truncate">
+                    <div className="text-xs text-gray-600 mt-1 truncate">
                       {replyingToMessage.content}
                     </div>
                   </div>
                 )}
 
-                <div className="message-input-container">
-                  {/* Formatting buttons */}
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleBoldToggle}
-                      className={`h-8 w-8 p-0 ${isBold ? 'bg-gray-200' : ''}`}
-                      title="Negrito"
-                    >
-                      <Bold className="h-4 w-4" />
-                    </Button>
+                <div className="flex items-end gap-2">
+                  {/* Formatting button - very compact */}
+                  <button
+                    onClick={handleBoldToggle}
+                    className={`message-button format ${isBold ? 'active' : ''}`}
+                    title="Negrito"
+                  >
+                    <Bold className="h-3 w-3" />
+                  </button>
+
+                  {/* Input container - WhatsApp style */}
+                  <div className="flex-1 bg-white border border-gray-200 rounded-full px-3 py-2 flex items-center gap-2">
+                    <Textarea
+                      ref={textareaRef}
+                      placeholder="Mensagem..."
+                      value={messageContent}
+                      onChange={(e) => setMessageContent(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={sendMessageMutation.isPending}
+                      className="flex-1 border-0 bg-transparent resize-none text-sm min-h-[20px] max-h-[80px] p-0 focus:outline-none"
+                      rows={1}
+                    />
                   </div>
 
-                  <Textarea
-                    ref={textareaRef}
-                    placeholder="Escreva uma mensagem... (Shift+Enter para nova linha)"
-                    value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    disabled={sendMessageMutation.isPending}
-                    className="rich-text-input flex-1 border-0 bg-transparent resize-none"
-                    rows={1}
-                  />
-
-                  <Button
+                  {/* Send button - compact and styled like WhatsApp */}
+                  <button
                     onClick={handleSendMessage}
                     disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                    className="h-8 w-8 p-0 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-                    title="Enviar mensagem"
+                    className="message-button send"
+                    title="Enviar"
                   >
-                    <Send className="h-4 w-4" />
-                  </Button>
+                    <Send className="h-3 w-3" />
+                  </button>
                 </div>
               </div>
             </>

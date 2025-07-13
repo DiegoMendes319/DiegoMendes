@@ -594,4 +594,130 @@
     opacity: 0.7;
     animation: pulse 1s infinite;
   }
+
+  /* Mobile-optimized message input */
+  .message-input-mobile {
+    background: #f0f2f5;
+    padding: 8px 12px;
+    border-top: 1px solid #e4e6ea;
+  }
+
+  .message-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: white;
+    border: 1px solid #e4e6ea;
+    border-radius: 24px;
+    min-height: 40px;
+    max-height: 120px;
+  }
+
+  .message-textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    resize: none;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 6px 0;
+    min-height: 20px;
+    max-height: 80px;
+    outline: none;
+  }
+
+  .message-textarea::placeholder {
+    color: #8696a0;
+  }
+
+  /* Compact buttons for mobile */
+  .message-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .message-button:hover {
+    transform: scale(1.05);
+  }
+
+  .message-button.send {
+    background: #d32f2f;
+    color: white;
+  }
+
+  .message-button.send:hover {
+    background: #b71c1c;
+  }
+
+  .message-button.format {
+    background: transparent;
+    color: #667085;
+  }
+
+  .message-button.format.active {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  /* Mobile responsive optimizations */
+  @media (max-width: 768px) {
+    .message-bubble {
+      max-width: 85%;
+      font-size: 14px;
+      padding: 8px 12px;
+    }
+    
+    .message-bubble.sent {
+      margin-left: 20px;
+    }
+    
+    .message-bubble.received {
+      margin-right: 20px;
+    }
+    
+    .message-input-mobile {
+      padding: 6px 10px;
+    }
+    
+    .message-button {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+    }
+    
+    .message-button svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    /* Chat background for mobile */
+    .chat-background {
+      background-size: 15px 15px;
+    }
+    
+    /* Mobile input styling */
+    .message-input-mobile .flex {
+      gap: 6px;
+    }
+    
+    .message-input-mobile .bg-white {
+      border-radius: 18px;
+      padding: 6px 12px;
+    }
+    
+    .message-input-mobile textarea {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  }
 }
