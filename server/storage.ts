@@ -82,6 +82,7 @@ export interface IStorage {
   getConversation(participant1Id: string, participant2Id: string): Promise<Conversation | undefined>;
   getUserConversations(userId: string): Promise<Conversation[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+  getMessage(messageId: string): Promise<Message | undefined>;
   getConversationMessages(conversationId: string): Promise<Message[]>;
   markMessageAsRead(messageId: string): Promise<boolean>;
   markConversationAsRead(conversationId: string, userId: string): Promise<boolean>;
@@ -1086,6 +1087,10 @@ export class MemStorage implements IStorage {
     }
     
     return newMessage;
+  }
+
+  async getMessage(messageId: string): Promise<Message | undefined> {
+    return this.messages.get(messageId);
   }
 
   async getConversationMessages(conversationId: string): Promise<Message[]> {

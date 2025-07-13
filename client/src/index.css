@@ -2,6 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Chat Background - Jikulumessu themed */
+.chat-background {
+  background-color: #f0f2f5;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 193, 7, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+    linear-gradient(135deg, transparent 0%, rgba(220, 38, 38, 0.02) 50%, transparent 100%);
+  background-size: 400px 400px, 300px 300px, 200px 200px, 100% 100%;
+  background-position: 0 0, 100% 100%, 50% 50%, 0 0;
+  animation: subtleFloat 20s ease-in-out infinite;
+}
+
+@keyframes subtleFloat {
+  0%, 100% { background-position: 0 0, 100% 100%, 50% 50%, 0 0; }
+  50% { background-position: 10px 10px, 90% 90%, 60% 40%, 0 0; }
+}
+
+/* Dark mode chat background */
+.dark .chat-background {
+  background-color: #1a1a1a;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 193, 7, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, transparent 0%, rgba(220, 38, 38, 0.03) 50%, transparent 100%);
+}
+
+/* Message bubble enhancements */
+.message-bubble {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-bubble.sent {
+  background: linear-gradient(135deg, #dcf8c6 0%, #d4edda 100%);
+  border-radius: 18px 18px 4px 18px;
+}
+
+.message-bubble.received {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 18px 18px 18px 4px;
+}
+
+.dark .message-bubble.sent {
+  background: linear-gradient(135deg, #056162 0%, #0d7377 100%);
+}
+
+.dark .message-bubble.received {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+}
+
+/* Message status indicators */
+.message-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.message-status.sent {
+  color: #9ca3af;
+}
+
+.message-status.delivered {
+  color: #3b82f6;
+}
+
+.message-status.read {
+  color: #10b981;
+}
+
+/* Rich text formatting */
+.rich-text-input {
+  min-height: 40px;
+  max-height: 120px;
+  resize: none;
+  line-height: 1.4;
+}
+
+.rich-text-input:focus {
+  outline: none;
+  border-color: var(--angola-red);
+}
+
+/* Swipe to reply animation */
+.swipe-reply {
+  transition: transform 0.3s ease;
+}
+
+.swipe-reply.swiped {
+  transform: translateX(-60px);
+}
+
+.reply-indicator {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--angola-red);
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reply-indicator.visible {
+  opacity: 1;
+}
+
+/* Unread message badge */
+.unread-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid white;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Message input enhancements */
+.message-input-container {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.message-input-container:focus-within {
+  border-color: var(--angola-red);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.dark .message-input-container {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .message-input-container:focus-within {
+  border-color: var(--angola-red);
+}
+
 /* Tutorial highlight animation */
 .tutorial-highlight {
   position: relative;
@@ -369,5 +535,63 @@
   @keyframes fadeIn {
     0% { opacity: 0; transform: translateY(10px); }
     100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Message system styles */
+  .message-bubble {
+    position: relative;
+    word-wrap: break-word;
+    max-width: 80%;
+  }
+
+  .message-bubble::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+
+  .message-bubble.sent::before {
+    right: -8px;
+    bottom: 5px;
+    border-width: 8px 0 0 8px;
+    border-color: transparent transparent transparent #d1fae5;
+  }
+
+  .message-bubble.received::before {
+    left: -8px;
+    bottom: 5px;
+    border-width: 8px 8px 0 0;
+    border-color: transparent white transparent transparent;
+  }
+
+  /* Context menu animations */
+  .context-menu-item {
+    @apply transition-colors duration-200 hover:bg-gray-100 cursor-pointer;
+  }
+
+  /* Message formatting */
+  .message-content strong {
+    @apply font-bold;
+  }
+
+  .message-content .reply-prefix {
+    @apply text-blue-600 font-medium text-sm;
+  }
+
+  /* Touch improvements */
+  .touch-none {
+    touch-action: none;
+  }
+
+  .select-none {
+    user-select: none;
+  }
+
+  /* Loading states */
+  .message-sending {
+    opacity: 0.7;
+    animation: pulse 1s infinite;
   }
 }

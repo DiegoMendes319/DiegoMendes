@@ -1258,6 +1258,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete message endpoint
+  app.delete("/api/messages/:id", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const { id } = req.params;
+      
+      // Check if message exists and belongs to current user
+      const message = await storage.getMessage(id);
+      if (!message) {
+        return res.status(404).json({ error: "Mensagem não encontrada" });
+      }
+
+      if (message.sender_id !== user.id) {
+        return res.status(403).json({ error: "Não pode eliminar mensagens de outros utilizadores" });
+      }
+
+      const success = await storage.deleteMessage(id);
+      if (!success) {
+        return res.status(500).json({ error: "Erro ao eliminar mensagem" });
+      }
+
+      res.json({ message: "Mensagem eliminada com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   app.get("/api/messages/participants", async (req, res) => {
     try {
       const sessionToken = req.cookies?.session_token;

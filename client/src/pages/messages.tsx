@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, Send, Search, Plus, ArrowLeft, Menu } from 'lucide-react';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { MessageCircle, Send, Search, Plus, ArrowLeft, Menu, Trash2, Reply, Check, CheckCheck, Bold, Type, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -57,6 +59,11 @@ export default function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const [showConversationList, setShowConversationList] = useState(true);
+  const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null);
+  const [isBold, setIsBold] = useState(false);
+  const [swipedMessageId, setSwipedMessageId] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Check if screen is mobile
   useEffect(() => {
@@ -132,13 +139,137 @@ export default function MessagesPage() {
     },
   });
 
+  // Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      return await apiRequest(`/api/messages/${messageId}`, 'DELETE');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations', selectedConversation, 'messages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations'] });
+      toast({
+        title: "Mensagem eliminada",
+        description: "A mensagem foi eliminada com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível eliminar a mensagem.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Format message content with bold
+  const formatMessageContent = (content: string) => {
+    if (isBold) {
+      return `**${content}**`;
+    }
+    return content;
+  };
+
+  // Handle text formatting
+  const handleBoldToggle = () => {
+    setIsBold(!isBold);
+  };
+
+  // Handle Enter key for send and Shift+Enter for new line
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [messageContent]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (!selectedConversation || !messageContent.trim()) return;
     
+    let content = messageContent.trim();
+    
+    // Add reply prefix if replying to a message
+    if (replyingToMessage) {
+      content = `@${replyingToMessage.id}: ${content}`;
+    }
+    
+    // Apply formatting
+    content = formatMessageContent(content);
+    
     sendMessageMutation.mutate({
       conversationId: selectedConversation,
-      content: messageContent.trim(),
+      content: content,
     });
+    
+    // Clear reply and reset formatting
+    setReplyingToMessage(null);
+    setIsBold(false);
+    setMessageContent('');
+  };
+
+  // Handle swipe to reply
+  const handleSwipeStart = (messageId: string) => {
+    setSwipedMessageId(messageId);
+  };
+
+  const handleSwipeEnd = () => {
+    setSwipedMessageId(null);
+  };
+
+  const handleReply = (message: Message) => {
+    setReplyingToMessage(message);
+    setSwipedMessageId(null);
+    textareaRef.current?.focus();
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    deleteMessageMutation.mutate(messageId);
+  };
+
+  // Render message with formatting
+  const renderMessageContent = (content: string) => {
+    // Handle bold formatting
+    const boldRegex = /\*\*(.*?)\*\*/g;
+    const parts = content.split(boldRegex);
+    
+    return parts.map((part, index) => {
+      if (index % 2 === 1) {
+        return <strong key={index}>{part}</strong>;
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
+  // Check if message is sent by current user
+  const isMessageSent = (message: Message) => message.sender_id === user?.id;
+
+  // Message status component
+  const MessageStatus = ({ message }: { message: Message }) => {
+    if (!isMessageSent(message)) return null;
+    
+    return (
+      <span className={`message-status ${message.is_read ? 'read' : 'sent'}`}>
+        {message.is_read ? (
+          <CheckCheck className="h-3 w-3" />
+        ) : (
+          <Check className="h-3 w-3" />
+        )}
+      </span>
+    );
   };
 
   const handleStartConversation = (participantId: string) => {
@@ -365,33 +496,66 @@ export default function MessagesPage() {
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden chat-background">
                 <ScrollArea className="h-full p-4">
                   {messagesLoading ? (
                     <div className="text-center py-8">Carregando mensagens...</div>
                   ) : (
                     <div className="space-y-4">
                       {messages?.map((message: Message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${
-                            message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                          }`}
-                        >
-                          <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.sender_id === user?.id
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 text-gray-900'
-                            }`}
-                          >
-                            <div className="text-sm">{message.content}</div>
-                            <div className="text-xs mt-1 opacity-70">
-                              {formatMessageTime(message.created_at)}
+                        <ContextMenu key={message.id}>
+                          <ContextMenuTrigger>
+                            <div
+                              className={`flex ${
+                                isMessageSent(message) ? 'justify-end' : 'justify-start'
+                              } ${swipedMessageId === message.id ? 'swipe-reply swiped' : 'swipe-reply'}`}
+                              onTouchStart={() => handleSwipeStart(message.id)}
+                              onTouchEnd={handleSwipeEnd}
+                            >
+                              <div
+                                className={`max-w-xs lg:max-w-md px-4 py-2 message-bubble ${
+                                  isMessageSent(message) ? 'sent' : 'received'
+                                } relative`}
+                              >
+                                {/* Reply indicator for swipe */}
+                                {swipedMessageId === message.id && (
+                                  <div className="reply-indicator visible">
+                                    <Reply className="h-4 w-4" />
+                                  </div>
+                                )}
+                                
+                                {/* Message content */}
+                                <div className="text-sm whitespace-pre-wrap">
+                                  {renderMessageContent(message.content)}
+                                </div>
+                                
+                                {/* Message time and status */}
+                                <div className="flex items-center justify-end text-xs mt-1 opacity-70 gap-1">
+                                  <span>{formatMessageTime(message.created_at)}</span>
+                                  <MessageStatus message={message} />
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
+                          </ContextMenuTrigger>
+                          
+                          <ContextMenuContent>
+                            <ContextMenuItem onClick={() => handleReply(message)}>
+                              <Reply className="h-4 w-4 mr-2" />
+                              Responder
+                            </ContextMenuItem>
+                            {isMessageSent(message) && (
+                              <ContextMenuItem 
+                                onClick={() => handleDeleteMessage(message.id)}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Eliminar
+                              </ContextMenuItem>
+                            )}
+                          </ContextMenuContent>
+                        </ContextMenu>
                       ))}
+                      <div ref={messagesEndRef} />
                     </div>
                   )}
                 </ScrollArea>
@@ -399,19 +563,61 @@ export default function MessagesPage() {
               
               {/* Message Input */}
               <div className="p-4 border-t border-gray-200 bg-gray-50">
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Escreva uma mensagem..."
+                {/* Reply indicator */}
+                {replyingToMessage && (
+                  <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Reply className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium text-blue-700">
+                          Responder a mensagem
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setReplyingToMessage(null)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1 truncate">
+                      {replyingToMessage.content}
+                    </div>
+                  </div>
+                )}
+
+                <div className="message-input-container">
+                  {/* Formatting buttons */}
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBoldToggle}
+                      className={`h-8 w-8 p-0 ${isBold ? 'bg-gray-200' : ''}`}
+                      title="Negrito"
+                    >
+                      <Bold className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <Textarea
+                    ref={textareaRef}
+                    placeholder="Escreva uma mensagem... (Shift+Enter para nova linha)"
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    onKeyDown={handleKeyDown}
                     disabled={sendMessageMutation.isPending}
-                    className="flex-1"
+                    className="rich-text-input flex-1 border-0 bg-transparent resize-none"
+                    rows={1}
                   />
+
                   <Button
                     onClick={handleSendMessage}
                     disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                    className="px-4"
+                    className="h-8 w-8 p-0 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                    title="Enviar mensagem"
                   >
                     <Send className="h-4 w-4" />
                   </Button>

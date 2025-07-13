@@ -125,7 +125,7 @@ export default function Navbar() {
                   <DropdownMenuItem onClick={() => setLocation("/messages")}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Mensagens
-                    {unreadCount > 0 && (
+                    {unreadCount && unreadCount > 0 && (
                       <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[1.5rem] h-6 flex items-center justify-center">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
@@ -219,7 +219,7 @@ export default function Navbar() {
                   >
                     <MessageCircle className="w-4 h-4 inline mr-2" />
                     Mensagens
-                    {unreadCount > 0 && (
+                    {unreadCount && unreadCount > 0 && (
                       <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[1.5rem] h-6 flex items-center justify-center">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
