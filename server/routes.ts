@@ -18,16 +18,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication endpoints
   app.post("/api/auth/login", async (req, res) => {
     try {
-      // Verificar se logins estão habilitados
-      const loginSetting = await storage.getSiteSetting('login_enabled');
-      if (loginSetting && loginSetting.value === 'false') {
-        return res.status(403).json({ 
-          error: "Conexões temporariamente desativadas", 
-          message: "De momento, não estamos a permitir conexões. Estaremos disponíveis em breve."
-        });
-      }
-
       const { email, password } = req.body;
+      
+      // Verificar se é admin (admin pode sempre conectar)
+      const isAdminLogin = email === 'admin@jikulumessu.com';
+      
+      // Verificar se logins estão habilitados (não se aplica a admin)
+      if (!isAdminLogin) {
+        const loginSetting = await storage.getSiteSetting('login_enabled');
+        if (loginSetting && loginSetting.value === 'false') {
+          return res.status(403).json({ 
+            error: "Conexões temporariamente desativadas", 
+            message: "De momento, não estamos a permitir conexões. Estaremos disponíveis em breve."
+          });
+        }
+      }
       
       if (!email || !password) {
         return res.status(400).json({ error: "Email e palavra-passe são obrigatórios" });
@@ -68,16 +73,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Simple login endpoint (name + password)
   app.post("/api/auth/simple-login", async (req, res) => {
     try {
-      // Verificar se logins estão habilitados
-      const loginSetting = await storage.getSiteSetting('login_enabled');
-      if (loginSetting && loginSetting.value === 'false') {
-        return res.status(403).json({ 
-          error: "Conexões temporariamente desativadas", 
-          message: "De momento, não estamos a permitir conexões. Estaremos disponíveis em breve."
-        });
-      }
-
       const { first_name, last_name, password } = req.body;
+      
+      // Verificar se é admin (admin pode sempre conectar)
+      const isAdminLogin = first_name === 'Admin' && last_name === 'Jikulumessu';
+      
+      // Verificar se logins estão habilitados (não se aplica a admin)
+      if (!isAdminLogin) {
+        const loginSetting = await storage.getSiteSetting('login_enabled');
+        if (loginSetting && loginSetting.value === 'false') {
+          return res.status(403).json({ 
+            error: "Conexões temporariamente desativadas", 
+            message: "De momento, não estamos a permitir conexões. Estaremos disponíveis em breve."
+          });
+        }
+      }
       
       if (!first_name || !last_name || !password) {
         return res.status(400).json({ error: "Nome e palavra-passe são obrigatórios" });

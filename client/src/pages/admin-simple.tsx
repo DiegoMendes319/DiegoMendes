@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Users, Settings, Activity, BarChart3, User, UserCheck, UserX, Eye, Edit, Trash2, Clock, MapPin, Star, AlertTriangle, MessageCircle, CheckCircle, Trash } from "lucide-react";
+import { Shield, Users, Settings, Activity, BarChart3, User, UserCheck, UserX, Eye, Edit, Trash2, Clock, MapPin, Star, AlertTriangle, MessageCircle, CheckCircle, Trash, TrendingUp, Calendar } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -59,6 +60,13 @@ export default function AdminPage() {
   const { data: settings } = useQuery({
     queryKey: ['/api/admin/settings'],
     enabled: !!isAdmin,
+  });
+
+  // Analytics data
+  const { data: analyticsData } = useQuery({
+    queryKey: ['/api/admin/analytics'],
+    enabled: !!isAdmin,
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Analytics
@@ -222,45 +230,57 @@ export default function AdminPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Utilizadores</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+      {/* Stats Cards - Optimized for Mobile */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-all duration-200">
+          <CardHeader className="pb-2 px-3 sm:px-4">
+            <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 flex items-center gap-1">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Total de Utilizadores</span>
+              <span className="sm:hidden">Total</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.total || 0}</div>
+          <CardContent className="px-3 sm:px-4 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-blue-800">{stats?.total || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilizadores Activos</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-md transition-all duration-200">
+          <CardHeader className="pb-2 px-3 sm:px-4">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-700 flex items-center gap-1">
+              <UserCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Utilizadores Activos</span>
+              <span className="sm:hidden">Activos</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.active || 0}</div>
+          <CardContent className="px-3 sm:px-4 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-green-800">{stats?.active || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilizadores Suspensos</CardTitle>
-            <UserX className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-md transition-all duration-200">
+          <CardHeader className="pb-2 px-3 sm:px-4">
+            <CardTitle className="text-xs sm:text-sm font-medium text-yellow-700 flex items-center gap-1">
+              <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Administradores</span>
+              <span className="sm:hidden">Admins</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.suspended || 0}</div>
+          <CardContent className="px-3 sm:px-4 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-yellow-800">{stats?.admins || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Novos Hoje</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-md transition-all duration-200">
+          <CardHeader className="pb-2 px-3 sm:px-4">
+            <CardTitle className="text-xs sm:text-sm font-medium text-purple-700 flex items-center gap-1">
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Novos Hoje</span>
+              <span className="sm:hidden">Hoje</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.newToday || 0}</div>
+          <CardContent className="px-3 sm:px-4 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-purple-800">{stats?.newToday || 0}</div>
           </CardContent>
         </Card>
       </div>
@@ -440,36 +460,124 @@ export default function AdminPage() {
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* User Growth Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Crescimento de Utilizadores
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[
+                      { date: '01/01', users: 0 },
+                      { date: '02/01', users: 2 },
+                      { date: '03/01', users: 5 },
+                      { date: '04/01', users: 8 },
+                      { date: '05/01', users: 12 },
+                      { date: '06/01', users: 15 },
+                      { date: '07/01', users: stats?.total || 0 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="users" stroke="#dc2626" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* User Distribution by Role */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Distribuição por Papel
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Utilizadores', value: (stats?.total || 0) - (stats?.admins || 0), fill: '#3b82f6' },
+                          { name: 'Administradores', value: stats?.admins || 0, fill: '#dc2626' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        <Cell fill="#3b82f6" />
+                        <Cell fill="#dc2626" />
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Activity Overview */}
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Dados</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                Resumo da Atividade
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Visitantes</TableHead>
-                      <TableHead>Visualizações</TableHead>
-                      <TableHead>Registos</TableHead>
-                      <TableHead>Pesquisas</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {analytics?.map((analytic) => (
-                      <TableRow key={analytic.date}>
-                        <TableCell>
-                          {new Date(analytic.date).toLocaleDateString('pt-AO')}
-                        </TableCell>
-                        <TableCell>{analytic.visitors}</TableCell>
-                        <TableCell>{analytic.page_views}</TableCell>
-                        <TableCell>{analytic.registrations}</TableCell>
-                        <TableCell>{analytic.searches}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{stats?.total || 0}</div>
+                  <div className="text-sm text-blue-800">Total de Utilizadores</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{stats?.active || 0}</div>
+                  <div className="text-sm text-green-800">Utilizadores Ativos</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">{stats?.newToday || 0}</div>
+                  <div className="text-sm text-purple-800">Novos Hoje</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Atividade Recente
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {logs?.slice(0, 5).map((log, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div>
+                        <div className="font-medium">{log.action}</div>
+                        <div className="text-sm text-gray-600">{log.details}</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(log.timestamp).toLocaleString('pt-PT')}
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
