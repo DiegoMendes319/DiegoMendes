@@ -242,7 +242,7 @@ export default function MessagesPage() {
       const replyContent = replyingToMessage.content.length > 30 
         ? replyingToMessage.content.substring(0, 30) + "..."
         : replyingToMessage.content;
-      content = `↩️ ${replyContent}\n\n${content}`;
+      content = `↩️ Resposta a: "${replyContent}"\n\n${content}`;
     }
     
     // Apply formatting
@@ -292,9 +292,32 @@ export default function MessagesPage() {
     deleteMessageMutation.mutate(messageId);
   };
 
-  // Render message with formatting
+  // Render message with formatting and reply indicators
   const renderMessageContent = (content: string) => {
-    // Handle bold formatting
+    // Check if this is a reply message
+    if (content.includes('↩️ Resposta a:')) {
+      const parts = content.split('\n\n');
+      const replyPart = parts[0];
+      const messagePart = parts.slice(1).join('\n\n');
+      
+      return (
+        <div>
+          <div className="text-xs opacity-75 mb-2 p-2 bg-black bg-opacity-20 rounded-lg border-l-2 border-white border-opacity-30">
+            {replyPart}
+          </div>
+          <div className="message-text">
+            {messagePart.split(/(\*\*.*?\*\*)/).map((part, index) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={index}>{part.slice(2, -2)}</strong>;
+              }
+              return <span key={index}>{part}</span>;
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Handle bold formatting for regular messages
     const boldRegex = /\*\*(.*?)\*\*/g;
     const parts = content.split(boldRegex);
     
@@ -553,27 +576,28 @@ export default function MessagesPage() {
                   {messagesLoading ? (
                     <div className="text-center py-8">Carregando mensagens...</div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-0">
                       {messages?.map((message: Message) => (
-                        <ContextMenu key={message.id}>
-                          <ContextMenuTrigger>
-                            <div
-                              className={`flex ${
-                                isMessageSent(message) ? 'justify-end' : 'justify-start'
-                              } ${swipedMessageId === message.id ? 'swipe-reply swiped' : 'swipe-reply'}`}
-                              onTouchStart={(e) => handleSwipeStart(e, message.id)}
-                              onClick={() => {
-                                if (swipedMessageId === message.id) {
-                                  handleReply(message);
-                                  setSwipedMessageId(null);
-                                }
-                              }}
-                            >
+                        <div key={message.id} className="message-container">
+                          <ContextMenu>
+                            <ContextMenuTrigger>
                               <div
-                                className={`max-w-xs lg:max-w-md px-4 py-2 message-bubble ${
-                                  isMessageSent(message) ? 'sent' : 'received'
-                                } relative`}
+                                className={`flex ${
+                                  isMessageSent(message) ? 'justify-end' : 'justify-start'
+                                } ${swipedMessageId === message.id ? 'swipe-reply swiped' : 'swipe-reply'}`}
+                                onTouchStart={(e) => handleSwipeStart(e, message.id)}
+                                onClick={() => {
+                                  if (swipedMessageId === message.id) {
+                                    handleReply(message);
+                                    setSwipedMessageId(null);
+                                  }
+                                }}
                               >
+                                <div
+                                  className={`max-w-xs lg:max-w-md px-5 py-3 message-bubble ${
+                                    isMessageSent(message) ? 'sent' : 'received'
+                                  } relative`}
+                                >
                                 {/* Reply indicator for swipe */}
                                 {swipedMessageId === message.id && (
                                   <div className="reply-indicator visible">
@@ -591,24 +615,25 @@ export default function MessagesPage() {
                                   <span>{formatMessageTime(message.created_at)}</span>
                                   <MessageStatus message={message} />
                                 </div>
+                                </div>
                               </div>
-                            </div>
-                          </ContextMenuTrigger>
-                          
-                          <ContextMenuContent>
-                            <ContextMenuItem onClick={() => handleReply(message)}>
-                              <Reply className="h-4 w-4 mr-2" />
-                              Responder
-                            </ContextMenuItem>
-                            <ContextMenuItem 
-                              onClick={() => handleDeleteMessage(message.id)}
-                              className="text-red-600 focus:text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Eliminar
-                            </ContextMenuItem>
-                          </ContextMenuContent>
-                        </ContextMenu>
+                            </ContextMenuTrigger>
+                            
+                            <ContextMenuContent>
+                              <ContextMenuItem onClick={() => handleReply(message)}>
+                                <Reply className="h-4 w-4 mr-2" />
+                                Responder
+                              </ContextMenuItem>
+                              <ContextMenuItem 
+                                onClick={() => handleDeleteMessage(message.id)}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Eliminar
+                              </ContextMenuItem>
+                            </ContextMenuContent>
+                          </ContextMenu>
+                        </div>
                       ))}
                       <div ref={messagesEndRef} />
                     </div>
