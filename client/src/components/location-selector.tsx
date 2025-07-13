@@ -91,31 +91,6 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
 
   return (
     <div className="space-y-4">
-      {/* Recomendação Visual para Seleção Hierárquica */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-          <div className="flex-1">
-            <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-              Recomendação para Melhor Filtro
-            </h4>
-            <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-              Para obter os melhores resultados, recomendamos que selecione as localizações de forma hierárquica:
-            </p>
-            <div className="flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-300">
-              <span className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">1º Província</span>
-              <ArrowRight className="w-4 h-4" />
-              <span className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">2º Município</span>
-              <ArrowRight className="w-4 h-4" />
-              <span className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">3º Bairro</span>
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-              Esta é a melhor maneira para que o filtro funcione correctamente e encontre prestadores de serviços na sua área.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label htmlFor="province">

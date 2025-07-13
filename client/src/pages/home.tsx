@@ -21,7 +21,6 @@ interface SearchFilters {
   municipality?: string;
   neighborhood?: string;
   service?: string;
-  contract_type?: string;
   min_age?: number;
   max_age?: number;
 }
@@ -88,9 +87,7 @@ export default function Home() {
     setSearchFilters(prev => ({ ...prev, service: service === "todos" ? undefined : service }));
   };
 
-  const handleContractFilter = (contract_type: string) => {
-    setSearchFilters(prev => ({ ...prev, contract_type: contract_type === "todos" ? undefined : contract_type }));
-  };
+
 
   const handleAgeFilter = (ageRange: string) => {
     if (ageRange === "todos") {
@@ -180,7 +177,7 @@ export default function Home() {
             <div className="space-y-4 md:space-y-6">
               <LocationSelector onLocationChange={handleLocationChange} />
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Tipo de Serviço
@@ -218,26 +215,6 @@ export default function Home() {
                       <SelectItem value="animador_festas">Animador de Festas</SelectItem>
                       <SelectItem value="fotografo">Fotógrafo</SelectItem>
                       <SelectItem value="outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tipo de Contrato
-                  </label>
-                  <Select onValueChange={handleContractFilter}>
-                    <SelectTrigger className="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                      <SelectValue placeholder="Todos os contratos" />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
-                      <SelectItem value="todos">Todos os contratos</SelectItem>
-                      <SelectItem value="tempo_inteiro">Tempo Inteiro</SelectItem>
-                      <SelectItem value="meio_periodo">Meio Período</SelectItem>
-                      <SelectItem value="por_horas">Por Horas</SelectItem>
-                      <SelectItem value="fins_semana">Fins de Semana</SelectItem>
-                      <SelectItem value="eventual">Eventual</SelectItem>
-                      <SelectItem value="freelance">Freelance</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
