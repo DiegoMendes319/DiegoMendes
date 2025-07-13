@@ -83,6 +83,19 @@ export const site_analytics = pgTable("site_analytics", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const feedback = pgTable("feedback", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  category: text("category").notNull(),
+  message: text("message").notNull(),
+  sender_name: text("sender_name"),
+  sender_email: text("sender_email"),
+  sender_id: text("sender_id"),
+  is_authenticated: boolean("is_authenticated").default(false),
+  is_read: boolean("is_read").default(false),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   created_at: true,
@@ -153,6 +166,18 @@ export const insertAnalyticsSchema = createInsertSchema(site_analytics).omit({
   created_at: true,
 });
 
+export const insertFeedbackSchema = createInsertSchema(feedback).omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export const updateFeedbackSchema = createInsertSchema(feedback).omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+}).partial();
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
@@ -161,6 +186,8 @@ export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
 export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
 export type UpdateSiteSetting = z.infer<typeof updateSiteSettingSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
+export type UpdateFeedback = z.infer<typeof updateFeedbackSchema>;
 
 export type User = typeof users.$inferSelect & {
   // Add computed fields for compatibility
@@ -171,3 +198,4 @@ export type Review = typeof reviews.$inferSelect;
 export type AdminLog = typeof admin_logs.$inferSelect;
 export type SiteSetting = typeof site_settings.$inferSelect;
 export type SiteAnalytics = typeof site_analytics.$inferSelect;
+export type Feedback = typeof feedback.$inferSelect;

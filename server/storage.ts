@@ -1,4 +1,4 @@
-import { users, reviews, admin_logs, site_settings, site_analytics, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics } from "@shared/schema";
+import { users, reviews, admin_logs, site_settings, site_analytics, feedback, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type Feedback, type InsertFeedback, type UpdateFeedback, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics } from "@shared/schema";
 import { eq, and, ilike, or, sql, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
@@ -68,6 +68,14 @@ export interface IStorage {
   // Analytics
   getAnalytics(days?: number): Promise<SiteAnalytics[]>;
   recordAnalytics(data: InsertAnalytics): Promise<void>;
+  
+  // Feedback methods
+  createFeedback(feedback: InsertFeedback): Promise<Feedback>;
+  getAllFeedback(): Promise<Feedback[]>;
+  getFeedbackByCategory(category: string): Promise<Feedback[]>;
+  markFeedbackAsRead(feedbackId: string): Promise<boolean>;
+  deleteFeedback(feedbackId: string): Promise<boolean>;
+  getUnreadFeedbackCount(): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -80,6 +88,7 @@ export class MemStorage implements IStorage {
   private adminLogs: Map<string, AdminLog>;
   private siteSettings: Map<string, SiteSetting>;
   private analytics: Map<string, SiteAnalytics>;
+  private feedbackMessages: Map<string, Feedback>;
 
   constructor() {
     this.users = new Map();
@@ -91,6 +100,7 @@ export class MemStorage implements IStorage {
     this.adminLogs = new Map();
     this.siteSettings = new Map();
     this.analytics = new Map();
+    this.feedbackMessages = new Map();
     this.initializeSampleData();
   }
 
@@ -941,6 +951,49 @@ export class MemStorage implements IStorage {
     
     this.analytics.set(id, analytics);
   }
+
+  // Feedback methods
+  async createFeedback(feedback: InsertFeedback): Promise<Feedback> {
+    const id = crypto.randomUUID();
+    const newFeedback: Feedback = {
+      id,
+      ...feedback,
+      is_read: false,
+      created_at: new Date(),
+    };
+
+    this.feedbackMessages.set(id, newFeedback);
+    return newFeedback;
+  }
+
+  async getAllFeedback(): Promise<Feedback[]> {
+    return Array.from(this.feedbackMessages.values())
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  async getFeedbackByCategory(category: string): Promise<Feedback[]> {
+    return Array.from(this.feedbackMessages.values())
+      .filter(f => f.category === category)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  async markFeedbackAsRead(feedbackId: string): Promise<boolean> {
+    const feedback = this.feedbackMessages.get(feedbackId);
+    if (!feedback) return false;
+
+    const updatedFeedback = { ...feedback, is_read: true };
+    this.feedbackMessages.set(feedbackId, updatedFeedback);
+    return true;
+  }
+
+  async deleteFeedback(feedbackId: string): Promise<boolean> {
+    return this.feedbackMessages.delete(feedbackId);
+  }
+
+  async getUnreadFeedbackCount(): Promise<number> {
+    return Array.from(this.feedbackMessages.values())
+      .filter(f => !f.is_read).length;
+  }
 }
 
 // Database storage implementation
@@ -1252,6 +1305,88 @@ class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error deleting review:", error);
       return false;
+    }
+  }
+
+  // Feedback methods for DatabaseStorage
+  async createFeedback(feedback: InsertFeedback): Promise<Feedback> {
+    if (!this.db) {
+      throw new Error("Database not available");
+    }
+    try {
+      const result = await this.db.insert(feedback).values(feedback).returning();
+      return result[0];
+    } catch (error) {
+      console.error("Error creating feedback:", error);
+      throw error;
+    }
+  }
+
+  async getAllFeedback(): Promise<Feedback[]> {
+    if (!this.db) return [];
+    try {
+      const result = await this.db
+        .select()
+        .from(feedback)
+        .orderBy(desc(feedback.created_at));
+      return result;
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return [];
+    }
+  }
+
+  async getFeedbackByCategory(category: string): Promise<Feedback[]> {
+    if (!this.db) return [];
+    try {
+      const result = await this.db
+        .select()
+        .from(feedback)
+        .where(eq(feedback.category, category))
+        .orderBy(desc(feedback.created_at));
+      return result;
+    } catch (error) {
+      console.error("Error fetching feedback by category:", error);
+      return [];
+    }
+  }
+
+  async markFeedbackAsRead(feedbackId: string): Promise<boolean> {
+    if (!this.db) return false;
+    try {
+      const result = await this.db
+        .update(feedback)
+        .set({ is_read: true })
+        .where(eq(feedback.id, feedbackId));
+      return result.count > 0;
+    } catch (error) {
+      console.error("Error marking feedback as read:", error);
+      return false;
+    }
+  }
+
+  async deleteFeedback(feedbackId: string): Promise<boolean> {
+    if (!this.db) return false;
+    try {
+      const result = await this.db.delete(feedback).where(eq(feedback.id, feedbackId));
+      return result.count > 0;
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      return false;
+    }
+  }
+
+  async getUnreadFeedbackCount(): Promise<number> {
+    if (!this.db) return 0;
+    try {
+      const result = await this.db
+        .select({ count: sql<number>`count(*)` })
+        .from(feedback)
+        .where(eq(feedback.is_read, false));
+      return result[0]?.count || 0;
+    } catch (error) {
+      console.error("Error counting unread feedback:", error);
+      return 0;
     }
   }
 }

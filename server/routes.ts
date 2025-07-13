@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, updateUserSchema, insertReviewSchema } from "@shared/schema";
+import { insertUserSchema, updateUserSchema, insertReviewSchema, insertFeedbackSchema } from "@shared/schema";
 import { z } from "zod";
 
 const searchFiltersSchema = z.object({
@@ -989,6 +989,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error checking maintenance mode:', error);
       res.json({ enabled: false });
+    }
+  });
+
+  // Feedback endpoints
+  app.post("/api/feedback", async (req, res) => {
+    try {
+      const validatedData = insertFeedbackSchema.parse(req.body);
+      const feedback = await storage.createFeedback(validatedData);
+      res.status(201).json(feedback);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/feedback", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const category = req.query.category as string | undefined;
+      const feedback = category 
+        ? await storage.getFeedbackByCategory(category)
+        : await storage.getAllFeedback();
+
+      res.json(feedback);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/admin/feedback/:id/read", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const success = await storage.markFeedbackAsRead(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Feedback não encontrado" });
+      }
+
+      res.json({ message: "Feedback marcado como lido" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.delete("/api/admin/feedback/:id", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const success = await storage.deleteFeedback(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Feedback não encontrado" });
+      }
+
+      res.json({ message: "Feedback eliminado com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/feedback/unread-count", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const count = await storage.getUnreadFeedbackCount();
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
 

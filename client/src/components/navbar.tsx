@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Home, LogIn, LogOut, ChevronDown, Shield } from "lucide-react";
+import { Menu, X, User, Home, LogIn, LogOut, ChevronDown, Shield, MessageCircle } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import JikulumessuIcon from "./jikulumessu-icon";
 import ThemeToggle from "./theme-toggle";
+import FeedbackModal from "./feedback-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ import { useSiteSettings } from "@/hooks/use-site-settings";
 export default function Navbar() {
   const [location, setLocation] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
@@ -90,6 +92,17 @@ export default function Navbar() {
               <User className="w-4 h-4 inline mr-2" />
               Registar
             </Link>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsFeedbackOpen(true)}
+              className="nav-link"
+              title="Enviar feedback para o administrador"
+            >
+              <MessageCircle className="w-4 h-4 inline mr-2" />
+              Feedback
+            </Button>
             
             {/* Connection Status */}
             {user ? (
@@ -222,10 +235,29 @@ export default function Navbar() {
                   Conectar-se
                 </Button>
               )}
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setIsFeedbackOpen(true);
+                  setIsMenuOpen(false);
+                }}
+                className="w-full justify-start mobile-nav-link"
+              >
+                <MessageCircle className="w-4 h-4 inline mr-2" />
+                Feedback
+              </Button>
             </div>
           </div>
         )}
       </div>
+      
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
     </nav>
   );
 }
