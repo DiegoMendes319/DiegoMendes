@@ -247,45 +247,15 @@ export default function AdminPage() {
     }
   };
 
-  // Função para obter descrição da definição
+  // Função para obter descrição da definição - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingDescription = (key: string) => {
     const descriptions = {
       'site_title': 'O título principal do site que aparece no navegador e nos resultados de pesquisa',
       'site_description': 'Descrição breve do site para SEO e redes sociais',
-      'contact_email': 'Email principal para contacto público',
-      'contact_phone': 'Número de telefone para contacto',
       'maintenance_mode': 'Activar/desactivar modo de manutenção (true/false)',
-      'max_upload_size': 'Tamanho máximo permitido para uploads em MB',
       'registration_enabled': 'Permitir que novos utilizadores se registem (true/false)',
-      'review_moderation': 'Activar moderação de avaliações antes de publicar (true/false)',
-      'welcome_message': 'Mensagem mostrada aos novos utilizadores',
-      'terms_version': 'Versão atual dos termos de serviço',
-      'privacy_version': 'Versão atual da política de privacidade',
-      'featured_services': 'Lista de serviços em destaque separados por vírgula',
-      'social_facebook': 'URL da página do Facebook',
-      'social_instagram': 'URL da página do Instagram',
-      'analytics_enabled': 'Activar sistema de análise de dados (true/false)',
-      'notification_email': 'Email para receber notificações do sistema',
       'primary_color': 'Cor principal do site e elementos principais',
       'secondary_color': 'Cor secundária para elementos complementares',
-      'accent_color': 'Cor de destaque para elementos importantes',
-      'background_color': 'Cor de fundo principal do site',
-      'text_color': 'Cor principal do texto',
-      'header_color': 'Cor do cabeçalho/navbar',
-      'footer_color': 'Cor do rodapé',
-      'button_color': 'Cor dos botões principais',
-      'link_color': 'Cor dos links',
-      'border_color': 'Cor das bordas e separadores',
-      'success_color': 'Cor para mensagens de sucesso',
-      'warning_color': 'Cor para mensagens de aviso',
-      'error_color': 'Cor para mensagens de erro',
-      'info_color': 'Cor para mensagens informativas',
-      'card_background': 'Cor de fundo dos cartões',
-      'sidebar_color': 'Cor da barra lateral',
-      'menu_color': 'Cor do menu de navegação',
-      'hover_color': 'Cor quando o cursor passa sobre elementos',
-      'active_color': 'Cor para elementos ativos/selecionados',
-      'disabled_color': 'Cor para elementos desativados',
     };
     return descriptions[key] || 'Definição personalizada do sistema';
   };
@@ -388,25 +358,15 @@ export default function AdminPage() {
     }
   };
 
-  // Função para obter nome amigável da definição
+  // Função para obter nome amigável da definição - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingFriendlyName = (key: string) => {
     const names = {
       'site_title': 'Título do Site',
       'site_description': 'Descrição do Site',
-      'contact_email': 'Email de Contacto',
-      'contact_phone': 'Telefone de Contacto',
       'maintenance_mode': 'Modo de Manutenção',
-      'max_upload_size': 'Tamanho Máximo de Upload (MB)',
       'registration_enabled': 'Permitir Novos Registos',
-      'review_moderation': 'Moderação de Avaliações',
-      'welcome_message': 'Mensagem de Boas-vindas',
-      'terms_version': 'Versão dos Termos',
-      'privacy_version': 'Versão da Política de Privacidade',
-      'featured_services': 'Serviços em Destaque',
-      'social_facebook': 'Facebook URL',
-      'social_instagram': 'Instagram URL',
-      'analytics_enabled': 'Análise de Dados Activada',
-      'notification_email': 'Email para Notificações',
+      'primary_color': 'Cor Primária',
+      'secondary_color': 'Cor Secundária',
     };
     return names[key] || key;
   };

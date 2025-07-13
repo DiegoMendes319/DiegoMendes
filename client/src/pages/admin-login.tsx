@@ -1,156 +1,131 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Shield, ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import JikulumessuIcon from "@/components/jikulumessu-icon";
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import JikulumessuIcon from '@/components/jikulumessu-icon';
 
-export default function AdminLogin() {
-  const [, setLocation] = useLocation();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
+export default function AdminLoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setError('');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setError('');
 
     try {
-      const response = await apiRequest('/api/auth/login', 'POST', {
-        email: formData.email,
-        password: formData.password
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
+
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Credenciais inválidas');
+        throw new Error(data.error || 'Erro ao fazer login');
       }
 
-      const result = await response.json();
-      
-      // Check if user is admin
-      const adminCheck = await apiRequest('/api/admin/is-admin', 'GET');
-      const adminData = await adminCheck.json();
-      
-      if (!adminData.isAdmin) {
-        throw new Error('Acesso negado. Apenas administradores podem aceder durante manutenção.');
-      }
+      // Store session token
+      document.cookie = `session_token=${data.sessionToken}; path=/; max-age=${30 * 24 * 60 * 60}`;
 
       toast({
-        title: "Login administrativo realizado",
-        description: `Bem-vindo, ${result.user?.name || 'Administrador'}!`,
+        title: "Login realizado com sucesso",
+        description: "Redirecionando para o painel de administração...",
       });
-      
-      // Redirect to home or admin panel
-      setLocation("/");
-    } catch (error: any) {
-      setError(error.message || 'Erro no login');
+
+      // Redirect to admin panel
+      setLocation('/admin');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Erro inesperado');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <Card className="shadow-2xl">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <JikulumessuIcon size="xl" className="text-red-600" />
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <JikulumessuIcon size="lg" className="text-red-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+            <Shield className="h-6 w-6 text-red-600" />
+            Admin Login
+          </CardTitle>
+          <CardDescription>
+            Acesso exclusivo para administradores do Jikulumessu
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@jikulumessu.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
-              <Shield className="w-6 h-6 text-red-600" />
-              Acesso Administrativo
-            </CardTitle>
-            <CardDescription>
-              Site em modo de manutenção. Apenas administradores podem aceder.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-amber-800 dark:text-amber-200">
-                Este acesso é restrito a administradores durante o período de manutenção.
-              </AlertDescription>
-            </Alert>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="admin@jikulumessu.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Palavra-passe</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password">Palavra-passe</Label>
+              <div className="relative">
                 <Input
                   id="password"
-                  name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Digite sua palavra-passe"
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full bg-red-600 hover:bg-red-700 text-white"
-                disabled={isLoading}
-              >
-                {isLoading ? 'A processar...' : 'Aceder como Administrador'}
-              </Button>
-            </form>
-
-            <div className="text-center pt-4">
-              <Button
-                variant="ghost"
-                onClick={() => setLocation("/maintenance")}
-                className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>Credenciais padrão:</p>
+            <p className="font-mono">admin@jikulumessu.com / admin123</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
