@@ -83,7 +83,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@jikulumessu.com"
+                placeholder="Digite seu email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -120,10 +120,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>Credenciais padrão:</p>
-            <p className="font-mono">admin@jikulumessu.com / admin123</p>
-          </div>
+
         </CardContent>
       </Card>
     </div>

@@ -10,7 +10,7 @@ import Auth from "@/pages/auth";
 import Login from "@/pages/login";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
-import AdminPanel from "@/pages/admin";
+import AdminPanel from "@/pages/admin-simple";
 import AdminLogin from "@/pages/admin-login";
 import ChangePassword from "@/pages/change-password";
 import RecoverPassword from "@/pages/recover-password";

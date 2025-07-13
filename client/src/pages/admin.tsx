@@ -250,64 +250,26 @@ export default function AdminPage() {
   // Função para obter descrição da definição - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingDescription = (key: string) => {
     const descriptions = {
-      'site_title': 'O título principal do site que aparece no navegador e nos resultados de pesquisa',
-      'site_description': 'Descrição breve do site para SEO e redes sociais',
       'maintenance_mode': 'Activar/desactivar modo de manutenção (true/false)',
       'registration_enabled': 'Permitir que novos utilizadores se registem (true/false)',
-      'primary_color': 'Cor principal do site e elementos principais',
-      'secondary_color': 'Cor secundária para elementos complementares',
     };
     return descriptions[key] || 'Definição personalizada do sistema';
   };
 
-  // Função para obter exemplo da definição
+  // Função para obter exemplo da definição - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingExample = (key: string) => {
     const examples = {
-      'site_title': 'Jikulumessu - Portal de Serviços',
-      'site_description': 'Plataforma para conectar pessoas com prestadores de serviços em Angola',
-      'contact_email': 'contacto@jikulumessu.ao',
-      'contact_phone': '+244 900 000 000',
       'maintenance_mode': 'false',
-      'max_upload_size': '10',
       'registration_enabled': 'true',
-      'review_moderation': 'false',
-      'welcome_message': 'Bem-vindo ao Jikulumessu! Encontre os melhores serviços aqui.',
-      'terms_version': '1.0',
-      'privacy_version': '1.0',
-      'featured_services': 'limpeza, jardinagem, segurança, transporte',
-      'social_facebook': 'https://facebook.com/jikulumessu',
-      'social_instagram': 'https://instagram.com/jikulumessu',
-      'analytics_enabled': 'true',
-      'notification_email': 'admin@jikulumessu.ao',
-      'primary_color': '#DC2626',
-      'secondary_color': '#000000',
-      'accent_color': '#FCD34D',
-      'background_color': '#FFFFFF',
-      'text_color': '#111827',
-      'header_color': '#DC2626',
-      'footer_color': '#374151',
-      'button_color': '#DC2626',
-      'link_color': '#2563EB',
-      'border_color': '#D1D5DB',
-      'success_color': '#059669',
-      'warning_color': '#D97706',
-      'error_color': '#DC2626',
-      'info_color': '#0EA5E9',
-      'card_background': '#F9FAFB',
-      'sidebar_color': '#F3F4F6',
-      'menu_color': '#FFFFFF',
-      'hover_color': '#F3F4F6',
-      'active_color': '#EF4444',
-      'disabled_color': '#9CA3AF',
     };
     return examples[key] || 'valor_exemplo';
   };
 
-  // Função para obter input apropriado
+  // Função para obter input apropriado - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingInput = (key: string) => {
-    const booleanKeys = ['maintenance_mode', 'registration_enabled', 'review_moderation', 'analytics_enabled'];
-    const textareaKeys = ['site_description', 'welcome_message', 'featured_services'];
-    const colorKeys = ['primary_color', 'secondary_color', 'accent_color', 'background_color', 'text_color', 'header_color', 'footer_color', 'button_color', 'link_color', 'border_color', 'success_color', 'warning_color', 'error_color', 'info_color', 'card_background', 'sidebar_color', 'menu_color', 'hover_color', 'active_color', 'disabled_color'];
+    const booleanKeys = ['maintenance_mode', 'registration_enabled'];
+    const textareaKeys = [];
+    const colorKeys = [];
     
     if (colorKeys.includes(key)) {
       return (
@@ -361,12 +323,8 @@ export default function AdminPage() {
   // Função para obter nome amigável da definição - APENAS DEFINIÇÕES ESSENCIAIS
   const getSettingFriendlyName = (key: string) => {
     const names = {
-      'site_title': 'Título do Site',
-      'site_description': 'Descrição do Site',
       'maintenance_mode': 'Modo de Manutenção',
       'registration_enabled': 'Permitir Novos Registos',
-      'primary_color': 'Cor Primária',
-      'secondary_color': 'Cor Secundária',
     };
     return names[key] || key;
   };
