@@ -6,9 +6,11 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   first_name: text("first_name").notNull(),
   last_name: text("last_name").notNull(),
+  name: text("name"), // Full name derived from first_name + last_name
   email: text("email").unique(), // Made optional for users without email
   phone: text("phone").notNull(),
   date_of_birth: timestamp("date_of_birth"), // For age validation ≥18
+  age: integer("age"), // Calculated age
   province: text("province").notNull(),
   municipality: text("municipality").notNull(),
   neighborhood: text("neighborhood").notNull(),
