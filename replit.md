@@ -63,6 +63,11 @@ Jikulumessu is a full-stack web application designed to connect people with qual
   - Implemented auto-expanding textarea with line break support (Enter for new line, Shift+Enter to send)
   - Added automatic text wrapping for long messages to prevent horizontal overflow
   - Improved textarea auto-resize functionality with proper word breaking
+✓ **Profile Page Consistency Updates (Janeiro 2025)**:
+  - Fixed secondary "Guardar Alterações" button to use green background instead of red
+  - Corrected mobile line break functionality - Enter creates new line, Shift+Enter sends message
+  - Enhanced profile image display in conversations with consistent fallback avatars
+  - Improved avatar styling with colored backgrounds for better visual distinction
 ✓ **Registration Form Cleanup (Janeiro 2025)**: Removed "Política de Cookies" option from registration forms and fixed Terms/Privacy links to redirect to correct pages
 ✓ **Tutorial Button Removal**: Completely removed tutorial button from navbar while maintaining automatic tutorial functionality for new users
 ✓ **Smart Profile Button**: Implemented intelligent profile button that redirects authenticated users to profile or shows connection message for non-authenticated users

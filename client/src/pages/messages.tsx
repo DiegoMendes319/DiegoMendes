@@ -625,18 +625,19 @@ export default function MessagesPage() {
                             key={message.id}
                             className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} items-end gap-2`}
                           >
-                            {/* Avatar for received messages (left side) */}
+                            {/* Avatar for received messages (left side) - Always show */}
                             {!isCurrentUser && (
                               <Avatar 
                                 className="h-8 w-8 mb-1 cursor-pointer hover:scale-110 transition-transform"
                                 onClick={() => {
                                   // Create image modal for profile viewing
-                                  if (participantProfile?.profile_url) {
+                                  const imageUrl = participantProfile?.profile_url || selectedConversationData?.participant_profile_image;
+                                  if (imageUrl) {
                                     const modal = document.createElement('div');
                                     modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
                                     modal.innerHTML = `
                                       <div class="max-w-md max-h-[80vh] relative">
-                                        <img src="${participantProfile.profile_url}" alt="Perfil" class="w-full h-auto rounded-lg" />
+                                        <img src="${imageUrl}" alt="Perfil" class="w-full h-auto rounded-lg" />
                                         <button class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">×</button>
                                       </div>
                                     `;
@@ -645,8 +646,11 @@ export default function MessagesPage() {
                                   }
                                 }}
                               >
-                                <AvatarImage src={participantProfile?.profile_url || selectedConversationData?.participant_profile_image} />
-                                <AvatarFallback className="text-xs">
+                                <AvatarImage 
+                                  src={participantProfile?.profile_url || selectedConversationData?.participant_profile_image} 
+                                  alt="Perfil do participante"
+                                />
+                                <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
                                   {participantProfile?.name?.[0]?.toUpperCase() || 
                                    selectedConversationData?.participant_name?.[0]?.toUpperCase() || 'U'}
                                 </AvatarFallback>
@@ -666,18 +670,19 @@ export default function MessagesPage() {
                               </div>
                             </div>
                             
-                            {/* Avatar for sent messages (right side) */}
+                            {/* Avatar for sent messages (right side) - Always show */}
                             {isCurrentUser && (
                               <Avatar 
                                 className="h-8 w-8 mb-1 cursor-pointer hover:scale-110 transition-transform"
                                 onClick={() => {
                                   // Create image modal for profile viewing
-                                  if (user?.profile_url) {
+                                  const imageUrl = user?.profile_url || user?.profile_image;
+                                  if (imageUrl) {
                                     const modal = document.createElement('div');
                                     modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
                                     modal.innerHTML = `
                                       <div class="max-w-md max-h-[80vh] relative">
-                                        <img src="${user.profile_url}" alt="Perfil" class="w-full h-auto rounded-lg" />
+                                        <img src="${imageUrl}" alt="Perfil" class="w-full h-auto rounded-lg" />
                                         <button class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">×</button>
                                       </div>
                                     `;
@@ -686,8 +691,11 @@ export default function MessagesPage() {
                                   }
                                 }}
                               >
-                                <AvatarImage src={user?.profile_url || user?.profile_image} />
-                                <AvatarFallback className="text-xs">
+                                <AvatarImage 
+                                  src={user?.profile_url || user?.profile_image} 
+                                  alt="Meu perfil"
+                                />
+                                <AvatarFallback className="text-xs bg-green-100 text-green-600">
                                   {user?.name?.[0]?.toUpperCase() || 
                                    user?.first_name?.[0]?.toUpperCase() || 'U'}
                                 </AvatarFallback>
@@ -735,11 +743,11 @@ export default function MessagesPage() {
                     }}
                     onKeyDown={(e) => {
                       try {
-                        if (e.key === 'Enter' && e.shiftKey) {
-                          // Shift+Enter creates new line - allow default behavior
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          // Regular Enter creates new line - allow default behavior
                           return;
                         }
-                        if (e.key === 'Enter' && !e.shiftKey) {
+                        if (e.key === 'Enter' && e.shiftKey) {
                           e.preventDefault();
                           handleSendMessage();
                         }

@@ -663,7 +663,7 @@ export default function Profile() {
               <Button
                 onClick={handleSaveProfile}
                 disabled={updateProfileMutation.isPending}
-                className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 <Save className="h-4 w-4 mr-2" />
                 {updateProfileMutation.isPending ? 'A guardar...' : 'Guardar Alterações'}
