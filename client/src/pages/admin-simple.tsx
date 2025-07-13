@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Shield, Users, Settings, Activity, BarChart3, User, UserCheck, UserX, Eye, Edit, Trash2, Clock, MapPin, Star, AlertTriangle, MessageCircle, CheckCircle, Trash, TrendingUp, Calendar } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { toast, toastAngola } from "@/hooks/use-toast";
@@ -210,6 +213,14 @@ export default function AdminPage() {
   // Filter settings to only show essential ones
   const essentialSettings = settings?.filter(setting => 
     setting.key === 'maintenance_mode' || setting.key === 'registration_enabled' || setting.key === 'login_enabled'
+  ) || [];
+
+  // Maintenance page settings
+  const maintenanceSettings = settings?.filter(setting => 
+    setting.key === 'maintenance_title' || 
+    setting.key === 'maintenance_description' || 
+    setting.key === 'maintenance_status' ||
+    setting.key === 'maintenance_contact_text'
   ) || [];
 
   return (
@@ -450,6 +461,71 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Maintenance Page Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Configuração da Página de Manutenção
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Title */}
+                <div>
+                  <Label htmlFor="maintenance-title">Título da Página</Label>
+                  <Input
+                    id="maintenance-title"
+                    placeholder="Site em Manutenção"
+                    value={maintenanceSettings.find(s => s.key === 'maintenance_title')?.value || 'Site em Manutenção'}
+                    onChange={(e) => updateSettingMutation.mutate({ key: 'maintenance_title', value: e.target.value })}
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <Label htmlFor="maintenance-description">Descrição</Label>
+                  <Textarea
+                    id="maintenance-description"
+                    placeholder="Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias."
+                    value={maintenanceSettings.find(s => s.key === 'maintenance_description')?.value || 'Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.'}
+                    onChange={(e) => updateSettingMutation.mutate({ key: 'maintenance_description', value: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+
+                {/* Status Message */}
+                <div>
+                  <Label htmlFor="maintenance-status">Mensagem de Status</Label>
+                  <Input
+                    id="maintenance-status"
+                    placeholder="Voltaremos em breve"
+                    value={maintenanceSettings.find(s => s.key === 'maintenance_status')?.value || 'Voltaremos em breve'}
+                    onChange={(e) => updateSettingMutation.mutate({ key: 'maintenance_status', value: e.target.value })}
+                  />
+                </div>
+
+                {/* Contact Text */}
+                <div>
+                  <Label htmlFor="maintenance-contact">Texto de Contacto</Label>
+                  <Input
+                    id="maintenance-contact"
+                    placeholder="Precisa de ajuda urgente?"
+                    value={maintenanceSettings.find(s => s.key === 'maintenance_contact_text')?.value || 'Precisa de ajuda urgente?'}
+                    onChange={(e) => updateSettingMutation.mutate({ key: 'maintenance_contact_text', value: e.target.value })}
+                  />
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    💡 <strong>Dica:</strong> Estas configurações são aplicadas imediatamente quando o modo de manutenção está ativado. 
+                    Pode personalizar completamente a mensagem que os utilizadores veem durante a manutenção.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

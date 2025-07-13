@@ -233,6 +233,30 @@ export class MemStorage implements IStorage {
         value: "false",
         description: "Modo de manutenção",
         type: "boolean"
+      },
+      {
+        key: "maintenance_title",
+        value: "Site em Manutenção",
+        description: "Título da página de manutenção",
+        type: "text"
+      },
+      {
+        key: "maintenance_description",
+        value: "Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.",
+        description: "Descrição da página de manutenção",
+        type: "text"
+      },
+      {
+        key: "maintenance_status",
+        value: "Voltaremos em breve",
+        description: "Mensagem de status da manutenção",
+        type: "text"
+      },
+      {
+        key: "maintenance_contact_text",
+        value: "Precisa de ajuda urgente?",
+        description: "Texto de contacto da página de manutenção",
+        type: "text"
       }
     ];
 

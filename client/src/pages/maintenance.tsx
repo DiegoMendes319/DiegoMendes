@@ -1,7 +1,37 @@
+import { useEffect, useState } from "react";
 import { Wrench, Clock, Heart } from "lucide-react";
 import JikulumessuIcon from "../components/jikulumessu-icon";
 
 export default function MaintenancePage() {
+  const [maintenanceSettings, setMaintenanceSettings] = useState({
+    title: 'Site em Manutenção',
+    description: 'Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.',
+    status: 'Voltaremos em breve',
+    contactText: 'Precisa de ajuda urgente?'
+  });
+
+  useEffect(() => {
+    // Load maintenance settings from API
+    const loadMaintenanceSettings = async () => {
+      try {
+        const response = await fetch('/api/maintenance-settings');
+        if (response.ok) {
+          const settings = await response.json();
+          setMaintenanceSettings({
+            title: settings.title || 'Site em Manutenção',
+            description: settings.description || 'Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.',
+            status: settings.status || 'Voltaremos em breve',
+            contactText: settings.contactText || 'Precisa de ajuda urgente?'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load maintenance settings:', error);
+      }
+    };
+
+    loadMaintenanceSettings();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -20,25 +50,24 @@ export default function MaintenancePage() {
           
           {/* Title */}
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Site em Manutenção
+            {maintenanceSettings.title}
           </h1>
           
           {/* Description */}
           <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-            Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. 
-            O site voltará em breve com novas funcionalidades e melhorias.
+            {maintenanceSettings.description}
           </p>
           
           {/* Status */}
           <div className="flex items-center justify-center gap-2 mb-6 text-sm text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4" />
-            <span>Voltaremos em breve</span>
+            <span>{maintenanceSettings.status}</span>
           </div>
           
           {/* Contact Info */}
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-              Precisa de ajuda urgente?
+              {maintenanceSettings.contactText}
             </p>
             <a 
               href="mailto:contacto@jikulumessu.ao"

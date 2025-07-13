@@ -1071,6 +1071,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Maintenance settings endpoint (public access)
+  app.get("/api/maintenance-settings", async (req, res) => {
+    try {
+      const titleSetting = await storage.getSiteSetting('maintenance_title');
+      const descriptionSetting = await storage.getSiteSetting('maintenance_description');
+      const statusSetting = await storage.getSiteSetting('maintenance_status');
+      const contactTextSetting = await storage.getSiteSetting('maintenance_contact_text');
+      
+      res.json({
+        title: titleSetting?.value || 'Site em Manutenção',
+        description: descriptionSetting?.value || 'Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.',
+        status: statusSetting?.value || 'Voltaremos em breve',
+        contactText: contactTextSetting?.value || 'Precisa de ajuda urgente?'
+      });
+    } catch (error) {
+      console.error('Error getting maintenance settings:', error);
+      res.json({
+        title: 'Site em Manutenção',
+        description: 'Estamos a trabalhar para melhorar a sua experiência no Jikulumessu. O site voltará em breve com novas funcionalidades e melhorias.',
+        status: 'Voltaremos em breve',
+        contactText: 'Precisa de ajuda urgente?'
+      });
+    }
+  });
+
   // Feedback endpoints
   app.post("/api/feedback", async (req, res) => {
     try {
