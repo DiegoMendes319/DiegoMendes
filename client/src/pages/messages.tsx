@@ -53,6 +53,44 @@ export default function MessagesPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Error boundary state
+  const [hasError, setHasError] = useState(false);
+  
+  // Catch errors
+  useEffect(() => {
+    const handleError = (error: any) => {
+      console.error('MessagesPage error:', error);
+      setHasError(true);
+    };
+    
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+  
+  // Reset error state
+  const resetError = () => {
+    setHasError(false);
+    window.location.reload();
+  };
+  
+  // Error fallback UI
+  if (hasError) {
+    return (
+      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-4">Algo deu errado</h2>
+          <p className="text-gray-600 mb-6">Houve um erro ao carregar as mensagens.</p>
+          <button 
+            onClick={resetError}
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageContent, setMessageContent] = useState('');
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
@@ -87,7 +125,13 @@ export default function MessagesPage() {
   // Redirect if not logged in
   if (!user) {
     setLocation('/login');
-    return null;
+    return (
+      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Redirecionando para login...</p>
+        </div>
+      </div>
+    );
   }
 
   // Fetch conversations
@@ -97,10 +141,17 @@ export default function MessagesPage() {
   });
 
   // Fetch messages for selected conversation
-  const { data: messages, isLoading: messagesLoading } = useQuery({
+  const { data: messages, isLoading: messagesLoading, error: messagesError } = useQuery({
     queryKey: ['/api/messages/conversations', selectedConversation, 'messages'],
     enabled: !!selectedConversation,
+    retry: 2,
+    retryDelay: 1000,
   });
+
+  // Handle messages error
+  if (messagesError) {
+    console.error('Erro ao carregar mensagens:', messagesError);
+  }
 
   // Fetch participants for new chat
   const { data: participants } = useQuery({
@@ -358,10 +409,24 @@ export default function MessagesPage() {
 
   const selectConversation = (conversationId: string) => {
     try {
-      setSelectedConversation(conversationId);
-      if (isMobile) {
-        setShowConversationList(false);
+      console.log('Selecionando conversa:', conversationId);
+      
+      // Prevent multiple rapid clicks
+      if (selectedConversation === conversationId) {
+        console.log('Conversa já selecionada');
+        return;
       }
+      
+      setSelectedConversation(conversationId);
+      
+      // For mobile, hide conversation list with slight delay
+      if (isMobile) {
+        setTimeout(() => {
+          setShowConversationList(false);
+        }, 100);
+      }
+      
+      console.log('Conversa selecionada com sucesso');
     } catch (error) {
       console.error('Erro ao selecionar conversa:', error);
       toast({
@@ -521,7 +586,24 @@ export default function MessagesPage() {
                         ? 'bg-blue-50 border-blue-200'
                         : ''
                     }`}
-                    onClick={() => selectConversation(conversation.id)}
+                    onClick={(e) => {
+                      try {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selectConversation(conversation.id);
+                      } catch (error) {
+                        console.error('Erro no clique da conversa:', error);
+                        setHasError(true);
+                      }
+                    }}
+                    onTouchStart={(e) => {
+                      try {
+                        // Prevent default touch behavior that might cause issues
+                        e.stopPropagation();
+                      } catch (error) {
+                        console.error('Erro no toque:', error);
+                      }
+                    }}
                   >
                     <Avatar className="h-12 w-12 mr-3">
                       <AvatarImage src={conversation.participant_profile_image} />
@@ -566,7 +648,7 @@ export default function MessagesPage() {
             <>
               {/* Chat Header - Desktop only */}
               {!isMobile && (
-                <div className="p-4 border-b border-gray-200 bg-gray-50">
+                <div className="p-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
                   <div className="flex items-center">
                     <Avatar className="h-10 w-10 mr-3">
                       <AvatarImage src={selectedConversationData?.participant_profile_image} />
@@ -583,12 +665,34 @@ export default function MessagesPage() {
                   </div>
                 </div>
               )}
+              
+              {/* Error state for messages */}
+              {messagesError && (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg m-4">
+                  <p className="font-semibold">Erro ao carregar mensagens</p>
+                  <p className="text-sm">Por favor, tente novamente ou contacte o suporte.</p>
+                </div>
+              )}
 
               {/* Messages */}
               <div className="flex-1 overflow-hidden chat-background">
                 <ScrollArea className="h-full p-4">
                   {messagesLoading ? (
                     <div className="text-center py-8">Carregando mensagens...</div>
+                  ) : messagesError ? (
+                    <div className="text-center py-8">
+                      <p className="text-red-600 mb-4">Erro ao carregar mensagens</p>
+                      <button 
+                        onClick={() => window.location.reload()}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                      >
+                        Tentar novamente
+                      </button>
+                    </div>
+                  ) : !messages || messages.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      Nenhuma mensagem ainda. Envie a primeira!
+                    </div>
                   ) : (
                     <div className="space-y-0">
                       {messages?.map((message: Message) => (
