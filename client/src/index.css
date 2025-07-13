@@ -604,15 +604,15 @@
 
   /* Navbar Styles */
   .nav-link {
-    @apply text-gray-700 hover:text-[var(--angola-red)] px-3 py-2 rounded-md text-sm font-medium transition-colors;
+    @apply text-gray-700 dark:text-gray-300 hover:text-[var(--angola-red)] dark:hover:text-[var(--angola-red)] px-3 py-2 rounded-md text-sm font-medium transition-colors;
   }
 
   .nav-link.active {
-    @apply text-[var(--angola-red)] font-semibold;
+    @apply text-[var(--angola-red)] dark:text-[var(--angola-red)] font-semibold;
   }
 
   .mobile-nav-link {
-    @apply text-gray-700 hover:text-[var(--angola-red)] block px-3 py-2 rounded-md text-base font-medium transition-colors;
+    @apply text-gray-700 dark:text-gray-300 hover:text-[var(--angola-red)] dark:hover:text-[var(--angola-red)] block px-3 py-2 rounded-md text-base font-medium transition-colors;
   }
   
   @keyframes skeleton-loading {
