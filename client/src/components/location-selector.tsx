@@ -72,11 +72,11 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="province">
-          Província <span className="text-red-500">*</span>
+          Província <span className="text-gray-500">(opcional)</span>
         </Label>
         <Select value={selectedProvince} onValueChange={handleProvinceChange}>
           <SelectTrigger className="cascading-select">
-            <SelectValue placeholder="Selecione uma província" />
+            <SelectValue placeholder="Todas as províncias" />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(locationData).map(([key, province]) => (
@@ -90,7 +90,7 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
       
       <div>
         <Label htmlFor="municipality">
-          Município <span className="text-red-500">*</span>
+          Município <span className="text-gray-500">(opcional)</span>
         </Label>
         <Select 
           value={selectedMunicipality} 
@@ -98,7 +98,7 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
           disabled={!selectedProvince}
         >
           <SelectTrigger className="cascading-select">
-            <SelectValue placeholder="Selecione um município" />
+            <SelectValue placeholder="Todos os municípios" />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(municipalities).map(([key, municipality]) => (

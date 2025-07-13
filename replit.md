@@ -68,6 +68,13 @@ Jikulumessu is a full-stack web application designed to connect people with qual
   - Corrected mobile line break functionality - Enter creates new line, Shift+Enter sends message
   - Enhanced profile image display in conversations with consistent fallback avatars
   - Improved avatar styling with colored backgrounds for better visual distinction
+✓ **Flexible Filtering System (Janeiro 2025)**:
+  - Implemented non-mandatory filter system - users can filter in any order they prefer
+  - Added age-based filtering with predefined ranges (18-25, 26-35, 36-45, 46-55, 56-65, 65+)
+  - Removed mandatory requirements from location filters (province, municipality optional)
+  - Added "Clear All Filters" button for easy filter reset
+  - Updated search interface with 3-column layout for better mobile experience
+  - Backend support for min_age and max_age filtering in both MemStorage and DatabaseStorage
 ✓ **Registration Form Cleanup (Janeiro 2025)**: Removed "Política de Cookies" option from registration forms and fixed Terms/Privacy links to redirect to correct pages
 ✓ **Tutorial Button Removal**: Completely removed tutorial button from navbar while maintaining automatic tutorial functionality for new users
 ✓ **Smart Profile Button**: Implemented intelligent profile button that redirects authenticated users to profile or shows connection message for non-authenticated users

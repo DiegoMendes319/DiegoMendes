@@ -1,5 +1,5 @@
 import { users, reviews, admin_logs, site_settings, site_analytics, feedback, conversations, messages, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type Feedback, type InsertFeedback, type UpdateFeedback, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics, type Conversation, type InsertConversation, type Message, type InsertMessage, type UpdateMessage } from "@shared/schema";
-import { eq, and, ilike, or, sql, desc } from "drizzle-orm";
+import { eq, and, ilike, or, sql, desc, gte, lte } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import bcrypt from "bcrypt";
@@ -20,6 +20,8 @@ export interface IStorage {
     neighborhood?: string;
     service?: string;
     contract_type?: string;
+    min_age?: number;
+    max_age?: number;
   }): Promise<User[]>;
   getAllUsers(): Promise<User[]>;
   
@@ -421,6 +423,8 @@ export class MemStorage implements IStorage {
     neighborhood?: string;
     service?: string;
     contract_type?: string;
+    min_age?: number;
+    max_age?: number;
   }): Promise<User[]> {
     let filteredUsers = Array.from(this.users.values());
 
@@ -455,6 +459,21 @@ export class MemStorage implements IStorage {
       filteredUsers = filteredUsers.filter(user => 
         user.contract_type.toLowerCase() === filters.contract_type!.toLowerCase()
       );
+    }
+
+    // Age filtering
+    if (filters.min_age !== undefined || filters.max_age !== undefined) {
+      filteredUsers = filteredUsers.filter(user => {
+        const userAge = user.age || (user.date_of_birth ? Math.floor((Date.now() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0);
+        
+        if (filters.min_age !== undefined && userAge < filters.min_age) {
+          return false;
+        }
+        if (filters.max_age !== undefined && userAge > filters.max_age) {
+          return false;
+        }
+        return true;
+      });
     }
 
     // TODO: Implement geolocation-based sorting when lat/lng are provided
@@ -1339,6 +1358,8 @@ class DatabaseStorage implements IStorage {
     neighborhood?: string;
     service?: string;
     contract_type?: string;
+    min_age?: number;
+    max_age?: number;
   }): Promise<User[]> {
     if (!this.db) return [];
     try {
@@ -1355,6 +1376,14 @@ class DatabaseStorage implements IStorage {
       }
       if (filters.contract_type) {
         query = query.where(eq(users.contract_type, filters.contract_type));
+      }
+      
+      // Age filtering using database query
+      if (filters.min_age !== undefined) {
+        query = query.where(gte(users.age, filters.min_age));
+      }
+      if (filters.max_age !== undefined) {
+        query = query.where(lte(users.age, filters.max_age));
       }
       
       const result = await query;

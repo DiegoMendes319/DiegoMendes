@@ -22,6 +22,8 @@ interface SearchFilters {
   neighborhood?: string;
   service?: string;
   contract_type?: string;
+  min_age?: number;
+  max_age?: number;
 }
 
 export default function Home() {
@@ -81,6 +83,19 @@ export default function Home() {
 
   const handleContractFilter = (contract_type: string) => {
     setSearchFilters(prev => ({ ...prev, contract_type: contract_type === "todos" ? undefined : contract_type }));
+  };
+
+  const handleAgeFilter = (ageRange: string) => {
+    if (ageRange === "todos") {
+      setSearchFilters(prev => ({ ...prev, min_age: undefined, max_age: undefined }));
+    } else {
+      const [min, max] = ageRange.split('-').map(Number);
+      setSearchFilters(prev => ({ ...prev, min_age: min, max_age: max }));
+    }
+  };
+
+  const clearAllFilters = () => {
+    setSearchFilters({});
   };
 
   const handleProfileClick = (profile: User) => {
@@ -158,7 +173,7 @@ export default function Home() {
             <div className="space-y-4 md:space-y-6">
               <LocationSelector onLocationChange={handleLocationChange} />
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Tipo de Serviço
@@ -219,12 +234,36 @@ export default function Home() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Faixa Etária
+                  </label>
+                  <Select onValueChange={handleAgeFilter}>
+                    <SelectTrigger className="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                      <SelectValue placeholder="Todas as idades" />
+                    </SelectTrigger>
+                    <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                      <SelectItem value="todos">Todas as idades</SelectItem>
+                      <SelectItem value="18-25">18-25 anos</SelectItem>
+                      <SelectItem value="26-35">26-35 anos</SelectItem>
+                      <SelectItem value="36-45">36-45 anos</SelectItem>
+                      <SelectItem value="46-55">46-55 anos</SelectItem>
+                      <SelectItem value="56-65">56-65 anos</SelectItem>
+                      <SelectItem value="66-100">Mais de 65 anos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
-              <div className="text-center">
-                <Button onClick={() => refetch()} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 w-full sm:w-auto px-6 py-3 text-sm md:text-base">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button onClick={() => refetch()} className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 px-6 py-3 text-sm md:text-base">
                   <Search className="h-4 w-4 mr-2" />
                   Buscar Prestadores
+                </Button>
+                <Button onClick={clearAllFilters} variant="outline" className="border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10 px-6 py-3 text-sm md:text-base">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Limpar Filtros
                 </Button>
               </div>
             </div>
