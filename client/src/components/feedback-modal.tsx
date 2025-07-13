@@ -76,31 +76,70 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     
     if (!selectedCategory || !message.trim()) {
       toast({
-        title: "Erro",
-        description: "Por favor, selecione uma categoria e escreva a sua mensagem",
+        title: "Campos obrigatórios",
+        description: "Por favor, selecione uma categoria e escreva uma mensagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user && (!firstName.trim() || !lastName.trim())) {
+      toast({
+        title: "Identificação necessária",
+        description: "Por favor, forneça o seu nome e apelido.",
         variant: "destructive",
       });
       return;
     }
 
     setIsSubmitting(true);
-    
-    try {
-      const feedbackData = {
-        category: selectedCategory,
-        message: message.trim(),
-        senderName: user ? user.name : (firstName && lastName ? `${firstName} ${lastName}` : null),
-        senderEmail: user?.email || null,
-        senderId: user?.id || null,
-        isAuthenticated: !!user
-      };
 
-      const response = await apiRequest('/api/feedback', 'POST', feedbackData);
+    try {
+      // Get admin user ID (we know it's admin-test-user from the initialized data)
+      const adminUserId = 'admin-test-user';
       
-      if (response.ok) {
+      if (user) {
+        // For authenticated users, create/get conversation and send message
+        const conversationResponse = await apiRequest('/api/messages/conversations', 'POST', {
+          participant_id: adminUserId
+        });
+        
+        if (conversationResponse.ok) {
+          const conversation = await conversationResponse.json();
+          
+          // Format message with category
+          const categoryInfo = FEEDBACK_CATEGORIES.find(cat => cat.id === selectedCategory);
+          const formattedMessage = `[${categoryInfo?.title}] ${message}`;
+          
+          await apiRequest(`/api/messages/conversations/${conversation.id}/messages`, 'POST', {
+            content: formattedMessage
+          });
+          
+          toast({
+            title: "Feedback enviado",
+            description: "A sua mensagem foi enviada ao administrador.",
+          });
+          
+          // Reset form
+          setSelectedCategory("");
+          setMessage("");
+          onClose();
+        } else {
+          throw new Error('Erro ao criar conversa');
+        }
+      } else {
+        // For non-authenticated users, still send through the old feedback system
+        await apiRequest('/api/feedback', 'POST', {
+          category: selectedCategory,
+          message: message,
+          sender_name: `${firstName} ${lastName}`,
+          sender_email: null,
+          user_id: null
+        });
+        
         toast({
           title: "Feedback enviado",
-          description: "A sua mensagem foi enviada com sucesso ao Jiku!",
+          description: "Obrigado pelo seu feedback. Será analisado em breve.",
         });
         
         // Reset form
@@ -109,14 +148,12 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         setFirstName("");
         setLastName("");
         onClose();
-      } else {
-        const error = await response.json();
-        throw new Error(error.error || "Erro ao enviar feedback");
       }
-    } catch (error: any) {
+    } catch (error) {
+      console.error('Erro ao enviar feedback:', error);
       toast({
         title: "Erro",
-        description: error.message || "Erro ao enviar feedback",
+        description: "Não foi possível enviar o feedback. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -128,167 +165,121 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[var(--angola-red)]">
-            <MessageCircle className="w-5 h-5" />
-            Enviar Feedback ao Jiku (Administrador do Site)
+          <DialogTitle className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-red-600" />
+            Feedback para o Jiku
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Category Selection */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Categoria do Feedback</Label>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Selecione a categoria que melhor descreve o tipo de feedback que deseja enviar:
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {FEEDBACK_CATEGORIES.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <div
-                    key={category.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedCategory === category.id
-                        ? "border-[var(--angola-red)] bg-red-50 dark:bg-red-900/20"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => setSelectedCategory(category.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Icon className="w-5 h-5 text-[var(--angola-red)] mt-0.5" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">{category.title}</span>
-                          <Badge className={`text-xs ${category.color}`}>
-                            {category.id.replace('_', ' ')}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {category.description}
-                        </p>
-                      </div>
+            <Label htmlFor="category">Categoria do Feedback</Label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {FEEDBACK_CATEGORIES.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    <div className="flex items-center gap-2">
+                      <category.icon className="w-4 h-4" />
+                      {category.title}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {selectedCategoryData && (
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <selectedCategoryData.icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedCategoryData.description}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Message Form */}
-          {selectedCategory && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  {selectedCategoryData && <selectedCategoryData.icon className="w-4 h-4" />}
-                  <span className="font-medium text-sm">
-                    {selectedCategoryData?.title}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  {selectedCategoryData?.description}
-                </p>
-              </div>
-
-              {/* Identification (optional for non-authenticated users) */}
-              {!user && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">
-                    Identificação (Opcional)
-                  </Label>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Pode optar por se identificar ou enviar o feedback de forma anónima
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="firstName" className="text-xs">Primeiro Nome</Label>
-                      <Input
-                        id="firstName"
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Opcional"
-                        className="text-sm"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName" className="text-xs">Último Nome</Label>
-                      <Input
-                        id="lastName"
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Opcional"
-                        className="text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Authenticated user info */}
-              {user && (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                      Conectado como: {user.name}
-                    </span>
-                  </div>
-                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                    O seu nome será automaticamente incluído no feedback
-                  </p>
-                </div>
-              )}
-
-              {/* Message */}
-              <div className="space-y-2">
-                <Label htmlFor="message" className="text-sm font-medium">
-                  Mensagem *
+          {/* User Identification (if not authenticated) */}
+          {!user && (
+            <div className="space-y-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="w-4 h-4 text-amber-600" />
+                <Label className="text-amber-800 dark:text-amber-200">
+                  Identifique-se para enviar feedback
                 </Label>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Escreva aqui a sua mensagem para o Jiku..."
-                  className="min-h-[120px] text-sm"
-                  required
-                />
-                <p className="text-xs text-gray-500">
-                  Seja específico e detalhado para ajudar o Jiku a compreender melhor o seu feedback
-                </p>
               </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  disabled={isSubmitting}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !selectedCategory || !message.trim()}
-                  className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
-                >
-                  {isSubmitting ? (
-                    "Enviando..."
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Enviar Feedback
-                    </>
-                  )}
-                </Button>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">Nome</Label>
+                  <Input
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Primeiro nome"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Apelido</Label>
+                  <Input
+                    id="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Apelido"
+                    required
+                  />
+                </div>
               </div>
-            </form>
+            </div>
           )}
-        </div>
+
+          {/* Message */}
+          <div className="space-y-2">
+            <Label htmlFor="message">Mensagem</Label>
+            <Textarea
+              id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Escreva a sua mensagem aqui..."
+              className="min-h-[120px]"
+              required
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  A enviar...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Enviar Feedback
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

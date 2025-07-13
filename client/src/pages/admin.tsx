@@ -71,11 +71,7 @@ export default function AdminPage() {
     enabled: !!isAdmin,
   });
 
-  // Feedback
-  const { data: feedback } = useQuery({
-    queryKey: ['/api/admin/feedback'],
-    enabled: !!isAdmin,
-  });
+
 
   // Initialize settings values when data is loaded
   useEffect(() => {
@@ -189,47 +185,7 @@ export default function AdminPage() {
     },
   });
 
-  // Mark feedback as read mutation
-  const markFeedbackReadMutation = useMutation({
-    mutationFn: async (feedbackId: string) => {
-      return await apiRequest(`/api/admin/feedback/${feedbackId}/read`, 'PATCH');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/feedback'] });
-      toast({
-        title: "Feedback marcado como lido",
-        description: "O feedback foi marcado como lido com sucesso.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro",
-        description: "Não foi possível marcar o feedback como lido.",
-        variant: "destructive",
-      });
-    },
-  });
 
-  // Delete feedback mutation
-  const deleteFeedbackMutation = useMutation({
-    mutationFn: async (feedbackId: string) => {
-      return await apiRequest(`/api/admin/feedback/${feedbackId}`, 'DELETE');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/feedback'] });
-      toast({
-        title: "Feedback eliminado",
-        description: "O feedback foi eliminado com sucesso.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro",
-        description: "Não foi possível eliminar o feedback.",
-        variant: "destructive",
-      });
-    },
-  });
 
   // Redirect if not logged in
   useEffect(() => {
@@ -291,27 +247,7 @@ export default function AdminPage() {
     }
   };
 
-  const getFeedbackCategoryColor = (category: string) => {
-    switch (category) {
-      case 'complaint_user': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'site_evaluation': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'compliment': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'suggestion': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'bug_report': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
 
-  const getFeedbackCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'complaint_user': return <AlertTriangle className="w-4 h-4" />;
-      case 'site_evaluation': return <MessageCircle className="w-4 h-4" />;
-      case 'compliment': return <CheckCircle className="w-4 h-4" />;
-      case 'suggestion': return <Settings className="w-4 h-4" />;
-      case 'bug_report': return <AlertTriangle className="w-4 h-4" />;
-      default: return <MessageCircle className="w-4 h-4" />;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -385,9 +321,8 @@ export default function AdminPage() {
 
         {/* Main Content */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="users">Utilizadores</TabsTrigger>
-            <TabsTrigger value="feedback">Feedback</TabsTrigger>
             <TabsTrigger value="logs">Logs</TabsTrigger>
             <TabsTrigger value="settings">Definições</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -507,98 +442,7 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
 
-          {/* Feedback Tab */}
-          <TabsContent value="feedback" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Feedback dos Utilizadores</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Categoria</TableHead>
-                        <TableHead>Mensagem</TableHead>
-                        <TableHead>Remetente</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Estado</TableHead>
-                        <TableHead>Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {feedback?.map((item: any) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {getFeedbackCategoryIcon(item.category)}
-                              <Badge className={getFeedbackCategoryColor(item.category)}>
-                                {item.category.replace('_', ' ')}
-                              </Badge>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-xs">
-                              <p className="text-sm truncate">{item.message}</p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {item.message.length > 100 ? item.message.substring(0, 100) + '...' : item.message}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              <div className="font-medium">
-                                {item.senderName || 'Anónimo'}
-                              </div>
-                              {item.senderEmail && (
-                                <div className="text-gray-500 text-xs">
-                                  {item.senderEmail}
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            {formatDate(item.created_at)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={item.is_read ? "outline" : "destructive"}>
-                              {item.is_read ? 'Lido' : 'Não lido'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              {!item.is_read && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => markFeedbackReadMutation.mutate(item.id)}
-                                  disabled={markFeedbackReadMutation.isPending}
-                                >
-                                  <CheckCircle className="w-4 h-4" />
-                                </Button>
-                              )}
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  if (window.confirm('Tem certeza que deseja eliminar este feedback?')) {
-                                    deleteFeedbackMutation.mutate(item.id);
-                                  }
-                                }}
-                                disabled={deleteFeedbackMutation.isPending}
-                              >
-                                <Trash className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           {/* Logs Tab */}
           <TabsContent value="logs" className="space-y-4">

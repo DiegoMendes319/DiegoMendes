@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { useSiteSettings } from "@/hooks/use-site-settings";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
@@ -19,6 +20,13 @@ export default function Navbar() {
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
   const { getSetting } = useSiteSettings();
+  
+  // Get unread message count for authenticated users
+  const { data: unreadCount } = useQuery({
+    queryKey: ['/api/messages/unread-count'],
+    enabled: !!user,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
   const isActive = (path: string) => {
     return location === path;
@@ -93,17 +101,6 @@ export default function Navbar() {
               Registar
             </Link>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsFeedbackOpen(true)}
-              className="nav-link"
-              title="Enviar feedback para o administrador"
-            >
-              <MessageCircle className="w-4 h-4 inline mr-2" />
-              Feedback
-            </Button>
-            
             {/* Connection Status */}
             {user ? (
               <DropdownMenu>
@@ -119,13 +116,26 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLocation("/")}>
+                    <Home className="w-4 h-4 mr-2" />
+                    Página Inicial
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLocation("/profile")}>
                     <User className="w-4 h-4 mr-2" />
-                    Ver Perfil
+                    Editar Perfil
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLocation("/messages")}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Mensagens
+                    {unreadCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[1.5rem] h-6 flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsFeedbackOpen(true)}>
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Feedback
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => setLocation("/admin")}>
@@ -133,9 +143,13 @@ export default function Navbar() {
                       Painel Admin
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem onClick={() => setLocation("/change-password")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Alterar Palavra-passe
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -190,13 +204,25 @@ export default function Navbar() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
+                      setLocation("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <Home className="w-4 h-4 inline mr-2" />
+                    Página Inicial
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
                       setLocation("/profile");
                       setIsMenuOpen(false);
                     }}
                     className="w-full justify-start mobile-nav-link"
                   >
                     <User className="w-4 h-4 inline mr-2" />
-                    {user.name} - Ver Perfil
+                    Editar Perfil
                   </Button>
                   <Button
                     variant="ghost"
@@ -209,6 +235,23 @@ export default function Navbar() {
                   >
                     <MessageCircle className="w-4 h-4 inline mr-2" />
                     Mensagens
+                    {unreadCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[1.5rem] h-6 flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setIsFeedbackOpen(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <MessageCircle className="w-4 h-4 inline mr-2" />
+                    Feedback
                   </Button>
                   {isAdmin && (
                     <Button
@@ -228,13 +271,25 @@ export default function Navbar() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
+                      setLocation("/change-password");
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <User className="w-4 h-4 inline mr-2" />
+                    Alterar Palavra-passe
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
                     className="w-full justify-start mobile-nav-link"
                   >
                     <LogOut className="w-4 h-4 inline mr-2" />
-                    Logout
+                    Sair
                   </Button>
                 </>
               ) : (
