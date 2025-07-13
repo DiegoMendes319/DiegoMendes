@@ -65,8 +65,29 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
     setManualNeighborhood("");
   };
 
-  const municipalities = selectedProvince ? locationData[selectedProvince]?.municipalities || {} : {};
-  const neighborhoods = selectedMunicipality ? municipalities[selectedMunicipality]?.neighborhoods || [] : [];
+  // Get municipalities - either from selected province or all municipalities
+  const municipalities = selectedProvince 
+    ? Object.entries(locationData[selectedProvince]?.municipalities || {}).map(([key, municipality]) => ({
+        key,
+        name: municipality.name,
+        province: selectedProvince
+      }))
+    : Object.entries(locationData).flatMap(([provinceKey, province]) => 
+        Object.entries(province.municipalities).map(([munKey, municipality]) => ({
+          key: munKey,
+          name: municipality.name,
+          province: provinceKey
+        }))
+      );
+
+  // Get neighborhoods - either from selected municipality or all neighborhoods
+  const neighborhoods = selectedMunicipality && selectedProvince && locationData[selectedProvince]?.municipalities[selectedMunicipality]
+    ? locationData[selectedProvince].municipalities[selectedMunicipality].neighborhoods
+    : Object.entries(locationData).flatMap(([_, province]) => 
+        Object.entries(province.municipalities).flatMap(([_, municipality]) => 
+          municipality.neighborhoods
+        )
+      );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -97,16 +118,14 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
           onValueChange={handleMunicipalityChange}
         >
           <SelectTrigger className="cascading-select">
-            <SelectValue placeholder="Todos os municípios" />
+            <SelectValue placeholder={selectedProvince ? "Municípios da província" : "Todos os municípios"} />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(locationData).flatMap(([provinceKey, province]) => 
-              Object.entries(province.municipalities).map(([key, municipality]) => (
-                <SelectItem key={`${provinceKey}-${key}`} value={key}>
-                  {municipality.name}
-                </SelectItem>
-              ))
-            )}
+            {municipalities.map((municipality, index) => (
+              <SelectItem key={`${municipality.province}-${municipality.key}-${index}`} value={municipality.key}>
+                {municipality.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -141,18 +160,14 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
             onValueChange={handleNeighborhoodChange}
           >
             <SelectTrigger className="cascading-select">
-              <SelectValue placeholder="Todos os bairros" />
+              <SelectValue placeholder={selectedMunicipality ? "Bairros do município" : "Todos os bairros"} />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(locationData).flatMap(([provinceKey, province]) => 
-                Object.entries(province.municipalities).flatMap(([munKey, municipality]) => 
-                  municipality.neighborhoods.map((neighborhood) => (
-                    <SelectItem key={`${provinceKey}-${munKey}-${neighborhood}`} value={neighborhood.toLowerCase()}>
-                      {neighborhood}
-                    </SelectItem>
-                  ))
-                )
-              )}
+              {neighborhoods.map((neighborhood, index) => (
+                <SelectItem key={`${neighborhood}-${index}`} value={neighborhood.toLowerCase()}>
+                  {neighborhood}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         )}
