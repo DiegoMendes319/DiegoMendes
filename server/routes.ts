@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, updateUserSchema, insertReviewSchema, insertFeedbackSchema } from "@shared/schema";
+import { insertUserSchema, updateUserSchema, insertReviewSchema, insertFeedbackSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
 const searchFiltersSchema = z.object({
@@ -1113,6 +1113,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const count = await storage.getUnreadFeedbackCount();
       res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Messages endpoints
+  app.get("/api/messages/conversations", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const conversations = await storage.getUserConversations(user.id);
+      res.json(conversations);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/messages/conversations", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const { participant_id } = req.body;
+      if (!participant_id) {
+        return res.status(400).json({ error: "ID do participante é obrigatório" });
+      }
+
+      // Check if conversation already exists
+      const existingConversation = await storage.getConversation(user.id, participant_id);
+      if (existingConversation) {
+        return res.json(existingConversation);
+      }
+
+      // Create new conversation
+      const conversationData = {
+        participant1_id: user.id,
+        participant2_id: participant_id,
+      };
+
+      const validated = insertConversationSchema.parse(conversationData);
+      const conversation = await storage.createConversation(validated);
+      res.json(conversation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/messages/conversations/:id/messages", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const { id } = req.params;
+      const messages = await storage.getConversationMessages(id);
+      
+      // Mark messages as read
+      await storage.markConversationAsRead(id, user.id);
+      
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/messages/conversations/:id/messages", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const { id } = req.params;
+      const { content } = req.body;
+
+      if (!content || content.trim() === '') {
+        return res.status(400).json({ error: "Conteúdo da mensagem é obrigatório" });
+      }
+
+      const messageData = {
+        conversation_id: id,
+        sender_id: user.id,
+        content: content.trim(),
+        is_read: false,
+      };
+
+      const validated = insertMessageSchema.parse(messageData);
+      const message = await storage.createMessage(validated);
+      res.json(message);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/messages/unread-count", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const count = await storage.getUnreadMessageCount(user.id);
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/messages/participants", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const participants = await storage.getActiveUsers();
+      // Filter out current user
+      const filteredParticipants = participants.filter(p => p.id !== user.id);
+      res.json(filteredParticipants);
     } catch (error) {
       res.status(500).json({ error: "Erro interno do servidor" });
     }

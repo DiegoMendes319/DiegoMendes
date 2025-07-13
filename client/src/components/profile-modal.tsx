@@ -2,12 +2,16 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon } from "lucide-react";
+import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle } from "lucide-react";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
 import FullSizeImageModal from "./full-size-image-modal";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
 interface ProfileModalProps {
@@ -21,6 +25,52 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showFullImage, setShowFullImage] = useState(false);
   const { user: currentUser } = useAuth();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  // Start conversation mutation
+  const startConversationMutation = useMutation({
+    mutationFn: async (participantId: string) => {
+      return await apiRequest('/api/messages/conversations', 'POST', { participant_id: participantId });
+    },
+    onSuccess: (conversation) => {
+      setLocation('/messages');
+      onClose();
+      toast({
+        title: "Conversa iniciada",
+        description: "Pode agora comunicar com este utilizador.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar a conversa.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMessage = () => {
+    if (!currentUser) {
+      toast({
+        title: "Autenticação necessária",
+        description: "Faça login para enviar mensagens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentUser.id === user.id) {
+      toast({
+        title: "Ação não permitida",
+        description: "Não pode enviar mensagens para si mesmo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    startConversationMutation.mutate(user.id);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -142,16 +192,27 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
             />
           </div>
 
-          {/* Contact Button - Always visible at bottom */}
-          <div className="flex justify-center pt-4 border-t">
+          {/* Action Buttons - Always visible at bottom */}
+          <div className="flex justify-center gap-4 pt-4 border-t">
             <Button 
               onClick={onContact}
-              className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white px-8 py-3 text-lg font-semibold rounded-lg"
+              className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white px-6 py-3 text-lg font-semibold rounded-lg"
               data-tutorial="contact-btn"
             >
               <Phone className="h-5 w-5 mr-2" />
               Entrar em Contato
             </Button>
+            
+            {currentUser && currentUser.id !== user.id && (
+              <Button 
+                onClick={handleSendMessage}
+                disabled={startConversationMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg font-semibold rounded-lg"
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                {startConversationMutation.isPending ? 'A processar...' : 'Enviar Mensagem'}
+              </Button>
+            )}
           </div>
         </div>
         

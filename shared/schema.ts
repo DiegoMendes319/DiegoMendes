@@ -14,9 +14,9 @@ export const users = pgTable("users", {
   neighborhood: text("neighborhood").notNull(),
   address_complement: text("address_complement"), // Address complement (number, block, reference)
   contract_type: text("contract_type").notNull(), // "diarista" | "mensal" | "verbal" | "escrito"
-  services: text("services").array().notNull(), // ["limpeza", "jardinagem", ...]
+  services: text("services").array(), // ["limpeza", "jardinagem", ...] - optional for regular users
   custom_service: text("custom_service"), // Custom service description when "outros" is selected
-  availability: text("availability").notNull(),
+  availability: text("availability"), // Optional for regular users
   about_me: text("about_me"), // Free text "Sobre mim"
   profile_url: text("profile_url"),
   facebook_url: text("facebook_url"),
@@ -25,6 +25,7 @@ export const users = pgTable("users", {
   password: text("password"), // For simple auth (hashed in real app)
   role: text("role").default("user"), // "user", "admin", "super_admin"
   status: text("status").default("active"), // "active", "suspended", "inactive"
+  account_type: text("account_type").default("regular"), // "service_provider", "regular"
   created_at: timestamp("created_at").defaultNow().notNull(),
   auth_user_id: uuid("auth_user_id").unique(), // For Supabase auth integration
   // Rating fields
@@ -94,6 +95,24 @@ export const feedback = pgTable("feedback", {
   is_read: boolean("is_read").default(false),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Private messages system
+export const conversations = pgTable("conversations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  participant1_id: uuid("participant1_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  participant2_id: uuid("participant2_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  conversation_id: uuid("conversation_id").references(() => conversations.id, { onDelete: "cascade" }).notNull(),
+  sender_id: uuid("sender_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  content: text("content").notNull(),
+  is_read: boolean("is_read").default(false),
+  created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -178,6 +197,33 @@ export const updateFeedbackSchema = createInsertSchema(feedback).omit({
   updated_at: true,
 }).partial();
 
+// Message schemas
+export const insertConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  created_at: true,
+});
+
+export const updateMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  created_at: true,
+  conversation_id: true,
+  sender_id: true,
+}).partial();
+
+export const updateConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+  participant1_id: true,
+  participant2_id: true,
+}).partial();
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
@@ -188,6 +234,10 @@ export type UpdateSiteSetting = z.infer<typeof updateSiteSettingSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type UpdateFeedback = z.infer<typeof updateFeedbackSchema>;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type UpdateConversation = z.infer<typeof updateConversationSchema>;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type UpdateMessage = z.infer<typeof updateMessageSchema>;
 
 export type User = typeof users.$inferSelect & {
   // Add computed fields for compatibility
@@ -199,3 +249,5 @@ export type AdminLog = typeof admin_logs.$inferSelect;
 export type SiteSetting = typeof site_settings.$inferSelect;
 export type SiteAnalytics = typeof site_analytics.$inferSelect;
 export type Feedback = typeof feedback.$inferSelect;
+export type Conversation = typeof conversations.$inferSelect;
+export type Message = typeof messages.$inferSelect;

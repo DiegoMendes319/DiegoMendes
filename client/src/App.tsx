@@ -25,6 +25,7 @@ import Help from "@/pages/help";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import Security from "@/pages/security";
+import Messages from "@/pages/messages";
 
 function Router() {
   useScrollToTop(); // Automatically scroll to top on route changes
@@ -71,6 +72,7 @@ function Router() {
           <Route path="/security" component={Security} />
           <Route path="/admin" component={AdminPanel} />
           <Route path="/admin-login" component={AdminLogin} />
+          <Route path="/messages" component={Messages} />
           <Route path="/change-password" component={ChangePassword} />
           <Route path="/recover-password" component={RecoverPassword} />
           <Route path="/server-error" component={ServerErrorPage} />

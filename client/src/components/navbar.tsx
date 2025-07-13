@@ -123,6 +123,10 @@ export default function Navbar() {
                     <User className="w-4 h-4 mr-2" />
                     Ver Perfil
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocation("/messages")}>
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Mensagens
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => setLocation("/admin")}>
                       <Shield className="w-4 h-4 mr-2" />
@@ -193,6 +197,18 @@ export default function Navbar() {
                   >
                     <User className="w-4 h-4 inline mr-2" />
                     {user.name} - Ver Perfil
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setLocation("/messages");
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start mobile-nav-link"
+                  >
+                    <MessageCircle className="w-4 h-4 inline mr-2" />
+                    Mensagens
                   </Button>
                   {isAdmin && (
                     <Button

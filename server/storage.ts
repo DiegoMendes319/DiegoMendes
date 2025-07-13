@@ -1,4 +1,4 @@
-import { users, reviews, admin_logs, site_settings, site_analytics, feedback, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type Feedback, type InsertFeedback, type UpdateFeedback, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics } from "@shared/schema";
+import { users, reviews, admin_logs, site_settings, site_analytics, feedback, conversations, messages, type User, type InsertUser, type UpdateUser, type Review, type InsertReview, type UpdateReview, type AdminLog, type SiteSetting, type SiteAnalytics, type Feedback, type InsertFeedback, type UpdateFeedback, type InsertAdminLog, type InsertSiteSetting, type UpdateSiteSetting, type InsertAnalytics, type Conversation, type InsertConversation, type Message, type InsertMessage, type UpdateMessage } from "@shared/schema";
 import { eq, and, ilike, or, sql, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
@@ -76,6 +76,18 @@ export interface IStorage {
   markFeedbackAsRead(feedbackId: string): Promise<boolean>;
   deleteFeedback(feedbackId: string): Promise<boolean>;
   getUnreadFeedbackCount(): Promise<number>;
+  
+  // Message methods
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  getConversation(participant1Id: string, participant2Id: string): Promise<Conversation | undefined>;
+  getUserConversations(userId: string): Promise<Conversation[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  getConversationMessages(conversationId: string): Promise<Message[]>;
+  markMessageAsRead(messageId: string): Promise<boolean>;
+  markConversationAsRead(conversationId: string, userId: string): Promise<boolean>;
+  getUnreadMessageCount(userId: string): Promise<number>;
+  deleteMessage(messageId: string): Promise<boolean>;
+  getActiveUsers(): Promise<User[]>; // For participants list
 }
 
 export class MemStorage implements IStorage {
@@ -89,6 +101,8 @@ export class MemStorage implements IStorage {
   private siteSettings: Map<string, SiteSetting>;
   private analytics: Map<string, SiteAnalytics>;
   private feedbackMessages: Map<string, Feedback>;
+  private conversations: Map<string, Conversation>;
+  private messages: Map<string, Message>;
 
   constructor() {
     this.users = new Map();
@@ -101,6 +115,8 @@ export class MemStorage implements IStorage {
     this.siteSettings = new Map();
     this.analytics = new Map();
     this.feedbackMessages = new Map();
+    this.conversations = new Map();
+    this.messages = new Map();
     this.initializeSampleData();
   }
 
@@ -993,6 +1009,102 @@ export class MemStorage implements IStorage {
   async getUnreadFeedbackCount(): Promise<number> {
     return Array.from(this.feedbackMessages.values())
       .filter(f => !f.is_read).length;
+  }
+
+  // Message methods implementation
+  async createConversation(conversation: InsertConversation): Promise<Conversation> {
+    const id = crypto.randomUUID();
+    const newConversation: Conversation = {
+      ...conversation,
+      id,
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    this.conversations.set(id, newConversation);
+    return newConversation;
+  }
+
+  async getConversation(participant1Id: string, participant2Id: string): Promise<Conversation | undefined> {
+    return Array.from(this.conversations.values()).find(conv => 
+      (conv.participant1_id === participant1Id && conv.participant2_id === participant2Id) ||
+      (conv.participant1_id === participant2Id && conv.participant2_id === participant1Id)
+    );
+  }
+
+  async getUserConversations(userId: string): Promise<Conversation[]> {
+    return Array.from(this.conversations.values())
+      .filter(conv => conv.participant1_id === userId || conv.participant2_id === userId)
+      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const id = crypto.randomUUID();
+    const newMessage: Message = {
+      ...message,
+      id,
+      created_at: new Date(),
+    };
+
+    this.messages.set(id, newMessage);
+    
+    // Update conversation timestamp
+    const conversation = this.conversations.get(message.conversation_id);
+    if (conversation) {
+      const updatedConversation = { ...conversation, updated_at: new Date() };
+      this.conversations.set(message.conversation_id, updatedConversation);
+    }
+    
+    return newMessage;
+  }
+
+  async getConversationMessages(conversationId: string): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(msg => msg.conversation_id === conversationId)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  async markMessageAsRead(messageId: string): Promise<boolean> {
+    const message = this.messages.get(messageId);
+    if (!message) return false;
+
+    const updatedMessage = { ...message, is_read: true };
+    this.messages.set(messageId, updatedMessage);
+    return true;
+  }
+
+  async markConversationAsRead(conversationId: string, userId: string): Promise<boolean> {
+    const messages = Array.from(this.messages.values())
+      .filter(msg => msg.conversation_id === conversationId && msg.sender_id !== userId);
+    
+    for (const message of messages) {
+      const updatedMessage = { ...message, is_read: true };
+      this.messages.set(message.id, updatedMessage);
+    }
+    
+    return true;
+  }
+
+  async getUnreadMessageCount(userId: string): Promise<number> {
+    const userConversations = await this.getUserConversations(userId);
+    let unreadCount = 0;
+    
+    for (const conversation of userConversations) {
+      const messages = await this.getConversationMessages(conversation.id);
+      unreadCount += messages.filter(msg => msg.sender_id !== userId && !msg.is_read).length;
+    }
+    
+    return unreadCount;
+  }
+
+  async deleteMessage(messageId: string): Promise<boolean> {
+    return this.messages.delete(messageId);
+  }
+
+  async getActiveUsers(): Promise<User[]> {
+    return Array.from(this.users.values())
+      .filter(user => user.status === 'active')
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 }
 
