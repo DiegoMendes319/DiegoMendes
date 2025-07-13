@@ -219,6 +219,18 @@ export class MemStorage implements IStorage {
         type: "boolean"
       },
       {
+        key: "registration_enabled",
+        value: "true",
+        description: "Permitir novos registos",
+        type: "boolean"
+      },
+      {
+        key: "login_enabled",
+        value: "true",
+        description: "Permitir conexões",
+        type: "boolean"
+      },
+      {
         key: "maintenance_mode",
         value: "false",
         description: "Modo de manutenção",
@@ -584,8 +596,15 @@ export class MemStorage implements IStorage {
       password: hashedPassword,
       created_at: now,
       auth_user_id: userData.auth_user_id || null,
+      role: "user", // Sempre definido como 'user' por padrão
+      status: "active", // Sempre ativo por padrão
+      rating: 0,
+      review_count: 0,
       average_rating: 0,
       total_reviews: 0,
+      bio: userData.about_me || null,
+      profile_image: userData.profile_url || null,
+      updated_at: now,
       // Computed fields
       name: `${userData.first_name} ${userData.last_name}`,
       age: age

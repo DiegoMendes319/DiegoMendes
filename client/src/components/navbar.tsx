@@ -241,18 +241,7 @@ export default function Navbar() {
                       </span>
                     )}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setIsFeedbackOpen(true);
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full justify-start mobile-nav-link"
-                  >
-                    <MessageCircle className="w-4 h-4 inline mr-2" />
-                    Feedback
-                  </Button>
+
                   {isAdmin && (
                     <Button
                       variant="ghost"

@@ -33,16 +33,20 @@ export default function AdminPage() {
     enabled: !!user,
   });
 
-  // Admin stats
+  // Admin stats - refresh every 5 seconds for real-time updates
   const { data: stats } = useQuery({
     queryKey: ['/api/admin/stats'],
     enabled: !!isAdmin,
+    refetchInterval: 5000, // Atualizar a cada 5 segundos
+    refetchOnWindowFocus: true, // Atualizar quando a janela volta ao foco
   });
 
-  // All users
+  // All users - refresh every 10 seconds for real-time updates
   const { data: users } = useQuery({
     queryKey: ['/api/admin/users'],
     enabled: !!isAdmin,
+    refetchInterval: 10000, // Atualizar a cada 10 segundos
+    refetchOnWindowFocus: true, // Atualizar quando a janela volta ao foco
   });
 
   // Admin logs
@@ -200,7 +204,7 @@ export default function AdminPage() {
 
   // Filter settings to only show essential ones
   const essentialSettings = settings?.filter(setting => 
-    setting.key === 'maintenance_mode' || setting.key === 'registration_enabled'
+    setting.key === 'maintenance_mode' || setting.key === 'registration_enabled' || setting.key === 'login_enabled'
   ) || [];
 
   return (
@@ -303,8 +307,8 @@ export default function AdminPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>
-                            {user.status}
+                          <Badge variant="default">
+                            Ativo
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -330,19 +334,7 @@ export default function AdminPage() {
                                 <SelectItem value="admin">admin</SelectItem>
                               </SelectContent>
                             </Select>
-                            <Select
-                              value={user.status}
-                              onValueChange={(value) => updateUserStatusMutation.mutate({ userId: user.id, status: value })}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="active">active</SelectItem>
-                                <SelectItem value="suspended">suspended</SelectItem>
-                                <SelectItem value="pending">pending</SelectItem>
-                              </SelectContent>
-                            </Select>
+
                             <Button
                               variant="ghost"
                               size="sm"
@@ -413,12 +405,15 @@ export default function AdminPage() {
                   <div key={setting.key} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-medium">
-                        {setting.key === 'maintenance_mode' ? 'Modo de Manutenção' : 'Permitir Novos Registos'}
+                        {setting.key === 'maintenance_mode' ? 'Modo de Manutenção' : 
+                         setting.key === 'registration_enabled' ? 'Permitir Novos Registos' : 'Permitir Conexões'}
                       </h3>
                       <p className="text-sm text-gray-600">
                         {setting.key === 'maintenance_mode' 
                           ? 'Activar/desactivar modo de manutenção do site'
-                          : 'Permitir que novos utilizadores se registem'
+                          : setting.key === 'registration_enabled'
+                          ? 'Permitir que novos utilizadores se registem'
+                          : 'Permitir que utilizadores existentes se conectem'
                         }
                       </p>
                     </div>
