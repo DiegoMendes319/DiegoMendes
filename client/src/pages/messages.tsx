@@ -77,6 +77,13 @@ export default function MessagesPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Request notification permission
+  useEffect(() => {
+    if (user && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, [user]);
+
   // Redirect if not logged in
   if (!user) {
     setLocation('/login');
@@ -109,7 +116,16 @@ export default function MessagesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations', selectedConversation, 'messages'] });
       queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/messages/unread-count'] });
       setMessageContent('');
+      
+      // Send push notification
+      if (Notification.permission === 'granted') {
+        new Notification('Nova mensagem enviada', {
+          body: 'Mensagem enviada com sucesso!',
+          icon: '/favicon.ico'
+        });
+      }
     },
     onError: () => {
       toast({
@@ -147,6 +163,7 @@ export default function MessagesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations', selectedConversation, 'messages'] });
       queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/messages/unread-count'] });
       toast({
         title: "Mensagem eliminada",
         description: "A mensagem foi eliminada com sucesso.",
@@ -197,7 +214,23 @@ export default function MessagesPage() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+    
+    // Check for new messages and show notification
+    if (messages && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.sender_id !== user?.id) {
+        // Show push notification for new message
+        if (Notification.permission === 'granted') {
+          new Notification('Nova mensagem recebida', {
+            body: lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''),
+            icon: '/favicon.ico',
+            badge: '/favicon.ico',
+            tag: 'message-' + lastMessage.id // Prevent duplicate notifications
+          });
+        }
+      }
+    }
+  }, [messages, user?.id]);
 
   const handleSendMessage = () => {
     if (!selectedConversation || !messageContent.trim()) return;
@@ -206,7 +239,10 @@ export default function MessagesPage() {
     
     // Add reply prefix if replying to a message
     if (replyingToMessage) {
-      content = `@${replyingToMessage.id}: ${content}`;
+      const replyContent = replyingToMessage.content.length > 30 
+        ? replyingToMessage.content.substring(0, 30) + "..."
+        : replyingToMessage.content;
+      content = `↩️ ${replyContent}\n\n${content}`;
     }
     
     // Apply formatting
@@ -224,12 +260,26 @@ export default function MessagesPage() {
   };
 
   // Handle swipe to reply
-  const handleSwipeStart = (messageId: string) => {
-    setSwipedMessageId(messageId);
-  };
-
-  const handleSwipeEnd = () => {
-    setSwipedMessageId(null);
+  const handleSwipeStart = (e: React.TouchEvent, messageId: string) => {
+    const startX = e.touches[0].clientX;
+    const handleSwipeMove = (moveEvent: TouchEvent) => {
+      const currentX = moveEvent.touches[0].clientX;
+      const diff = startX - currentX;
+      
+      if (diff > 50) { // Swipe left detected
+        setSwipedMessageId(messageId);
+        document.removeEventListener('touchmove', handleSwipeMove);
+        document.removeEventListener('touchend', handleSwipeEnd);
+      }
+    };
+    
+    const handleSwipeEnd = () => {
+      document.removeEventListener('touchmove', handleSwipeMove);
+      document.removeEventListener('touchend', handleSwipeEnd);
+    };
+    
+    document.addEventListener('touchmove', handleSwipeMove);
+    document.addEventListener('touchend', handleSwipeEnd);
   };
 
   const handleReply = (message: Message) => {
@@ -511,8 +561,13 @@ export default function MessagesPage() {
                               className={`flex ${
                                 isMessageSent(message) ? 'justify-end' : 'justify-start'
                               } ${swipedMessageId === message.id ? 'swipe-reply swiped' : 'swipe-reply'}`}
-                              onTouchStart={() => handleSwipeStart(message.id)}
-                              onTouchEnd={handleSwipeEnd}
+                              onTouchStart={(e) => handleSwipeStart(e, message.id)}
+                              onClick={() => {
+                                if (swipedMessageId === message.id) {
+                                  handleReply(message);
+                                  setSwipedMessageId(null);
+                                }
+                              }}
                             >
                               <div
                                 className={`max-w-xs lg:max-w-md px-4 py-2 message-bubble ${
@@ -545,15 +600,13 @@ export default function MessagesPage() {
                               <Reply className="h-4 w-4 mr-2" />
                               Responder
                             </ContextMenuItem>
-                            {isMessageSent(message) && (
-                              <ContextMenuItem 
-                                onClick={() => handleDeleteMessage(message.id)}
-                                className="text-red-600 focus:text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Eliminar
-                              </ContextMenuItem>
-                            )}
+                            <ContextMenuItem 
+                              onClick={() => handleDeleteMessage(message.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Eliminar
+                            </ContextMenuItem>
                           </ContextMenuContent>
                         </ContextMenu>
                       ))}

@@ -103,6 +103,22 @@ export default function Navbar() {
               </Link>
             )}
             
+            {/* Messages link for authenticated users */}
+            {user && (
+              <Link 
+                href="/messages" 
+                className={`nav-link ${isActive('/messages') ? 'active' : ''} relative`}
+              >
+                <MessageCircle className="w-4 h-4 inline mr-2" />
+                Mensagens
+                {unreadCount && unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[1.5rem] h-6 flex items-center justify-center unread-badge">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            
             {/* Connection Status */}
             {user ? (
               <DropdownMenu>
