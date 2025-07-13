@@ -163,10 +163,131 @@ export class MemStorage implements IStorage {
     this.usersByEmail.set(adminUser.email, adminUser);
     this.usersByAuthId.set(adminUser.auth_user_id, adminUser);
     
+    // Add sample users for messaging testing
+    this.addSampleUsers();
+    
     // Initialize default site settings
     this.initializeDefaultSettings();
     
     console.log("MemStorage initialized with admin user: admin@jikulumessu.com / admin123");
+  }
+
+  private addSampleUsers() {
+    const defaultPassword = "$2b$12$nvvxXJiqkgM.FVb7KYgpw.wUlov1jNfUl5tesjr75AKbBdoXw83Si"; // hash for "admin123"
+    
+    const sampleUsers = [
+      {
+        id: "user-1",
+        auth_user_id: "user-1-auth",
+        email: "maria@test.com",
+        first_name: "Maria",
+        last_name: "Silva",
+        phone: "+244 900 111 111",
+        date_of_birth: new Date("1985-05-15"),
+        province: "Luanda",
+        municipality: "Luanda",
+        neighborhood: "Ingombota",
+        services: ["limpeza", "cozinha"],
+        contract_type: "part_time",
+        availability: "Dias úteis",
+        bio: "Prestadora de serviços domésticos",
+        profile_image: null,
+        profile_url: null,
+        facebook_url: null,
+        instagram_url: null,
+        tiktok_url: null,
+        address_complement: "Rua A, 123",
+        about_me: "Profissional experiente em limpeza e cozinha",
+        password: defaultPassword,
+        rating: 4.5,
+        review_count: 3,
+        average_rating: 4.5,
+        total_reviews: 3,
+        role: "user",
+        status: "active",
+        account_type: "service_provider",
+        created_at: new Date(),
+        updated_at: new Date(),
+        name: "Maria Silva",
+        age: 39
+      },
+      {
+        id: "user-2",
+        auth_user_id: "user-2-auth",
+        email: "joao@test.com",
+        first_name: "João",
+        last_name: "Santos",
+        phone: "+244 900 222 222",
+        date_of_birth: new Date("1990-03-20"),
+        province: "Luanda",
+        municipality: "Luanda",
+        neighborhood: "Maianga",
+        services: ["jardinagem", "manutenção"],
+        contract_type: "full_time",
+        availability: "Todos os dias",
+        bio: "Especialista em jardinagem e manutenção",
+        profile_image: null,
+        profile_url: null,
+        facebook_url: null,
+        instagram_url: null,
+        tiktok_url: null,
+        address_complement: "Rua B, 456",
+        about_me: "Experiência em jardinagem e pequenos reparos",
+        password: defaultPassword,
+        rating: 4.8,
+        review_count: 5,
+        average_rating: 4.8,
+        total_reviews: 5,
+        role: "user",
+        status: "active",
+        account_type: "service_provider",
+        created_at: new Date(),
+        updated_at: new Date(),
+        name: "João Santos",
+        age: 34
+      },
+      {
+        id: "user-3",
+        auth_user_id: "user-3-auth",
+        email: "ana@test.com",
+        first_name: "Ana",
+        last_name: "Costa",
+        phone: "+244 900 333 333",
+        date_of_birth: new Date("1988-07-10"),
+        province: "Luanda",
+        municipality: "Luanda",
+        neighborhood: "Viana",
+        services: ["cuidados_infantis", "educação"],
+        contract_type: "part_time",
+        availability: "Manhãs",
+        bio: "Cuidadora de crianças e educadora",
+        profile_image: null,
+        profile_url: null,
+        facebook_url: null,
+        instagram_url: null,
+        tiktok_url: null,
+        address_complement: "Rua C, 789",
+        about_me: "Experiência em cuidados infantis e educação",
+        password: defaultPassword,
+        rating: 4.9,
+        review_count: 7,
+        average_rating: 4.9,
+        total_reviews: 7,
+        role: "user",
+        status: "active",
+        account_type: "service_provider",
+        created_at: new Date(),
+        updated_at: new Date(),
+        name: "Ana Costa",
+        age: 36
+      }
+    ];
+
+    sampleUsers.forEach(user => {
+      this.users.set(user.id, user);
+      this.usersByEmail.set(user.email, user);
+      this.usersByAuthId.set(user.auth_user_id, user);
+    });
   }
 
   private initializeDefaultSettings() {
@@ -1103,7 +1224,7 @@ export class MemStorage implements IStorage {
 
   async getActiveUsers(): Promise<User[]> {
     return Array.from(this.users.values())
-      .filter(user => user.status === 'active')
+      .filter(user => user.status !== 'suspended' && user.status !== 'deleted')
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 }

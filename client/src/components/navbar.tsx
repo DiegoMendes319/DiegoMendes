@@ -92,14 +92,16 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/auth" 
-              className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
-              data-tutorial="register-link"
-            >
-              <User className="w-4 h-4 inline mr-2" />
-              Registar
-            </Link>
+            {!user && (
+              <Link 
+                href="/auth" 
+                className={`nav-link ${isActive('/auth') ? 'active' : ''}`}
+                data-tutorial="register-link"
+              >
+                <User className="w-4 h-4 inline mr-2" />
+                Registar
+              </Link>
+            )}
             
             {/* Connection Status */}
             {user ? (
@@ -116,13 +118,9 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setLocation("/")}>
-                    <Home className="w-4 h-4 mr-2" />
-                    Página Inicial
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLocation("/profile")}>
                     <User className="w-4 h-4 mr-2" />
-                    Editar Perfil
+                    Ver Perfil
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLocation("/messages")}>
                     <MessageCircle className="w-4 h-4 mr-2" />
@@ -143,10 +141,6 @@ export default function Navbar() {
                       Painel Admin
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => setLocation("/change-password")}>
-                    <User className="w-4 h-4 mr-2" />
-                    Alterar Palavra-passe
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sair
@@ -188,30 +182,20 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-              <Link 
-                href="/auth" 
-                className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <User className="w-4 h-4 inline mr-2" />
-                Registar
-              </Link>
+              {!user && (
+                <Link 
+                  href="/auth" 
+                  className={`mobile-nav-link ${isActive('/auth') ? 'active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <User className="w-4 h-4 inline mr-2" />
+                  Registar
+                </Link>
+              )}
               
               {/* Mobile Connection Status */}
               {user ? (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setLocation("/");
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full justify-start mobile-nav-link"
-                  >
-                    <Home className="w-4 h-4 inline mr-2" />
-                    Página Inicial
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -222,7 +206,7 @@ export default function Navbar() {
                     className="w-full justify-start mobile-nav-link"
                   >
                     <User className="w-4 h-4 inline mr-2" />
-                    Editar Perfil
+                    Ver Perfil
                   </Button>
                   <Button
                     variant="ghost"
@@ -267,18 +251,6 @@ export default function Navbar() {
                       Painel Admin
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setLocation("/change-password");
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full justify-start mobile-nav-link"
-                  >
-                    <User className="w-4 h-4 inline mr-2" />
-                    Alterar Palavra-passe
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

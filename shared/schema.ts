@@ -99,17 +99,17 @@ export const feedback = pgTable("feedback", {
 
 // Private messages system
 export const conversations = pgTable("conversations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  participant1_id: uuid("participant1_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-  participant2_id: uuid("participant2_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  id: text("id").primaryKey(),
+  participant1_id: text("participant1_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  participant2_id: text("participant2_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const messages = pgTable("messages", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  conversation_id: uuid("conversation_id").references(() => conversations.id, { onDelete: "cascade" }).notNull(),
-  sender_id: uuid("sender_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  id: text("id").primaryKey(),
+  conversation_id: text("conversation_id").references(() => conversations.id, { onDelete: "cascade" }).notNull(),
+  sender_id: text("sender_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   content: text("content").notNull(),
   is_read: boolean("is_read").default(false),
   created_at: timestamp("created_at").defaultNow().notNull(),

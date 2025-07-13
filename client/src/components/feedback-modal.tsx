@@ -100,32 +100,41 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       
       if (user) {
         // For authenticated users, create/get conversation and send message
-        const conversationResponse = await apiRequest('/api/messages/conversations', 'POST', {
-          participant_id: adminUserId
-        });
-        
-        if (conversationResponse.ok) {
-          const conversation = await conversationResponse.json();
-          
-          // Format message with category
-          const categoryInfo = FEEDBACK_CATEGORIES.find(cat => cat.id === selectedCategory);
-          const formattedMessage = `[${categoryInfo?.title}] ${message}`;
-          
-          await apiRequest(`/api/messages/conversations/${conversation.id}/messages`, 'POST', {
-            content: formattedMessage
+        try {
+          const conversationResponse = await apiRequest('/api/messages/conversations', 'POST', {
+            participant_id: adminUserId
           });
           
-          toast({
-            title: "Feedback enviado",
-            description: "A sua mensagem foi enviada ao administrador.",
-          });
-          
-          // Reset form
-          setSelectedCategory("");
-          setMessage("");
-          onClose();
-        } else {
-          throw new Error('Erro ao criar conversa');
+          if (conversationResponse.ok) {
+            const conversation = await conversationResponse.json();
+            
+            // Format message with category
+            const categoryInfo = FEEDBACK_CATEGORIES.find(cat => cat.id === selectedCategory);
+            const formattedMessage = `[${categoryInfo?.title}] ${message}`;
+            
+            const messageResponse = await apiRequest(`/api/messages/conversations/${conversation.id}/messages`, 'POST', {
+              content: formattedMessage
+            });
+            
+            if (messageResponse.ok) {
+              toast({
+                title: "Feedback enviado",
+                description: "A sua mensagem foi enviada ao administrador.",
+              });
+              
+              // Reset form
+              setSelectedCategory("");
+              setMessage("");
+              onClose();
+            } else {
+              throw new Error('Erro ao enviar mensagem');
+            }
+          } else {
+            throw new Error('Erro ao criar conversa');
+          }
+        } catch (error) {
+          console.error('Erro específico no feedback:', error);
+          throw error;
         }
       } else {
         // For non-authenticated users, still send through the old feedback system
