@@ -15,7 +15,7 @@ interface LocationSelectorProps {
   };
 }
 
-export default function LocationSelector({ onLocationChange, defaultValues }: LocationSelectorProps) {
+export function LocationSelector({ onLocationChange, defaultValues }: LocationSelectorProps) {
   const [selectedProvince, setSelectedProvince] = useState(defaultValues?.province || "");
   const [selectedMunicipality, setSelectedMunicipality] = useState(defaultValues?.municipality || "");
   const [selectedNeighborhood, setSelectedNeighborhood] = useState(defaultValues?.neighborhood || "");
@@ -158,3 +158,5 @@ export default function LocationSelector({ onLocationChange, defaultValues }: Lo
     </div>
   );
 }
+
+export default LocationSelector;

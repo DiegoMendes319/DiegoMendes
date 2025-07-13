@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle } from "lucide-react";
+import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle, Facebook, Instagram, ExternalLink } from "lucide-react";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
@@ -167,6 +167,51 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
               ))}
             </div>
           </div>
+
+          {/* Social Media Section */}
+          {(user.facebook_url || user.instagram_url || user.whatsapp_url) && (
+            <div>
+              <h5 className="font-semibold text-gray-900 mb-3 flex items-center">
+                <ExternalLink className="h-5 w-5 mr-2 text-[var(--angola-red)]" />
+                Redes Sociais
+              </h5>
+              <div className="flex flex-wrap gap-3">
+                {user.facebook_url && (
+                  <a 
+                    href={user.facebook_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg transition-colors"
+                  >
+                    <Facebook className="h-4 w-4" />
+                    Facebook
+                  </a>
+                )}
+                {user.instagram_url && (
+                  <a 
+                    href={user.instagram_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg transition-colors"
+                  >
+                    <Instagram className="h-4 w-4" />
+                    Instagram
+                  </a>
+                )}
+                {user.whatsapp_url && (
+                  <a 
+                    href={user.whatsapp_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg transition-colors"
+                  >
+                    <Phone className="h-4 w-4" />
+                    WhatsApp
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* About Me Section */}
           {user.about_me && (

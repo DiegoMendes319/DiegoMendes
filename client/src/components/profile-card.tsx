@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, Eye, MessageCircle } from "lucide-react";
+import { MapPin, Star, Calendar, Eye, MessageCircle, Facebook, Instagram, Phone } from "lucide-react";
 import RatingStars from "./rating-stars";
 import FullSizeImageModal from "./full-size-image-modal";
 import { useAuth } from "@/hooks/use-auth";
@@ -131,10 +131,50 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
           )}
         </div>
         
-        <p className="text-sm text-gray-600 mb-4 flex items-center">
+        <p className="text-sm text-gray-600 mb-3 flex items-center">
           <Calendar className="h-4 w-4 mr-1" />
           {user.availability}
         </p>
+        
+        {/* Social Media Icons */}
+        {(user.facebook_url || user.instagram_url || user.whatsapp_url) && (
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xs text-gray-500">Redes sociais:</span>
+            {user.facebook_url && (
+              <a 
+                href={user.facebook_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+            )}
+            {user.instagram_url && (
+              <a 
+                href={user.instagram_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-pink-600 hover:text-pink-800 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+            )}
+            {user.whatsapp_url && (
+              <a 
+                href={user.whatsapp_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-green-600 hover:text-green-800 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Phone className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        )}
         
         <div className="flex flex-col sm:flex-row gap-2">
           <Button 
