@@ -34,6 +34,11 @@ export interface IStorage {
   verifyPassword(userId: string, password: string): Promise<boolean>;
   updatePassword(userId: string, newPassword: string): Promise<boolean>;
   
+  // Password recovery
+  createRecoveryToken(userId: string, method: 'email' | 'sms'): Promise<string>;
+  validateRecoveryToken(token: string): Promise<User | null>;
+  resetPasswordWithToken(token: string, newPassword: string): Promise<boolean>;
+  
   // Review methods
   createReview(review: InsertReview): Promise<Review>;
   getReviewsForUser(userId: string): Promise<Review[]>;
@@ -53,6 +58,7 @@ export interface IStorage {
   }>;
   updateUserRole(userId: string, role: string): Promise<User | undefined>;
   updateUserStatus(userId: string, status: string): Promise<User | undefined>;
+  deleteUser(userId: string): Promise<boolean>;
   
   // Site settings
   getSiteSettings(): Promise<SiteSetting[]>;
@@ -69,6 +75,7 @@ export class MemStorage implements IStorage {
   private usersByEmail: Map<string, User>;
   private usersByAuthId: Map<string, User>;
   private sessions: Map<string, { userId: string; expiresAt: Date }>;
+  private recoveryTokens: Map<string, { userId: string; token: string; expiresAt: Date; method: 'email' | 'sms' }>;
   private reviews: Map<string, Review>;
   private adminLogs: Map<string, AdminLog>;
   private siteSettings: Map<string, SiteSetting>;
@@ -79,6 +86,7 @@ export class MemStorage implements IStorage {
     this.usersByEmail = new Map();
     this.usersByAuthId = new Map();
     this.sessions = new Map();
+    this.recoveryTokens = new Map();
     this.reviews = new Map();
     this.adminLogs = new Map();
     this.siteSettings = new Map();
@@ -609,7 +617,83 @@ export class MemStorage implements IStorage {
     const hashedPassword = await this.hashPassword(newPassword);
     user.password = hashedPassword;
     this.users.set(userId, user);
+    if (user.email) {
+      this.usersByEmail.set(user.email.toLowerCase(), user);
+    }
     return true;
+  }
+
+  // Password recovery methods
+  async createRecoveryToken(userId: string, method: 'email' | 'sms'): Promise<string> {
+    const user = this.users.get(userId);
+    if (!user) {
+      throw new Error('Utilizador não encontrado');
+    }
+
+    // Generate a 6-digit token
+    const token = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Store the recovery token
+    this.recoveryTokens.set(token, {
+      userId,
+      token,
+      expiresAt,
+      method
+    });
+
+    // Clean up expired tokens
+    this.cleanupExpiredRecoveryTokens();
+
+    return token;
+  }
+
+  async validateRecoveryToken(token: string): Promise<User | null> {
+    const recoveryData = this.recoveryTokens.get(token);
+    if (!recoveryData) {
+      return null;
+    }
+
+    // Check if token is expired
+    if (new Date() > recoveryData.expiresAt) {
+      this.recoveryTokens.delete(token);
+      return null;
+    }
+
+    const user = this.users.get(recoveryData.userId);
+    return user || null;
+  }
+
+  async resetPasswordWithToken(token: string, newPassword: string): Promise<boolean> {
+    const recoveryData = this.recoveryTokens.get(token);
+    if (!recoveryData) {
+      return false;
+    }
+
+    // Check if token is expired
+    if (new Date() > recoveryData.expiresAt) {
+      this.recoveryTokens.delete(token);
+      return false;
+    }
+
+    // Update password
+    const success = await this.updatePassword(recoveryData.userId, newPassword);
+    
+    // Remove the used token
+    if (success) {
+      this.recoveryTokens.delete(token);
+    }
+
+    return success;
+  }
+
+  private cleanupExpiredRecoveryTokens(): void {
+    const now = new Date();
+    for (const [token, data] of this.recoveryTokens.entries()) {
+      if (now > data.expiresAt) {
+        this.recoveryTokens.delete(token);
+      }
+    }
   }
 
   private cleanupExpiredSessions(): void {
@@ -762,6 +846,51 @@ export class MemStorage implements IStorage {
     }
     
     return updatedUser;
+  }
+
+  async deleteUser(userId: string): Promise<boolean> {
+    const user = this.users.get(userId);
+    if (!user) return false;
+
+    // Remove user from all maps
+    this.users.delete(userId);
+    
+    if (user.email) {
+      this.usersByEmail.delete(user.email.toLowerCase());
+    }
+    
+    if (user.auth_user_id) {
+      this.usersByAuthId.delete(user.auth_user_id);
+    }
+
+    // Remove all reviews by this user
+    const reviewsToDelete = Array.from(this.reviews.entries())
+      .filter(([_, review]) => review.reviewee_id === userId)
+      .map(([id, _]) => id);
+    
+    for (const reviewId of reviewsToDelete) {
+      this.reviews.delete(reviewId);
+    }
+
+    // Remove all sessions for this user
+    const sessionsToDelete = Array.from(this.sessions.entries())
+      .filter(([_, session]) => session.userId === userId)
+      .map(([token, _]) => token);
+    
+    for (const sessionToken of sessionsToDelete) {
+      this.sessions.delete(sessionToken);
+    }
+
+    // Remove any recovery tokens for this user
+    const tokensToDelete = Array.from(this.recoveryTokens.entries())
+      .filter(([_, data]) => data.userId === userId)
+      .map(([token, _]) => token);
+    
+    for (const token of tokensToDelete) {
+      this.recoveryTokens.delete(token);
+    }
+
+    return true;
   }
 
   // Site settings

@@ -4,34 +4,100 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, Phone, Key } from "lucide-react";
 
 export default function RecoverPassword() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [token, setToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [recoveryData, setRecoveryData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("request");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRecoveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      await apiRequest('/api/auth/recover-password', 'POST', { email });
-      
-      setIsSubmitted(true);
-      toast({
-        title: "Pedido enviado",
-        description: "Se o email existir, receberá as instruções de recuperação",
+      const response = await apiRequest('/api/auth/recover-password', 'POST', { 
+        email: email || undefined, 
+        phone: phone || undefined 
       });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.token) {
+          setRecoveryData(data);
+          setActiveTab("reset");
+          toast({
+            title: "Token gerado",
+            description: `Token de recuperação: ${data.token}`,
+          });
+        } else {
+          setIsSubmitted(true);
+          toast({
+            title: "Pedido enviado",
+            description: data.message,
+          });
+        }
+      } else {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
     } catch (error: any) {
       toast({
         title: "Erro",
         description: error.message || "Erro ao enviar pedido de recuperação",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As palavras-passe não coincidem",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const response = await apiRequest('/api/auth/reset-password', 'POST', {
+        token,
+        newPassword
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Sucesso",
+          description: "Palavra-passe redefinida com sucesso",
+        });
+        setTimeout(() => setLocation("/login"), 2000);
+      } else {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao redefinir palavra-passe",
         variant: "destructive",
       });
     } finally {
@@ -53,10 +119,7 @@ export default function RecoverPassword() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600 dark:text-gray-300">
-              Se o email <strong>{email}</strong> existir no nosso sistema, receberá as instruções de recuperação de palavra-passe.
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Verifique a sua caixa de entrada e pasta de spam.
+              Se o contacto existir no nosso sistema, receberá as instruções de recuperação de palavra-passe.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 mt-6">
               <Button
@@ -69,6 +132,7 @@ export default function RecoverPassword() {
                 onClick={() => {
                   setIsSubmitted(false);
                   setEmail("");
+                  setPhone("");
                 }}
                 variant="outline"
                 className="border-[var(--angola-red)] text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
@@ -99,61 +163,142 @@ export default function RecoverPassword() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="exemplo@email.com"
-                required
-                className="w-full"
-              />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Introduza o email associado à sua conta
-              </p>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  A enviar...
-                </>
-              ) : (
-                <>
-                  <Mail className="h-4 w-4 mr-2" />
-                  Enviar Instruções
-                </>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="request">Solicitar Token</TabsTrigger>
+              <TabsTrigger value="reset">Redefinir Senha</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="request" className="space-y-4">
+              <form onSubmit={handleRecoveryRequest} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email (opcional)</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="exemplo@email.com"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+                  ou
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Número de Telefone (opcional)</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+244 900 000 000"
+                    className="w-full"
+                  />
+                </div>
+                
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Introduza o email ou número de telefone associado à sua conta
+                </p>
+                
+                <Button
+                  type="submit"
+                  className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white"
+                  disabled={isSubmitting || (!email && !phone)}
+                >
+                  {isSubmitting ? 'Enviando...' : (
+                    <>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Gerar Token de Recuperação
+                    </>
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="reset" className="space-y-4">
+              {recoveryData && (
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-medium text-green-800 dark:text-green-200">
+                      Token Gerado
+                    </span>
+                  </div>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Token: <strong>{recoveryData.token}</strong>
+                  </p>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Método: {recoveryData.method === 'email' ? 'Email' : 'SMS'}
+                  </p>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Expira em: {recoveryData.expiresIn}
+                  </p>
+                </div>
               )}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Lembrou-se da palavra-passe?{' '}
-              <button
-                onClick={() => setLocation('/login')}
-                className="text-[var(--angola-red)] hover:text-[var(--angola-red)]/80 font-medium"
-              >
-                Fazer Login
-              </button>
-            </p>
-          </div>
-
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              <strong>Nota:</strong> Por motivos de segurança, será sempre apresentada a mesma mensagem, 
-              mesmo que o email não exista no sistema.
-            </p>
-          </div>
+              
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="token">Token de Recuperação</Label>
+                  <Input
+                    id="token"
+                    name="token"
+                    type="text"
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
+                    placeholder="123456"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nova Palavra-passe</Label>
+                  <Input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Nova palavra-passe"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Nova Palavra-passe</Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirmar nova palavra-passe"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <Button
+                  type="submit"
+                  className="w-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Processando...' : (
+                    <>
+                      <Key className="h-4 w-4 mr-2" />
+                      Redefinir Palavra-passe
+                    </>
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

@@ -128,6 +128,29 @@ export default function AdminPage() {
     },
   });
 
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest(`/api/admin/users/${userId}`, 'DELETE');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/logs'] });
+      toast({
+        title: "Utilizador eliminado",
+        description: "O utilizador foi eliminado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível eliminar o utilizador.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Update site setting mutation
   const updateSettingMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
@@ -389,6 +412,19 @@ export default function AdminPage() {
                                   <SelectItem value="inactive">Inactivo</SelectItem>
                                 </SelectContent>
                               </Select>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  if (window.confirm(`Tem certeza que deseja eliminar completamente o utilizador ${user.name}? Esta ação não pode ser desfeita.`)) {
+                                    deleteUserMutation.mutate(user.id);
+                                  }
+                                }}
+                                disabled={deleteUserMutation.isPending}
+                                className="ml-2"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>

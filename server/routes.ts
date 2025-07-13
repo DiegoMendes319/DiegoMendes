@@ -308,26 +308,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Password recovery endpoint
   app.post('/api/auth/recover-password', async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, phone } = req.body;
       
-      if (!email) {
-        return res.status(400).json({ error: 'Email é obrigatório' });
+      if (!email && !phone) {
+        return res.status(400).json({ error: 'Email ou número de telefone é obrigatório' });
       }
 
-      // Check if user exists
-      const user = await storage.getUserByEmail(email);
+      let user = null;
+      let recoveryMethod: 'email' | 'sms' = 'email';
+
+      // Try to find user by email first
+      if (email) {
+        user = await storage.getUserByEmail(email);
+        recoveryMethod = 'email';
+      }
+
+      // If no user found by email, try by phone
+      if (!user && phone) {
+        const allUsers = await storage.getAllUsers();
+        user = allUsers.find(u => u.phone === phone);
+        recoveryMethod = 'sms';
+      }
+
       if (!user) {
         // Return success even if user doesn't exist (security best practice)
-        return res.json({ message: 'Se o email existir, receberá as instruções de recuperação' });
+        return res.json({ 
+          message: 'Se o contacto existir, receberá as instruções de recuperação',
+          success: true
+        });
       }
 
-      // In a real application, you would send an email with recovery link
-      // For now, we'll just log the recovery attempt
-      console.log(`Password recovery requested for: ${email}`);
+      // Create recovery token
+      const token = await storage.createRecoveryToken(user.id, recoveryMethod);
 
-      res.json({ message: 'Se o email existir, receberá as instruções de recuperação' });
+      // In a real application, you would send email/SMS
+      // For now, we'll return the token directly for demonstration
+      res.json({
+        message: 'Token de recuperação gerado com sucesso',
+        token: token,
+        method: recoveryMethod,
+        contact: recoveryMethod === 'email' ? user.email : user.phone,
+        expiresIn: '15 minutos',
+        success: true
+      });
     } catch (error) {
       console.error('Password recovery error:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Reset password with token endpoint
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: 'Token e nova palavra-passe são obrigatórios' });
+      }
+
+      // Validate token and reset password
+      const success = await storage.resetPasswordWithToken(token, newPassword);
+      
+      if (!success) {
+        return res.status(400).json({ error: 'Token inválido ou expirado' });
+      }
+
+      res.json({ message: 'Palavra-passe redefinida com sucesso' });
+    } catch (error) {
+      console.error('Reset password error:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
@@ -750,6 +798,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Delete user endpoint
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      const sessionToken = req.cookies?.session_token;
+      if (!sessionToken) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const user = await storage.validateSession(sessionToken);
+      if (!user) {
+        return res.status(401).json({ error: "Sessão inválida" });
+      }
+
+      const isAdmin = await storage.isAdmin(user.id);
+      if (!isAdmin) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+
+      // Prevent admin from deleting themselves
+      if (id === user.id) {
+        return res.status(400).json({ error: "Não pode eliminar a sua própria conta" });
+      }
+
+      // Get user info before deletion for logging
+      const userToDelete = await storage.getUser(id);
+      if (!userToDelete) {
+        return res.status(404).json({ error: "Utilizador não encontrado" });
+      }
+
+      // Delete user
+      const success = await storage.deleteUser(id);
+      if (!success) {
+        return res.status(500).json({ error: "Erro ao eliminar utilizador" });
+      }
+
+      // Log admin action
+      await storage.logAdminAction({
+        admin_id: user.id,
+        action: 'delete_user',
+        target_type: 'user',
+        target_id: id,
+        details: JSON.stringify({ 
+          deletedUser: { 
+            name: userToDelete.name, 
+            email: userToDelete.email,
+            phone: userToDelete.phone 
+          } 
+        }),
+        ip_address: req.ip,
+        user_agent: req.headers['user-agent'] || null,
+      });
+
+      res.json({ message: "Utilizador eliminado com sucesso" });
     } catch (error) {
       res.status(500).json({ error: "Erro interno do servidor" });
     }
