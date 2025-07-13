@@ -11,54 +11,69 @@ export interface LocationData {
 }
 
 export const locationData: LocationData = {
-  // 21 Provinces of Angola (2025 Update)
+  // 21 Provinces of Angola (2025 Update) - Based on official administrative structure
   luanda: {
     name: 'Luanda',
     municipalities: {
-      ingombota: {
-        name: 'Ingombota',
-        neighborhoods: ['Maianga', 'Alvalade', 'Miramar', 'Patrice Lumumba', 'Kinanga', 'Prenda']
+      luanda: {
+        name: 'Luanda',
+        neighborhoods: [
+          'Ingombota', 'Maianga', 'Rangel', 'Samba', 'Sambizanga', 'Angola Quiluanje',
+          'Mutamba', 'Maculusso', 'Alvalade', 'Miramar', 'Ilha do Cabo',
+          'São Paulo', 'Operário', 'Prenda', 'Cassenda', 'Kinanga',
+          'Palanca', 'Rocha Pinto', 'Ctm'
+        ]
       },
-      maianga: {
-        name: 'Maianga',
-        neighborhoods: ['Rangel', 'Operário', 'Kinanga', 'Prenda']
-      },
-      sambizanga: {
-        name: 'Sambizanga',
-        neighborhoods: ['Sambizanga', 'Operário', 'Ngola Kiluange', 'Cazenga']
-      },
-      kilamba_kiaxi: {
-        name: 'Kilamba Kiaxi',
-        neighborhoods: ['Kilamba', 'Golf', 'Camama', 'Benfica']
-      },
-      talatona: {
-        name: 'Talatona',
-        neighborhoods: ['Talatona', 'Benfica', 'Futungo', 'Luanda Sul']
-      },
-      viana: {
-        name: 'Viana',
-        neighborhoods: ['Viana', 'Calumbo', 'Kikolo', 'Zango']
+      belas: {
+        name: 'Belas',
+        neighborhoods: [
+          'Barra do Cuanza', 'Kilamba', 'Benfica', 'Mussulo', 'Ramiros',
+          'Futungo de Belas', 'Benfica e Mussulo', 'Quilamba Kiaxi'
+        ]
       },
       cacuaco: {
         name: 'Cacuaco',
-        neighborhoods: ['Cacuaco', 'Funda', 'Sequele', 'Kikolo']
+        neighborhoods: [
+          'Cacuaco', 'Funda', 'Quicolo', 'Kikolo', 'Sequele',
+          'Cacuaco Sede', 'Funda Centro', 'Quicolo Centro'
+        ]
+      },
+      cazenga: {
+        name: 'Cazenga',
+        neighborhoods: [
+          'Cazenga', 'Hoji Ya Henda', 'Tala Hady', 'Cazenga Popular',
+          'Distrito Industrial', 'Cazenga Sede', 'Hoji Ya Henda Centro'
+        ]
+      },
+      quicama: {
+        name: 'Quiçama',
+        neighborhoods: [
+          'Cabo Ledo', 'Demba Chio', 'Mumbondo', 'Muxima', 'Quixinje',
+          'Kixinje', 'Cabo Ledo Centro', 'Demba Chio Centro'
+        ]
+      },
+      viana: {
+        name: 'Viana',
+        neighborhoods: [
+          'Calumbo', 'Viana', 'Zango', 'Mbaia', 'Centralidade do Zango',
+          'Viana Centro', 'Calumbo Centro', 'Zango I', 'Zango II', 'Zango III'
+        ]
+      },
+      talatona: {
+        name: 'Talatona',
+        neighborhoods: [
+          'Talatona', 'Camama', 'Benfica', 'Futungo de Belas', 'Quificas',
+          'Talatona Centro', 'Camama Centro', 'Benfica Centro'
+        ]
       }
     }
   },
   icolo_bengo: {
     name: 'Icolo e Bengo',
     municipalities: {
-      icolo: {
-        name: 'Icolo',
-        neighborhoods: ['Icolo', 'Catete', 'Bom Jesus', 'Cabo Ledo']
-      },
-      belas: {
-        name: 'Belas',
-        neighborhoods: ['Belas', 'Ramires', 'Cabolombo', 'Bengo']
-      },
-      quicama: {
-        name: 'Quiçama',
-        neighborhoods: ['Quiçama', 'Muxima', 'Cabo Ledo', 'Kissama']
+      icolo_bengo: {
+        name: 'Icolo e Bengo',
+        neighborhoods: ['Icolo e Bengo Centro', 'Bairro Operário', 'Bairro Popular']
       }
     }
   },
@@ -67,27 +82,27 @@ export const locationData: LocationData = {
     municipalities: {
       caxito: {
         name: 'Caxito',
-        neighborhoods: ['Caxito', 'Kikuxi', 'Mabubas', 'Úcua']
-      },
-      dande: {
-        name: 'Dande',
-        neighborhoods: ['Dande', 'Caxito', 'Barra do Dande', 'Quixico']
-      },
-      nambuangongo: {
-        name: 'Nambuangongo',
-        neighborhoods: ['Nambuangongo', 'Bolongongo', 'Gombe', 'Zala']
+        neighborhoods: ['Caxito Centro', 'Bairro Operário', 'Bairro Popular']
       },
       ambriz: {
         name: 'Ambriz',
-        neighborhoods: ['Ambriz', 'Tabi', 'Quiage', 'Gombe']
+        neighborhoods: ['Ambriz', 'Ambriz Centro']
+      },
+      dande: {
+        name: 'Dande',
+        neighborhoods: ['Dande', 'Dande Centro']
       },
       dembos: {
         name: 'Dembos',
-        neighborhoods: ['Dembos', 'Cassoneca', 'Paredes', 'Quixico']
+        neighborhoods: ['Dembos', 'Dembos Centro']
+      },
+      nambuangongo: {
+        name: 'Nambuangongo',
+        neighborhoods: ['Nambuangongo', 'Nambuangongo Centro']
       },
       pango_aluquem: {
-        name: 'Pango Aluquém',
-        neighborhoods: ['Pango Aluquém', 'Quiage', 'Muxaluando', 'Quiculo']
+        name: 'Pango Aluquem',
+        neighborhoods: ['Pango Aluquem', 'Pango Aluquem Centro']
       }
     }
   },
@@ -96,43 +111,55 @@ export const locationData: LocationData = {
     municipalities: {
       benguela: {
         name: 'Benguela',
-        neighborhoods: ['Centro', 'Praia Morena', 'Compão', 'Caponte']
+        neighborhoods: [
+          'Benguela Centro', 'Praia Morena', 'Compão', 'Candemba', 'Catumbela',
+          'Benfica', 'Cavaco', 'Canjala', 'Restinga', 'Damba Maria'
+        ]
       },
       lobito: {
         name: 'Lobito',
-        neighborhoods: ['Canata', 'Compão', 'Restinga', 'Caponte']
+        neighborhoods: [
+          'Lobito Centro', 'Restinga', 'Bairro da Restinga', 'Ponta da Restinga',
+          'Canjala', 'Egipto Praia', 'Compão', 'Benfica', 'Cavaco'
+        ]
       },
-      catumbela: {
-        name: 'Catumbela',
-        neighborhoods: ['Catumbela', 'Praia Azul', 'Equimina', 'Biopio']
-      },
-      cubal: {
-        name: 'Cubal',
-        neighborhoods: ['Cubal', 'Capupa', 'Tumbulo', 'Caiongo']
-      },
-      ganda: {
-        name: 'Ganda',
-        neighborhoods: ['Ganda', 'Balombo', 'Chindumbo', 'Ebanga']
-      },
-      bocoio: {
-        name: 'Bocoio',
-        neighborhoods: ['Bocoio', 'Chila', 'Passe', 'Cubal']
-      },
-      caimbambo: {
-        name: 'Caimbambo',
-        neighborhoods: ['Caimbambo', 'Catumbela', 'Dombe Grande', 'Cubal']
+      baia_farta: {
+        name: 'Baía Farta',
+        neighborhoods: [
+          'Baía Farta', 'Calohanga', 'Dombe Grande', 'Equimina',
+          'Kalohanga', 'Baía Farta Centro'
+        ]
       },
       balombo: {
         name: 'Balombo',
-        neighborhoods: ['Balombo', 'Chindongo', 'Maca', 'Cubal']
+        neighborhoods: [
+          'Balombo', 'Chindumbo', 'Chingongo', 'Maca Mombolo',
+          'Chidumbo', 'Chigongo', 'Balombo Centro'
+        ]
+      },
+      bocoio: {
+        name: 'Bocoio',
+        neighborhoods: ['Bocoio', 'Cubal', 'Ganda', 'Bocoio Centro']
+      },
+      caimbambo: {
+        name: 'Caimbambo',
+        neighborhoods: ['Caimbambo', 'Caimbambo Centro']
       },
       chongoroi: {
         name: 'Chongoroi',
-        neighborhoods: ['Chongoroi', 'Cubal', 'Bocoio', 'Ganda']
+        neighborhoods: ['Chongoroi', 'Chongoroi Centro']
       },
-      chopera: {
-        name: 'Chopera',
-        neighborhoods: ['Chopera', 'Ganda', 'Ebanga', 'Balombo']
+      cubal: {
+        name: 'Cubal',
+        neighborhoods: ['Cubal', 'Cubal Centro']
+      },
+      ganda: {
+        name: 'Ganda',
+        neighborhoods: ['Ganda', 'Ganda Centro']
+      },
+      ukuma: {
+        name: 'Ukuma',
+        neighborhoods: ['Ukuma', 'Ukuma Centro']
       }
     }
   },
@@ -141,218 +168,51 @@ export const locationData: LocationData = {
     municipalities: {
       huambo: {
         name: 'Huambo',
-        neighborhoods: ['Centro', 'Comala', 'Comercial', 'Tchioco']
+        neighborhoods: [
+          'Huambo Centro', 'Kakelewa', 'Calundo', 'Viação', 'Vila Graça',
+          'Santa Iria', 'Katchidombe', 'Sassonde I', 'Sassonde II',
+          'Santo António', 'Casseque I', 'Casseque II', 'Kapango', 'Aviação'
+        ]
       },
       bailundo: {
         name: 'Bailundo',
-        neighborhoods: ['Bailundo', 'Bimbe', 'Lunge', 'Hanha']
+        neighborhoods: ['Bailundo', 'Bailundo Centro']
       },
-      cachiungo: {
-        name: 'Cachiungo',
-        neighborhoods: ['Cachiungo', 'Huambo', 'Bailundo', 'Ekuma']
-      },
-      caala: {
-        name: 'Caála',
-        neighborhoods: ['Caála', 'Catata', 'Calenga', 'Huambo']
-      },
-      ekunha: {
-        name: 'Ekunha',
-        neighborhoods: ['Ekunha', 'Caála', 'Mungo', 'Cachiungo']
-      },
-      londuimbali: {
-        name: 'Londuimbali',
-        neighborhoods: ['Londuimbali', 'Galanga', 'Ussoque', 'Bailundo']
-      },
-      longonjo: {
-        name: 'Longonjo',
-        neighborhoods: ['Longonjo', 'Alto Hama', 'Chilata', 'Galanga']
+      londuimbale: {
+        name: 'Londuimbale',
+        neighborhoods: ['Londuimbale', 'Londuimbale Centro']
       },
       mungo: {
         name: 'Mungo',
-        neighborhoods: ['Mungo', 'Ekunha', 'Caála', 'Longonjo']
+        neighborhoods: ['Mungo', 'Mungo Centro']
       },
-      chinjenje: {
-        name: 'Chinjenje',
-        neighborhoods: ['Chinjenje', 'Longonjo', 'Galanga', 'Ussoque']
+      tchindjenje: {
+        name: 'Tchindjenje',
+        neighborhoods: ['Tchindjenje', 'Tchindjenje Centro']
       },
       ucuma: {
         name: 'Ucuma',
-        neighborhoods: ['Ucuma', 'Cachiungo', 'Ekunha', 'Mungo']
+        neighborhoods: ['Ucuma', 'Ucuma Centro']
       },
-      chicala_choloanga: {
-        name: 'Chicala-Choloanga',
-        neighborhoods: ['Chicala-Choloanga', 'Bailundo', 'Londuimbali', 'Galanga']
-      }
-    }
-  },
-  huila: {
-    name: 'Huíla',
-    municipalities: {
-      lubango: {
-        name: 'Lubango',
-        neighborhoods: ['Centro', 'Comercial', 'Tchidia', 'Arimba']
+      ekunha: {
+        name: 'Ekunha',
+        neighborhoods: ['Ekunha', 'Ekunha Centro']
       },
-      matala: {
-        name: 'Matala',
-        neighborhoods: ['Matala', 'Mulondo', 'Capunda', 'Quihita']
+      tchicala_tcholoanga: {
+        name: 'Tchicala-Tcholoanga',
+        neighborhoods: ['Tchicala-Tcholoanga', 'Tchicala-Tcholoanga Centro']
       },
-      chibia: {
-        name: 'Chibia',
-        neighborhoods: ['Chibia', 'Jamba', 'Quipungo', 'Humpata']
+      catchiungo: {
+        name: 'Catchiungo',
+        neighborhoods: ['Catchiungo', 'Catchiungo Centro']
       },
-      humpata: {
-        name: 'Humpata',
-        neighborhoods: ['Humpata', 'Chibia', 'Lubango', 'Galangue']
+      longonjo: {
+        name: 'Longonjo',
+        neighborhoods: ['Longonjo', 'Longonjo Centro']
       },
-      quilengues: {
-        name: 'Quilengues',
-        neighborhoods: ['Quilengues', 'Matala', 'Jamba', 'Impulo']
-      },
-      quipungo: {
-        name: 'Quipungo',
-        neighborhoods: ['Quipungo', 'Chibia', 'Humpata', 'Lubango']
-      },
-      cacula: {
-        name: 'Cacula',
-        neighborhoods: ['Cacula', 'Quilengues', 'Matala', 'Jamba']
-      },
-      caconda: {
-        name: 'Caconda',
-        neighborhoods: ['Caconda', 'Cacula', 'Quilengues', 'Chiange']
-      },
-      jamba: {
-        name: 'Jamba',
-        neighborhoods: ['Jamba', 'Chibia', 'Quipungo', 'Humpata']
-      },
-      gambos: {
-        name: 'Gambos',
-        neighborhoods: ['Gambos', 'Chiange', 'Cacula', 'Quilengues']
-      },
-      cuvango: {
-        name: 'Cuvango',
-        neighborhoods: ['Cuvango', 'Gambos', 'Chiange', 'Jamba']
-      },
-      chiange: {
-        name: 'Chiange',
-        neighborhoods: ['Chiange', 'Caconda', 'Cuvango', 'Gambos']
-      },
-      chipindo: {
-        name: 'Chipindo',
-        neighborhoods: ['Chipindo', 'Cuvango', 'Gambos', 'Chiange']
-      },
-      galangue: {
-        name: 'Galangue',
-        neighborhoods: ['Galangue', 'Humpata', 'Lubango', 'Chibia']
-      }
-    }
-  },
-  uige: {
-    name: 'Uíge',
-    municipalities: {
-      uige: {
-        name: 'Uíge',
-        neighborhoods: ['Centro', 'Kimongo', 'Sagrada Família', 'Negage']
-      },
-      negage: {
-        name: 'Negage',
-        neighborhoods: ['Negage', 'Uíge', 'Mucaba', 'Songo']
-      },
-      mucaba: {
-        name: 'Mucaba',
-        neighborhoods: ['Mucaba', 'Negage', 'Uíge', 'Songo']
-      },
-      songo: {
-        name: 'Songo',
-        neighborhoods: ['Songo', 'Negage', 'Mucaba', 'Quitexe']
-      },
-      quitexe: {
-        name: 'Quitexe',
-        neighborhoods: ['Quitexe', 'Songo', 'Mucaba', 'Bungo']
-      },
-      bungo: {
-        name: 'Bungo',
-        neighborhoods: ['Bungo', 'Quitexe', 'Songo', 'Cangola']
-      },
-      cangola: {
-        name: 'Cangola',
-        neighborhoods: ['Cangola', 'Bungo', 'Quitexe', 'Zombo']
-      },
-      zombo: {
-        name: 'Zombo',
-        neighborhoods: ['Zombo', 'Cangola', 'Bungo', 'Milunga']
-      },
-      milunga: {
-        name: 'Milunga',
-        neighborhoods: ['Milunga', 'Zombo', 'Cangola', 'Puri']
-      },
-      puri: {
-        name: 'Puri',
-        neighborhoods: ['Puri', 'Milunga', 'Zombo', 'Bembe']
-      },
-      bembe: {
-        name: 'Bembe',
-        neighborhoods: ['Bembe', 'Puri', 'Milunga', 'Damba']
-      },
-      damba: {
-        name: 'Damba',
-        neighborhoods: ['Damba', 'Bembe', 'Puri', 'Sanza Pombo']
-      },
-      sanza_pombo: {
-        name: 'Sanza Pombo',
-        neighborhoods: ['Sanza Pombo', 'Damba', 'Bembe', 'Alto Cauale']
-      },
-      alto_cauale: {
-        name: 'Alto Cauale',
-        neighborhoods: ['Alto Cauale', 'Sanza Pombo', 'Damba', 'Quimbele']
-      },
-      quimbele: {
-        name: 'Quimbele',
-        neighborhoods: ['Quimbele', 'Alto Cauale', 'Sanza Pombo', 'Maquela']
-      },
-      maquela: {
-        name: 'Maquela do Zombo',
-        neighborhoods: ['Maquela do Zombo', 'Quimbele', 'Alto Cauale', 'Uíge']
-      }
-    }
-  },
-  bie: {
-    name: 'Bié',
-    municipalities: {
-      kuito: {
-        name: 'Kuito',
-        neighborhoods: ['Centro', 'Trumba', 'Cacolo', 'Catabola']
-      },
-      andulo: {
-        name: 'Andulo',
-        neighborhoods: ['Andulo', 'Kuito', 'Nharea', 'Catabola']
-      },
-      nharea: {
-        name: 'Nharea',
-        neighborhoods: ['Nharea', 'Andulo', 'Kuito', 'Cunhinga']
-      },
-      cunhinga: {
-        name: 'Cunhinga',
-        neighborhoods: ['Cunhinga', 'Nharea', 'Andulo', 'Catabola']
-      },
-      catabola: {
-        name: 'Catabola',
-        neighborhoods: ['Catabola', 'Kuito', 'Andulo', 'Cunhinga']
-      },
-      camacupa: {
-        name: 'Camacupa',
-        neighborhoods: ['Camacupa', 'Catabola', 'Kuito', 'Chinguar']
-      },
-      chinguar: {
-        name: 'Chinguar',
-        neighborhoods: ['Chinguar', 'Camacupa', 'Catabola', 'Chitembo']
-      },
-      chitembo: {
-        name: 'Chitembo',
-        neighborhoods: ['Chitembo', 'Chinguar', 'Camacupa', 'Cuemba']
-      },
-      cuemba: {
-        name: 'Cuemba',
-        neighborhoods: ['Cuemba', 'Chitembo', 'Chinguar', 'Kuito']
+      caala: {
+        name: 'Caála',
+        neighborhoods: ['Caála', 'Caála Centro']
       }
     }
   },
@@ -361,19 +221,59 @@ export const locationData: LocationData = {
     municipalities: {
       cabinda: {
         name: 'Cabinda',
-        neighborhoods: ['Centro', 'Tchiowa', 'Simulambuco', 'Malembo']
-      },
-      buco_zau: {
-        name: 'Buco Zau',
-        neighborhoods: ['Buco Zau', 'Necuto', 'Inhuca', 'Cabinda']
+        neighborhoods: [
+          'Cabinda Centro', 'Tchiowa', 'Simulambuco', 'Cabinda Sede',
+          'Malembo', 'Cabinda Porto', 'Cabinda Aeroporto'
+        ]
       },
       belize: {
         name: 'Belize',
-        neighborhoods: ['Belize', 'Cabinda', 'Buco Zau', 'Cacongo']
+        neighborhoods: ['Belize', 'Belize Centro']
+      },
+      buco_zau: {
+        name: 'Buco-Zau',
+        neighborhoods: ['Buco-Zau', 'Buco-Zau Centro']
       },
       cacongo: {
         name: 'Cacongo',
-        neighborhoods: ['Cacongo', 'Belize', 'Cabinda', 'Landana']
+        neighborhoods: ['Cacongo', 'Cacongo Centro']
+      }
+    }
+  },
+  bie: {
+    name: 'Bié',
+    municipalities: {
+      kuito: {
+        name: 'Kuito',
+        neighborhoods: ['Kuito Centro', 'Bairro Operário', 'Bairro Popular', 'Kuito Sede']
+      },
+      andulo: {
+        name: 'Andulo',
+        neighborhoods: ['Andulo', 'Andulo Centro']
+      },
+      camacupa: {
+        name: 'Camacupa',
+        neighborhoods: ['Camacupa', 'Camacupa Centro']
+      },
+      catabola: {
+        name: 'Catabola',
+        neighborhoods: ['Catabola', 'Catabola Centro']
+      },
+      chinguar: {
+        name: 'Chinguar',
+        neighborhoods: ['Chinguar', 'Chinguar Centro']
+      },
+      chitembo: {
+        name: 'Chitembo',
+        neighborhoods: ['Chitembo', 'Chitembo Centro']
+      },
+      cunhinga: {
+        name: 'Cunhinga',
+        neighborhoods: ['Cunhinga', 'Cunhinga Centro']
+      },
+      nharea: {
+        name: 'Nharea',
+        neighborhoods: ['Nharea', 'Nharea Centro']
       }
     }
   },
@@ -382,43 +282,43 @@ export const locationData: LocationData = {
     municipalities: {
       ndalatando: {
         name: 'N\'dalatando',
-        neighborhoods: ['Centro', 'Cambamba', 'Bolongongo', 'Cazengo']
+        neighborhoods: ['N\'dalatando Centro', 'Bairro Operário', 'Bairro Popular']
       },
-      cazengo: {
-        name: 'Cazengo',
-        neighborhoods: ['Cazengo', 'N\'dalatando', 'Lucala', 'Golungo Alto']
-      },
-      golungo_alto: {
-        name: 'Golungo Alto',
-        neighborhoods: ['Golungo Alto', 'Cazengo', 'N\'dalatando', 'Lucala']
-      },
-      lucala: {
-        name: 'Lucala',
-        neighborhoods: ['Lucala', 'Golungo Alto', 'Cazengo', 'Quiculungo']
-      },
-      quiculungo: {
-        name: 'Quiculungo',
-        neighborhoods: ['Quiculungo', 'Lucala', 'Golungo Alto', 'Samba Caju']
-      },
-      samba_caju: {
-        name: 'Samba Caju',
-        neighborhoods: ['Samba Caju', 'Quiculungo', 'Lucala', 'Banga']
+      ambriz: {
+        name: 'Ambriz',
+        neighborhoods: ['Ambriz', 'Ambriz Centro']
       },
       banga: {
         name: 'Banga',
-        neighborhoods: ['Banga', 'Samba Caju', 'Quiculungo', 'Ambaca']
-      },
-      ambaca: {
-        name: 'Ambaca',
-        neighborhoods: ['Ambaca', 'Banga', 'Samba Caju', 'Bolongongo']
+        neighborhoods: ['Banga', 'Banga Centro']
       },
       bolongongo: {
         name: 'Bolongongo',
-        neighborhoods: ['Bolongongo', 'Ambaca', 'Banga', 'Cambambe']
+        neighborhoods: ['Bolongongo', 'Bolongongo Centro']
       },
       cambambe: {
         name: 'Cambambe',
-        neighborhoods: ['Cambambe', 'Bolongongo', 'Ambaca', 'N\'dalatando']
+        neighborhoods: ['Cambambe', 'Cambambe Centro']
+      },
+      cazengo: {
+        name: 'Cazengo',
+        neighborhoods: ['Cazengo', 'Cazengo Centro']
+      },
+      dange_quitexe: {
+        name: 'Dange-Quitexe',
+        neighborhoods: ['Dange-Quitexe', 'Dange-Quitexe Centro']
+      },
+      lucala: {
+        name: 'Lucala',
+        neighborhoods: ['Lucala', 'Lucala Centro']
+      },
+      quiculungo: {
+        name: 'Quiculungo',
+        neighborhoods: ['Quiculungo', 'Quiculungo Centro']
+      },
+      samba_caju: {
+        name: 'Samba Caju',
+        neighborhoods: ['Samba Caju', 'Samba Caju Centro']
       }
     }
   },
@@ -427,51 +327,51 @@ export const locationData: LocationData = {
     municipalities: {
       sumbe: {
         name: 'Sumbe',
-        neighborhoods: ['Centro', 'Gunza', 'Quicombo', 'Conda']
-      },
-      porto_amboim: {
-        name: 'Porto Amboim',
-        neighborhoods: ['Porto Amboim', 'Sumbe', 'Quicombo', 'Gabela']
-      },
-      gabela: {
-        name: 'Gabela',
-        neighborhoods: ['Gabela', 'Porto Amboim', 'Sumbe', 'Seles']
-      },
-      seles: {
-        name: 'Seles',
-        neighborhoods: ['Seles', 'Gabela', 'Porto Amboim', 'Amboim']
+        neighborhoods: ['Sumbe Centro', 'Bairro Operário', 'Bairro Popular']
       },
       amboim: {
         name: 'Amboim',
-        neighborhoods: ['Amboim', 'Seles', 'Gabela', 'Conda']
-      },
-      conda: {
-        name: 'Conda',
-        neighborhoods: ['Conda', 'Amboim', 'Seles', 'Ebo']
-      },
-      ebo: {
-        name: 'Ebo',
-        neighborhoods: ['Ebo', 'Conda', 'Amboim', 'Libolo']
-      },
-      libolo: {
-        name: 'Libolo',
-        neighborhoods: ['Libolo', 'Ebo', 'Conda', 'Mussende']
-      },
-      mussende: {
-        name: 'Mussende',
-        neighborhoods: ['Mussende', 'Libolo', 'Ebo', 'Quibala']
-      },
-      quibala: {
-        name: 'Quibala',
-        neighborhoods: ['Quibala', 'Mussende', 'Libolo', 'Waku Kungo']
-      },
-      waku_kungo: {
-        name: 'Waku Kungo',
-        neighborhoods: ['Waku Kungo', 'Quibala', 'Mussende', 'Cassongue']
+        neighborhoods: ['Amboim', 'Amboim Centro']
       },
       cassongue: {
         name: 'Cassongue',
-        neighborhoods: ['Cassongue', 'Waku Kungo', 'Quibala', 'Sumbe']
+        neighborhoods: ['Cassongue', 'Cassongue Centro']
+      },
+      conda: {
+        name: 'Conda',
+        neighborhoods: ['Conda', 'Conda Centro']
+      },
+      ebo: {
+        name: 'Ebo',
+        neighborhoods: ['Ebo', 'Ebo Centro']
+      },
+      libolo: {
+        name: 'Libolo',
+        neighborhoods: ['Libolo', 'Libolo Centro']
+      },
+      mussende: {
+        name: 'Mussende',
+        neighborhoods: ['Mussende', 'Mussende Centro']
+      },
+      porto_amboim: {
+        name: 'Porto Amboim',
+        neighborhoods: ['Porto Amboim', 'Porto Amboim Centro']
+      },
+      quibala: {
+        name: 'Quibala',
+        neighborhoods: ['Quibala', 'Quibala Centro']
+      },
+      quilenda: {
+        name: 'Quilenda',
+        neighborhoods: ['Quilenda', 'Quilenda Centro']
+      },
+      seles: {
+        name: 'Seles',
+        neighborhoods: ['Seles', 'Seles Centro']
+      },
+      waku_kungo: {
+        name: 'Waku-Kungo',
+        neighborhoods: ['Waku-Kungo', 'Waku-Kungo Centro']
       }
     }
   },
@@ -480,27 +380,95 @@ export const locationData: LocationData = {
     municipalities: {
       ondjiva: {
         name: 'Ondjiva',
-        neighborhoods: ['Centro', 'Nehone', 'Evale', 'Xangongo']
-      },
-      cuvelai: {
-        name: 'Cuvelai',
-        neighborhoods: ['Cuvelai', 'Ondjiva', 'Nehone', 'Evale']
+        neighborhoods: [
+          'Ondjiva Centro', 'Bairro 1', 'Bairro 2', 'Bairro 3', 'Bairro 4',
+          'Bairro 5', 'Bairro 6', 'Bairro 7', 'Bairro 8', 'Bairro 9',
+          'Bairro 10', 'Bairro 11', 'Bairro 12'
+        ]
       },
       cahama: {
         name: 'Cahama',
-        neighborhoods: ['Cahama', 'Cuvelai', 'Ondjiva', 'Ombadja']
+        neighborhoods: ['Cahama', 'Cahama Centro']
       },
-      ombadja: {
-        name: 'Ombadja',
-        neighborhoods: ['Ombadja', 'Cahama', 'Cuvelai', 'Curoca']
+      cuanhama: {
+        name: 'Cuanhama',
+        neighborhoods: ['Cuanhama', 'Cuanhama Centro']
       },
       curoca: {
         name: 'Curoca',
-        neighborhoods: ['Curoca', 'Ombadja', 'Cahama', 'Namacunde']
+        neighborhoods: ['Curoca', 'Curoca Centro']
       },
       namacunde: {
         name: 'Namacunde',
-        neighborhoods: ['Namacunde', 'Curoca', 'Ombadja', 'Ondjiva']
+        neighborhoods: ['Namacunde', 'Namacunde Centro']
+      },
+      ombadja: {
+        name: 'Ombadja',
+        neighborhoods: ['Ombadja', 'Ombadja Centro']
+      }
+    }
+  },
+  huila: {
+    name: 'Huíla',
+    municipalities: {
+      lubango: {
+        name: 'Lubango',
+        neighborhoods: [
+          'Lubango Centro', 'Comercial', 'Mutundo', 'Bairro Operário',
+          'Bairro Popular', 'Bairro Comercial', 'Bairro do Boa Vida'
+        ]
+      },
+      caconda: {
+        name: 'Caconda',
+        neighborhoods: ['Caconda', 'Caconda Centro']
+      },
+      cacula: {
+        name: 'Cacula',
+        neighborhoods: ['Cacula', 'Cacula Centro']
+      },
+      caluquembe: {
+        name: 'Caluquembe',
+        neighborhoods: ['Caluquembe', 'Caluquembe Centro']
+      },
+      chiange: {
+        name: 'Chiange',
+        neighborhoods: ['Chiange', 'Chiange Centro']
+      },
+      chibia: {
+        name: 'Chibia',
+        neighborhoods: ['Chibia', 'Chibia Centro']
+      },
+      chipindo: {
+        name: 'Chipindo',
+        neighborhoods: ['Chipindo', 'Chipindo Centro']
+      },
+      cuvango: {
+        name: 'Cuvango',
+        neighborhoods: ['Cuvango', 'Cuvango Centro']
+      },
+      humpata: {
+        name: 'Humpata',
+        neighborhoods: ['Humpata', 'Humpata Centro']
+      },
+      jamba: {
+        name: 'Jamba',
+        neighborhoods: ['Jamba', 'Jamba Centro']
+      },
+      matala: {
+        name: 'Matala',
+        neighborhoods: ['Matala', 'Matala Centro']
+      },
+      mucuma: {
+        name: 'Mucuma',
+        neighborhoods: ['Mucuma', 'Mucuma Centro']
+      },
+      quipungo: {
+        name: 'Quipungo',
+        neighborhoods: ['Quipungo', 'Quipungo Centro']
+      },
+      quilengues: {
+        name: 'Quilengues',
+        neighborhoods: ['Quilengues', 'Quilengues Centro']
       }
     }
   },
@@ -509,39 +477,39 @@ export const locationData: LocationData = {
     municipalities: {
       dundo: {
         name: 'Dundo',
-        neighborhoods: ['Centro', 'Chitato', 'Capenda', 'Lucapa']
-      },
-      chitato: {
-        name: 'Chitato',
-        neighborhoods: ['Chitato', 'Dundo', 'Capenda', 'Lucapa']
-      },
-      capenda: {
-        name: 'Capenda-Camulemba',
-        neighborhoods: ['Capenda-Camulemba', 'Chitato', 'Dundo', 'Cambulo']
+        neighborhoods: ['Dundo Centro', 'Bairro Operário', 'Bairro Popular']
       },
       cambulo: {
         name: 'Cambulo',
-        neighborhoods: ['Cambulo', 'Capenda-Camulemba', 'Chitato', 'Lucapa']
+        neighborhoods: ['Cambulo', 'Cambulo Centro']
       },
-      lucapa: {
-        name: 'Lucapa',
-        neighborhoods: ['Lucapa', 'Cambulo', 'Capenda-Camulemba', 'Xa Muteba']
-      },
-      xa_muteba: {
-        name: 'Xa-Muteba',
-        neighborhoods: ['Xa-Muteba', 'Lucapa', 'Cambulo', 'Cuango']
-      },
-      cuango: {
-        name: 'Cuango',
-        neighborhoods: ['Cuango', 'Xa-Muteba', 'Lucapa', 'Caungula']
+      capenda_camulemba: {
+        name: 'Capenda-Camulemba',
+        neighborhoods: ['Capenda-Camulemba', 'Capenda-Camulemba Centro']
       },
       caungula: {
         name: 'Caungula',
-        neighborhoods: ['Caungula', 'Cuango', 'Xa-Muteba', 'Lubalo']
+        neighborhoods: ['Caungula', 'Caungula Centro']
+      },
+      chitato: {
+        name: 'Chitato',
+        neighborhoods: ['Chitato', 'Chitato Centro']
+      },
+      cuango: {
+        name: 'Cuango',
+        neighborhoods: ['Cuango', 'Cuango Centro']
+      },
+      cuilo: {
+        name: 'Cuilo',
+        neighborhoods: ['Cuilo', 'Cuilo Centro']
       },
       lubalo: {
         name: 'Lubalo',
-        neighborhoods: ['Lubalo', 'Caungula', 'Cuango', 'Dundo']
+        neighborhoods: ['Lubalo', 'Lubalo Centro']
+      },
+      xinge: {
+        name: 'Xinge',
+        neighborhoods: ['Xinge', 'Xinge Centro']
       }
     }
   },
@@ -550,19 +518,19 @@ export const locationData: LocationData = {
     municipalities: {
       saurimo: {
         name: 'Saurimo',
-        neighborhoods: ['Centro', 'Muconda', 'Cacolo', 'Dala']
-      },
-      muconda: {
-        name: 'Muconda',
-        neighborhoods: ['Muconda', 'Saurimo', 'Cacolo', 'Dala']
+        neighborhoods: ['Saurimo Centro', 'Bairro Operário', 'Bairro Popular']
       },
       cacolo: {
         name: 'Cacolo',
-        neighborhoods: ['Cacolo', 'Muconda', 'Saurimo', 'Dala']
+        neighborhoods: ['Cacolo', 'Cacolo Centro']
       },
       dala: {
         name: 'Dala',
-        neighborhoods: ['Dala', 'Cacolo', 'Muconda', 'Saurimo']
+        neighborhoods: ['Dala', 'Dala Centro']
+      },
+      muconda: {
+        name: 'Muconda',
+        neighborhoods: ['Muconda', 'Muconda Centro']
       }
     }
   },
@@ -571,59 +539,59 @@ export const locationData: LocationData = {
     municipalities: {
       malanje: {
         name: 'Malanje',
-        neighborhoods: ['Centro', 'Cacuso', 'Calandula', 'Cangandala']
+        neighborhoods: ['Malanje Centro', 'Bairro Operário', 'Bairro Popular']
       },
       cacuso: {
         name: 'Cacuso',
-        neighborhoods: ['Cacuso', 'Malanje', 'Calandula', 'Cangandala']
+        neighborhoods: ['Cacuso', 'Cacuso Centro']
       },
       calandula: {
         name: 'Calandula',
-        neighborhoods: ['Calandula', 'Cacuso', 'Malanje', 'Cambundi']
+        neighborhoods: ['Calandula', 'Calandula Centro']
       },
-      cambundi: {
+      cambundi_catembo: {
         name: 'Cambundi-Catembo',
-        neighborhoods: ['Cambundi-Catembo', 'Calandula', 'Cacuso', 'Cangandala']
+        neighborhoods: ['Cambundi-Catembo', 'Cambundi-Catembo Centro']
       },
       cangandala: {
         name: 'Cangandala',
-        neighborhoods: ['Cangandala', 'Cambundi-Catembo', 'Calandula', 'Cuaba Nzogo']
+        neighborhoods: ['Cangandala', 'Cangandala Centro']
       },
-      cuaba_nzogo: {
-        name: 'Cuaba Nzogo',
-        neighborhoods: ['Cuaba Nzogo', 'Cangandala', 'Cambundi-Catembo', 'Luquembo']
+      caombo: {
+        name: 'Caombo',
+        neighborhoods: ['Caombo', 'Caombo Centro']
+      },
+      cuaba_nzoji: {
+        name: 'Cuaba-Nzoji',
+        neighborhoods: ['Cuaba-Nzoji', 'Cuaba-Nzoji Centro']
+      },
+      cunda_dia_baze: {
+        name: 'Cunda-Dia-Baze',
+        neighborhoods: ['Cunda-Dia-Baze', 'Cunda-Dia-Baze Centro']
+      },
+      kiwaba_nzoji: {
+        name: 'Kiwaba-Nzoji',
+        neighborhoods: ['Kiwaba-Nzoji', 'Kiwaba-Nzoji Centro']
       },
       luquembo: {
         name: 'Luquembo',
-        neighborhoods: ['Luquembo', 'Cuaba Nzogo', 'Cangandala', 'Massango']
-      },
-      massango: {
-        name: 'Massango',
-        neighborhoods: ['Massango', 'Luquembo', 'Cuaba Nzogo', 'Mucari']
-      },
-      mucari: {
-        name: 'Mucari',
-        neighborhoods: ['Mucari', 'Massango', 'Luquembo', 'Quela']
-      },
-      quela: {
-        name: 'Quela',
-        neighborhoods: ['Quela', 'Mucari', 'Massango', 'Quirima']
-      },
-      quirima: {
-        name: 'Quirima',
-        neighborhoods: ['Quirima', 'Quela', 'Mucari', 'Marimba']
+        neighborhoods: ['Luquembo', 'Luquembo Centro']
       },
       marimba: {
         name: 'Marimba',
-        neighborhoods: ['Marimba', 'Quirima', 'Quela', 'Kiwaba Nzoji']
+        neighborhoods: ['Marimba', 'Marimba Centro']
       },
-      kiwaba_nzoji: {
-        name: 'Kiwaba Nzoji',
-        neighborhoods: ['Kiwaba Nzoji', 'Marimba', 'Quirima', 'Malanje']
+      massango: {
+        name: 'Massango',
+        neighborhoods: ['Massango', 'Massango Centro']
       },
-      kunda_dia_base: {
-        name: 'Kunda-dia-Base',
-        neighborhoods: ['Kunda-dia-Base', 'Kiwaba Nzoji', 'Marimba', 'Malanje']
+      mucari: {
+        name: 'Mucari',
+        neighborhoods: ['Mucari', 'Mucari Centro']
+      },
+      quela: {
+        name: 'Quela',
+        neighborhoods: ['Quela', 'Quela Centro']
       }
     }
   },
@@ -632,164 +600,177 @@ export const locationData: LocationData = {
     municipalities: {
       luena: {
         name: 'Luena',
-        neighborhoods: ['Centro', 'Luau', 'Camanongue', 'Lucusse']
-      },
-      luau: {
-        name: 'Luau',
-        neighborhoods: ['Luau', 'Luena', 'Camanongue', 'Lucusse']
-      },
-      camanongue: {
-        name: 'Camanongue',
-        neighborhoods: ['Camanongue', 'Luau', 'Luena', 'Lucusse']
-      },
-      lucusse: {
-        name: 'Lucusse',
-        neighborhoods: ['Lucusse', 'Camanongue', 'Luau', 'Luacano']
-      },
-      luacano: {
-        name: 'Luacano',
-        neighborhoods: ['Luacano', 'Lucusse', 'Camanongue', 'Bundas']
-      },
-      bundas: {
-        name: 'Bundas',
-        neighborhoods: ['Bundas', 'Luacano', 'Lucusse', 'Léua']
-      },
-      leua: {
-        name: 'Léua',
-        neighborhoods: ['Léua', 'Bundas', 'Luacano', 'Cameia']
-      },
-      cameia: {
-        name: 'Cameia',
-        neighborhoods: ['Cameia', 'Léua', 'Bundas', 'Alto Zambeze']
+        neighborhoods: ['Luena Centro', 'Bairro Operário', 'Bairro Popular']
       },
       alto_zambeze: {
         name: 'Alto Zambeze',
-        neighborhoods: ['Alto Zambeze', 'Cameia', 'Léua', 'Luena']
-      }
-    }
-  },
-  moxico_leste: {
-    name: 'Moxico Leste',
-    municipalities: {
-      cassai_zambeze: {
-        name: 'Cassai Zambeze',
-        neighborhoods: ['Cassai Zambeze', 'Cazombo', 'Mucusso', 'Rivungo']
+        neighborhoods: ['Alto Zambeze', 'Alto Zambeze Centro']
       },
-      cazombo: {
-        name: 'Cazombo',
-        neighborhoods: ['Cazombo', 'Cassai Zambeze', 'Mucusso', 'Rivungo']
+      bundas: {
+        name: 'Bundas',
+        neighborhoods: ['Bundas', 'Bundas Centro']
       },
-      mucusso: {
-        name: 'Mucusso',
-        neighborhoods: ['Mucusso', 'Cazombo', 'Cassai Zambeze', 'Rivungo']
+      camanongue: {
+        name: 'Camanongue',
+        neighborhoods: ['Camanongue', 'Camanongue Centro']
       },
-      rivungo: {
-        name: 'Rivungo',
-        neighborhoods: ['Rivungo', 'Mucusso', 'Cazombo', 'Cassai Zambeze']
+      cameia: {
+        name: 'Cameia',
+        neighborhoods: ['Cameia', 'Cameia Centro']
+      },
+      leua: {
+        name: 'Leua',
+        neighborhoods: ['Leua', 'Leua Centro']
+      },
+      luacano: {
+        name: 'Luacano',
+        neighborhoods: ['Luacano', 'Luacano Centro']
+      },
+      luchazes: {
+        name: 'Luchazes',
+        neighborhoods: ['Luchazes', 'Luchazes Centro']
+      },
+      moxico: {
+        name: 'Moxico',
+        neighborhoods: ['Moxico', 'Moxico Centro']
       }
     }
   },
   namibe: {
     name: 'Namibe',
     municipalities: {
-      namibe: {
-        name: 'Namibe',
-        neighborhoods: ['Centro', 'Tombua', 'Lucira', 'Bibala']
-      },
-      tombua: {
-        name: 'Tombua',
-        neighborhoods: ['Tombua', 'Namibe', 'Lucira', 'Bibala']
-      },
-      lucira: {
-        name: 'Lucira',
-        neighborhoods: ['Lucira', 'Tombua', 'Namibe', 'Bibala']
+      mocamedes: {
+        name: 'Moçâmedes',
+        neighborhoods: ['Moçâmedes Centro', 'Bairro Operário', 'Bairro Popular']
       },
       bibala: {
         name: 'Bibala',
-        neighborhoods: ['Bibala', 'Lucira', 'Tombua', 'Camucuio']
+        neighborhoods: ['Bibala', 'Bibala Centro']
       },
       camucuio: {
         name: 'Camucuio',
-        neighborhoods: ['Camucuio', 'Bibala', 'Lucira', 'Namibe']
+        neighborhoods: ['Camucuio', 'Camucuio Centro']
+      },
+      tombe: {
+        name: 'Tombe',
+        neighborhoods: ['Tombe', 'Tombe Centro']
+      },
+      virei: {
+        name: 'Virei',
+        neighborhoods: ['Virei', 'Virei Centro']
       }
     }
   },
-  cuando_cubango: {
-    name: 'Cuando Cubango',
+  uige: {
+    name: 'Uíge',
     municipalities: {
-      menongue: {
-        name: 'Menongue',
-        neighborhoods: ['Centro', 'Cuito Cuanavale', 'Dirico', 'Mavinga']
+      uige: {
+        name: 'Uíge',
+        neighborhoods: ['Uíge Centro', 'Bairro Operário', 'Bairro Popular']
       },
-      cuito_cuanavale: {
-        name: 'Cuito Cuanavale',
-        neighborhoods: ['Cuito Cuanavale', 'Menongue', 'Dirico', 'Mavinga']
+      alto_cauale: {
+        name: 'Alto Cauale',
+        neighborhoods: ['Alto Cauale', 'Alto Cauale Centro']
       },
-      dirico: {
-        name: 'Dirico',
-        neighborhoods: ['Dirico', 'Cuito Cuanavale', 'Menongue', 'Mavinga']
+      ambuila: {
+        name: 'Ambuila',
+        neighborhoods: ['Ambuila', 'Ambuila Centro']
       },
-      mavinga: {
-        name: 'Mavinga',
-        neighborhoods: ['Mavinga', 'Dirico', 'Cuito Cuanavale', 'Rivungo']
+      bembe: {
+        name: 'Bembe',
+        neighborhoods: ['Bembe', 'Bembe Centro']
       },
-      rivungo: {
-        name: 'Rivungo',
-        neighborhoods: ['Rivungo', 'Mavinga', 'Dirico', 'Nancova']
+      buengas: {
+        name: 'Buengas',
+        neighborhoods: ['Buengas', 'Buengas Centro']
       },
-      nancova: {
-        name: 'Nancova',
-        neighborhoods: ['Nancova', 'Rivungo', 'Mavinga', 'Menongue']
-      }
-    }
-  },
-  cuando: {
-    name: 'Cuando',
-    municipalities: {
-      calai: {
-        name: 'Calai',
-        neighborhoods: ['Calai', 'Cuangar', 'Longa', 'Mucusso']
+      bungo: {
+        name: 'Bungo',
+        neighborhoods: ['Bungo', 'Bungo Centro']
       },
-      cuangar: {
-        name: 'Cuangar',
-        neighborhoods: ['Cuangar', 'Calai', 'Longa', 'Mucusso']
+      damba: {
+        name: 'Damba',
+        neighborhoods: ['Damba', 'Damba Centro']
       },
-      longa: {
-        name: 'Longa',
-        neighborhoods: ['Longa', 'Cuangar', 'Calai', 'Mucusso']
+      milunga: {
+        name: 'Milunga',
+        neighborhoods: ['Milunga', 'Milunga Centro']
       },
-      mucusso: {
-        name: 'Mucusso',
-        neighborhoods: ['Mucusso', 'Longa', 'Cuangar', 'Calai']
+      mucaba: {
+        name: 'Mucaba',
+        neighborhoods: ['Mucaba', 'Mucaba Centro']
+      },
+      negage: {
+        name: 'Negage',
+        neighborhoods: ['Negage', 'Negage Centro']
+      },
+      puri: {
+        name: 'Puri',
+        neighborhoods: ['Puri', 'Puri Centro']
+      },
+      quitexe: {
+        name: 'Quitexe',
+        neighborhoods: ['Quitexe', 'Quitexe Centro']
+      },
+      sanza_pombo: {
+        name: 'Sanza Pombo',
+        neighborhoods: ['Sanza Pombo', 'Sanza Pombo Centro']
+      },
+      songo: {
+        name: 'Songo',
+        neighborhoods: ['Songo', 'Songo Centro']
+      },
+      zombo: {
+        name: 'Zombo',
+        neighborhoods: ['Zombo', 'Zombo Centro']
       }
     }
   },
   zaire: {
     name: 'Zaire',
     municipalities: {
-      mbanza_congo: {
-        name: 'Mbanza Congo',
-        neighborhoods: ['Centro', 'Soyo', 'Nzeto', 'Tomboco']
-      },
-      soyo: {
-        name: 'Soyo',
-        neighborhoods: ['Soyo', 'Mbanza Congo', 'Nzeto', 'Tomboco']
-      },
-      nzeto: {
-        name: 'Nzeto',
-        neighborhoods: ['Nzeto', 'Soyo', 'Mbanza Congo', 'Cuimba']
+      mbanza_kongo: {
+        name: 'Mbanza Kongo',
+        neighborhoods: ['Mbanza Kongo Centro', 'Bairro Operário', 'Bairro Popular']
       },
       cuimba: {
         name: 'Cuimba',
-        neighborhoods: ['Cuimba', 'Nzeto', 'Soyo', 'Tomboco']
-      },
-      tomboco: {
-        name: 'Tomboco',
-        neighborhoods: ['Tomboco', 'Cuimba', 'Nzeto', 'Nóqui']
+        neighborhoods: ['Cuimba', 'Cuimba Centro']
       },
       noqui: {
         name: 'Nóqui',
-        neighborhoods: ['Nóqui', 'Tomboco', 'Cuimba', 'Mbanza Congo']
+        neighborhoods: ['Nóqui', 'Nóqui Centro']
+      },
+      nsoso: {
+        name: 'Nsoso',
+        neighborhoods: ['Nsoso', 'Nsoso Centro']
+      },
+      soyo: {
+        name: 'Soyo',
+        neighborhoods: ['Soyo', 'Soyo Centro']
+      },
+      tomboco: {
+        name: 'Tomboco',
+        neighborhoods: ['Tomboco', 'Tomboco Centro']
+      }
+    }
+  },
+  // Novas províncias criadas em 2024
+  cuando: {
+    name: 'Cuando',
+    municipalities: {
+      cuando: {
+        name: 'Cuando',
+        neighborhoods: ['Cuando Centro', 'Bairro Operário', 'Bairro Popular']
+      }
+    }
+  },
+  cubango: {
+    name: 'Cubango',
+    municipalities: {
+      cubango: {
+        name: 'Cubango',
+        neighborhoods: ['Cubango Centro', 'Bairro Operário', 'Bairro Popular']
       }
     }
   }
