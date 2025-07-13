@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle, Facebook, Instagram, ExternalLink } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle, ExternalLink } from "lucide-react";
+import { FaWhatsapp, FaFacebook, FaInstagram } from "react-icons/fa";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
@@ -182,10 +182,9 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     href={user.facebook_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-3 rounded-lg transition-colors"
                   >
-                    <Facebook className="h-4 w-4" />
-                    Facebook
+                    <FaFacebook className="h-5 w-5" />
                   </a>
                 )}
                 {user.instagram_url && (
@@ -193,10 +192,9 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     href={user.instagram_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center justify-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-700 px-4 py-3 rounded-lg transition-colors"
                   >
-                    <Instagram className="h-4 w-4" />
-                    Instagram
+                    <FaInstagram className="h-5 w-5" />
                   </a>
                 )}
                 {user.whatsapp_url && (
@@ -204,10 +202,9 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     href={user.whatsapp_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-3 rounded-lg transition-colors"
                   >
-                    <FaWhatsapp className="h-4 w-4" />
-                    WhatsApp
+                    <FaWhatsapp className="h-5 w-5" />
                   </a>
                 )}
               </div>

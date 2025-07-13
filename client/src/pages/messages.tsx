@@ -165,6 +165,25 @@ export default function MessagesPage() {
     enabled: !!user,
   });
 
+  // Get selected conversation data with participant information
+  const selectedConversationData = conversations?.find(c => c.id === selectedConversation);
+  
+  // Fetch complete participant data for profile images
+  const participantId = selectedConversationData?.participant1_id === user?.id 
+    ? selectedConversationData?.participant2_id 
+    : selectedConversationData?.participant1_id;
+  
+  const { data: participantProfile } = useQuery({
+    queryKey: ['/api/users', participantId],
+    queryFn: async () => {
+      if (!participantId) return null;
+      const response = await fetch(`/api/users/${participantId}`);
+      if (!response.ok) throw new Error('Failed to fetch participant');
+      return response.json();
+    },
+    enabled: !!participantId,
+  });
+
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async ({ conversationId, content }: { conversationId: string; content: string }) => {
@@ -366,9 +385,7 @@ export default function MessagesPage() {
     participant.name.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
-  const selectedConversationData = conversations?.find(
-    (conv: Conversation) => conv.id === selectedConversation
-  );
+
 
   // Handle error state with better mobile UX
   if (hasError) {
@@ -602,7 +619,6 @@ export default function MessagesPage() {
                     {messages.map((message: Message) => {
                       try {
                         const isCurrentUser = message.sender_id === user?.id;
-                        const senderProfile = isCurrentUser ? user : selectedConversationData;
                         
                         return (
                           <div
@@ -611,11 +627,28 @@ export default function MessagesPage() {
                           >
                             {/* Avatar for received messages (left side) */}
                             {!isCurrentUser && (
-                              <Avatar className="h-8 w-8 mb-1">
-                                <AvatarImage src={senderProfile?.participant_profile_image || senderProfile?.profile_url} />
+                              <Avatar 
+                                className="h-8 w-8 mb-1 cursor-pointer hover:scale-110 transition-transform"
+                                onClick={() => {
+                                  // Create image modal for profile viewing
+                                  if (participantProfile?.profile_url) {
+                                    const modal = document.createElement('div');
+                                    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                                    modal.innerHTML = `
+                                      <div class="max-w-md max-h-[80vh] relative">
+                                        <img src="${participantProfile.profile_url}" alt="Perfil" class="w-full h-auto rounded-lg" />
+                                        <button class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">×</button>
+                                      </div>
+                                    `;
+                                    document.body.appendChild(modal);
+                                    modal.onclick = () => document.body.removeChild(modal);
+                                  }
+                                }}
+                              >
+                                <AvatarImage src={participantProfile?.profile_url || selectedConversationData?.participant_profile_image} />
                                 <AvatarFallback className="text-xs">
-                                  {senderProfile?.participant_name?.[0]?.toUpperCase() || 
-                                   senderProfile?.name?.[0]?.toUpperCase() || 'U'}
+                                  {participantProfile?.name?.[0]?.toUpperCase() || 
+                                   selectedConversationData?.participant_name?.[0]?.toUpperCase() || 'U'}
                                 </AvatarFallback>
                               </Avatar>
                             )}
@@ -635,7 +668,24 @@ export default function MessagesPage() {
                             
                             {/* Avatar for sent messages (right side) */}
                             {isCurrentUser && (
-                              <Avatar className="h-8 w-8 mb-1">
+                              <Avatar 
+                                className="h-8 w-8 mb-1 cursor-pointer hover:scale-110 transition-transform"
+                                onClick={() => {
+                                  // Create image modal for profile viewing
+                                  if (user?.profile_url) {
+                                    const modal = document.createElement('div');
+                                    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                                    modal.innerHTML = `
+                                      <div class="max-w-md max-h-[80vh] relative">
+                                        <img src="${user.profile_url}" alt="Perfil" class="w-full h-auto rounded-lg" />
+                                        <button class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">×</button>
+                                      </div>
+                                    `;
+                                    document.body.appendChild(modal);
+                                    modal.onclick = () => document.body.removeChild(modal);
+                                  }
+                                }}
+                              >
                                 <AvatarImage src={user?.profile_url || user?.profile_image} />
                                 <AvatarFallback className="text-xs">
                                   {user?.name?.[0]?.toUpperCase() || 

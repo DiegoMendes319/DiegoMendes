@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Star, Calendar, Eye, MessageCircle, Facebook, Instagram, Phone } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { MapPin, Star, Calendar, Eye, MessageCircle } from "lucide-react";
+import { FaWhatsapp, FaFacebook, FaInstagram } from "react-icons/fa";
 import RatingStars from "./rating-stars";
 import FullSizeImageModal from "./full-size-image-modal";
 import { useAuth } from "@/hooks/use-auth";
@@ -149,7 +149,7 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
                 className="text-blue-600 hover:text-blue-800 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Facebook className="h-4 w-4" />
+                <FaFacebook className="h-4 w-4" />
               </a>
             )}
             {user.instagram_url && (
@@ -160,7 +160,7 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
                 className="text-pink-600 hover:text-pink-800 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Instagram className="h-4 w-4" />
+                <FaInstagram className="h-4 w-4" />
               </a>
             )}
             {user.whatsapp_url && (
