@@ -491,7 +491,7 @@ export default function MessagesPage() {
         )}
       </div>
 
-      <div className={`${isMobile ? 'h-[calc(100vh-140px)]' : 'flex h-[calc(100vh-160px)]'} bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700`}>
+      <div className={`${isMobile ? 'h-[calc(100vh-180px)]' : 'flex h-[calc(100vh-200px)]'} bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700`}>
         {/* Conversations List - Responsive */}
         <div className={`${
           isMobile 
@@ -713,8 +713,8 @@ export default function MessagesPage() {
               
               {/* WhatsApp-style Message Input */}
               <div className="p-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-3 bg-gray-50 dark:bg-gray-800 rounded-full px-4 py-2 shadow-sm">
-                  <Input
+                <div className="flex items-end space-x-3 bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 py-2 shadow-sm">
+                  <Textarea
                     placeholder="Escreva uma mensagem..."
                     value={messageContent}
                     onChange={(e) => {
@@ -724,15 +724,44 @@ export default function MessagesPage() {
                         console.error('Error in message input:', error);
                       }
                     }}
-                    className="flex-1 border-none bg-transparent focus:ring-0 focus:outline-none shadow-none text-sm"
+                    className="flex-1 border-none bg-transparent focus:ring-0 focus:outline-none shadow-none text-sm resize-none min-h-[20px] max-h-24 overflow-y-auto leading-tight"
+                    rows={1}
+                    style={{ 
+                      wordWrap: 'break-word', 
+                      whiteSpace: 'pre-wrap',
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
+                      lineHeight: '1.2'
+                    }}
                     onKeyDown={(e) => {
                       try {
+                        if (e.key === 'Enter' && e.shiftKey) {
+                          // Shift+Enter creates new line - allow default behavior
+                          return;
+                        }
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
                           handleSendMessage();
                         }
                       } catch (error) {
                         console.error('Error in keydown handler:', error);
+                      }
+                    }}
+                    onInput={(e) => {
+                      // Auto-resize textarea based on content
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      const newHeight = Math.min(target.scrollHeight, 96);
+                      target.style.height = newHeight + 'px';
+                      
+                      // Handle automatic line breaks for long text
+                      const maxCharsPerLine = 50; // Adjust based on mobile screen
+                      const lines = target.value.split('\n');
+                      const hasLongLines = lines.some(line => line.length > maxCharsPerLine);
+                      
+                      if (hasLongLines) {
+                        target.style.overflowWrap = 'break-word';
+                        target.style.wordBreak = 'break-word';
                       }
                     }}
                   />
@@ -750,7 +779,7 @@ export default function MessagesPage() {
                       }
                     }}
                     disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                    className="h-8 w-8 p-0 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md"
+                    className="h-8 w-8 p-0 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md flex-shrink-0"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
