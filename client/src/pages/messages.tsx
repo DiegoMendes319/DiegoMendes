@@ -601,14 +601,28 @@ export default function MessagesPage() {
                   <div className="space-y-4">
                     {messages.map((message: Message) => {
                       try {
+                        const isCurrentUser = message.sender_id === user?.id;
+                        const senderProfile = isCurrentUser ? user : selectedConversationData;
+                        
                         return (
                           <div
                             key={message.id}
-                            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                            className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} items-end gap-2`}
                           >
+                            {/* Avatar for received messages (left side) */}
+                            {!isCurrentUser && (
+                              <Avatar className="h-8 w-8 mb-1">
+                                <AvatarImage src={senderProfile?.participant_profile_image || senderProfile?.profile_url} />
+                                <AvatarFallback className="text-xs">
+                                  {senderProfile?.participant_name?.[0]?.toUpperCase() || 
+                                   senderProfile?.name?.[0]?.toUpperCase() || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            
                             <div
                               className={`max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg message-bubble ${
-                                message.sender_id === user?.id ? 'sent' : 'received'
+                                isCurrentUser ? 'sent' : 'received'
                               }`}
                             >
                               <div className="whitespace-pre-wrap break-words">
@@ -618,6 +632,17 @@ export default function MessagesPage() {
                                 {formatMessageTime(message.created_at)}
                               </div>
                             </div>
+                            
+                            {/* Avatar for sent messages (right side) */}
+                            {isCurrentUser && (
+                              <Avatar className="h-8 w-8 mb-1">
+                                <AvatarImage src={user?.profile_url || user?.profile_image} />
+                                <AvatarFallback className="text-xs">
+                                  {user?.name?.[0]?.toUpperCase() || 
+                                   user?.first_name?.[0]?.toUpperCase() || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
                           </div>
                         );
                       } catch (error) {

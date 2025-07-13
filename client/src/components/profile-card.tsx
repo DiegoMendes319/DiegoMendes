@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Star, Calendar, Eye, MessageCircle, Facebook, Instagram, Phone } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import RatingStars from "./rating-stars";
 import FullSizeImageModal from "./full-size-image-modal";
 import { useAuth } from "@/hooks/use-auth";
@@ -170,7 +171,7 @@ export default function ProfileCard({ user, onClick }: ProfileCardProps) {
                 className="text-green-600 hover:text-green-800 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Phone className="h-4 w-4" />
+                <FaWhatsapp className="h-4 w-4" />
               </a>
             )}
           </div>

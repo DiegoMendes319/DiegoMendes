@@ -197,16 +197,6 @@ export default function Profile() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check file size (max 50MB)
-    if (file.size > 50 * 1024 * 1024) {
-      toast({
-        title: "Ficheiro muito grande",
-        description: "A imagem deve ter no máximo 50MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Check file type
     if (!file.type.startsWith('image/')) {
       toast({
@@ -217,42 +207,43 @@ export default function Profile() {
       return;
     }
 
-    // Compress and convert image
+    // Process image - accept any size and optimize
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
     
     img.onload = () => {
-      // Calculate new dimensions (max 800x800)
-      const maxSize = 800;
-      let { width, height } = img;
+      // Set canvas size to create perfect square with good resolution
+      const size = 400; // Fixed size for profile pictures
+      canvas.width = size;
+      canvas.height = size;
       
+      // Calculate crop dimensions for center crop
+      const { width, height } = img;
+      let sourceX = 0;
+      let sourceY = 0;
+      let sourceWidth = width;
+      let sourceHeight = height;
+      
+      // Center crop to make it square
       if (width > height) {
-        if (width > maxSize) {
-          height = (height * maxSize) / width;
-          width = maxSize;
-        }
-      } else {
-        if (height > maxSize) {
-          width = (width * maxSize) / height;
-          height = maxSize;
-        }
+        sourceWidth = height;
+        sourceX = (width - height) / 2;
+      } else if (height > width) {
+        sourceHeight = width;
+        sourceY = (height - width) / 2;
       }
       
-      // Set canvas dimensions
-      canvas.width = width;
-      canvas.height = height;
+      // Draw cropped and resized image
+      ctx?.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, size, size);
       
-      // Draw and compress image
-      ctx?.drawImage(img, 0, 0, width, height);
-      
-      // Convert to base64 with compression
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      // Convert to base64 with good quality
+      const optimizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
       
       // Update form data
       setFormData(prev => ({
         ...prev,
-        profile_url: compressedBase64
+        profile_url: optimizedBase64
       }));
 
       toast({

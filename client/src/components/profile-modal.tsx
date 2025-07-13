@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Star, Calendar, FileText, Phone, User as UserIcon, MessageCircle, Facebook, Instagram, ExternalLink } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import RatingStars from "./rating-stars";
 import ReviewsDisplay from "./reviews-display";
 import ReviewModal from "./review-modal";
@@ -205,7 +206,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg transition-colors"
                   >
-                    <Phone className="h-4 w-4" />
+                    <FaWhatsapp className="h-4 w-4" />
                     WhatsApp
                   </a>
                 )}
@@ -238,7 +239,7 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
           </div>
 
           {/* Action Buttons - Always visible at bottom */}
-          <div className="flex justify-center gap-4 pt-4 border-t">
+          <div className="flex justify-center pt-4 border-t">
             <Button 
               onClick={onContact}
               className="bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90 text-white px-6 py-3 text-lg font-semibold rounded-lg"
@@ -247,17 +248,6 @@ export default function ProfileModal({ user, isOpen, onClose, onContact }: Profi
               <Phone className="h-5 w-5 mr-2" />
               Entrar em Contato
             </Button>
-            
-            {currentUser && currentUser.id !== user.id && (
-              <Button 
-                onClick={handleSendMessage}
-                disabled={startConversationMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg font-semibold rounded-lg"
-              >
-                <MessageCircle className="h-5 w-5 mr-2" />
-                {startConversationMutation.isPending ? 'A processar...' : 'Enviar Mensagem'}
-              </Button>
-            )}
           </div>
         </div>
         
