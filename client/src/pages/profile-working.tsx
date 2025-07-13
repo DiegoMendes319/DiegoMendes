@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, MapPin, Phone, Mail, Calendar, Star, Edit, Upload, Camera, LogOut, Key, Settings, User as UserIcon } from 'lucide-react';
 import { insertUserSchema, type InsertUser } from '@shared/schema';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/lib/auth';
 import { useLocation } from 'wouter';
 import { locationData } from '@/lib/location-data';
 import { serviceOptions } from '@/lib/service-options';
