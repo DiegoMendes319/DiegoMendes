@@ -1,763 +1,711 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { User, MapPin, Phone, Mail, Calendar, Star, Edit, Upload, Camera, LogOut, Key, Settings, User as UserIcon } from 'lucide-react';
-import { insertUserSchema, type InsertUser } from '@shared/schema';
-import { useAuth } from '@/hooks/use-auth';
-import { useLocation } from 'wouter';
-import { locationData } from '@/lib/location-data';
-import { serviceOptions } from '@/lib/service-options';
-import { apiRequest } from '@/lib/queryClient';
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import LocationSelector from "@/components/location-selector";
+import { 
+  User, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Calendar, 
+  Star, 
+  Edit, 
+  LogOut,
+  Home,
+  Briefcase,
+  Clock,
+  DollarSign,
+  Save,
+  Trash2,
+  Camera,
+  Lock,
+  MessageCircle
+} from "lucide-react";
 
-interface ProfileData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  name: string;
-  email: string;
-  phone: string;
-  date_of_birth: string;
-  age: number;
-  province: string;
-  municipality: string;
-  neighborhood: string;
-  address_complement?: string;
-  services: string[];
-  contract_type: string;
-  availability: string;
-  about_me?: string;
-  profile_url?: string;
-  facebook_url?: string;
-  instagram_url?: string;
-  whatsapp_url?: string;
-  average_rating: number;
-  total_reviews: number;
-  created_at: string;
-}
+import { serviceOptions } from "@/lib/service-options";
 
-const profileSchema = insertUserSchema.extend({
-  date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato inválido (use YYYY-MM-DD)'),
-  facebook_url: z.string().optional(),
-  instagram_url: z.string().optional(),
-  whatsapp_url: z.string().optional(),
-});
+const contractTypes = [
+  { id: "full-time", name: "Tempo integral" },
+  { id: "part-time", name: "Tempo parcial" },
+  { id: "freelance", name: "Freelancer" },
+  { id: "contract", name: "Contrato" },
+  { id: "temporary", name: "Temporário" }
+];
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(6, 'Palavra-passe deve ter pelo menos 6 caracteres'),
-  newPassword: z.string().min(6, 'Palavra-passe deve ter pelo menos 6 caracteres'),
-  confirmPassword: z.string().min(6, 'Palavra-passe deve ter pelo menos 6 caracteres'),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Palavras-passe não coincidem',
-  path: ['confirmPassword'],
-});
-
-export default function ProfilePage() {
+export default function Profile() {
+  const [, setLocation] = useLocation();
+  const { user, loading, logout, refreshUser } = useAuth();
+  const [editMode, setEditMode] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [, navigate] = useLocation();
-  const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('personal');
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone: '',
-      date_of_birth: '',
-      province: '',
-      municipality: '',
-      neighborhood: '',
-      address_complement: '',
-      services: [],
-      contract_type: '',
-      availability: '',
-      about_me: '',
-      profile_url: '',
-      facebook_url: '',
-      instagram_url: '',
-      whatsapp_url: '',
-    },
+  // Form state for editing
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    date_of_birth: '',
+    province: '',
+    municipality: '',
+    neighborhood: '',
+    address_complement: '',
+    contract_type: '',
+    services: [] as string[],
+    availability: '',
+    about_me: '',
+    profile_url: '',
+    facebook_url: '',
+    instagram_url: '',
+    whatsapp_url: ''
   });
 
-  const passwordForm = useForm<z.infer<typeof passwordSchema>>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation("/auth");
+      return;
+    }
+  }, [user, loading, setLocation]);
+
+  // Fetch user profile data
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['/api/users', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const response = await apiRequest(`/api/users/${user.id}`, 'GET');
+      return response.json();
     },
+    enabled: !!user?.id,
   });
 
-  const { data: profile, isLoading } = useQuery<ProfileData>({
-    queryKey: ['/api/auth/me'],
-    refetchOnWindowFocus: false,
-  });
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data: Partial<ProfileData>) => {
-      return apiRequest('/api/users/' + profile?.id, 'PUT', data);
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Perfil atualizado',
-        description: 'As suas informações foram atualizadas com sucesso.',
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Erro ao atualizar perfil',
-        description: error.message || 'Ocorreu um erro ao atualizar o perfil.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const changePasswordMutation = useMutation({
-    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
-      return apiRequest('/api/auth/change-password', 'POST', data);
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Palavra-passe alterada',
-        description: 'A sua palavra-passe foi alterada com sucesso.',
-      });
-      passwordForm.reset();
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Erro ao alterar palavra-passe',
-        description: error.message || 'Ocorreu um erro ao alterar a palavra-passe.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const uploadImageMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const reader = new FileReader();
-      return new Promise<string>((resolve) => {
-        reader.onload = (e) => {
-          const result = e.target?.result as string;
-          resolve(result);
-        };
-        reader.readAsDataURL(file);
-      });
-    },
-    onSuccess: (imageUrl: string) => {
-      form.setValue('profile_url', imageUrl);
-      setImagePreview(imageUrl);
-    },
-  });
-
-  // Load profile data into form when fetched
+  // Update form data when profile loads
   useEffect(() => {
     if (profile) {
-      const formData = {
-        ...profile,
-        date_of_birth: profile.date_of_birth ? new Date(profile.date_of_birth).toISOString().split('T')[0] : '',
-      };
-      form.reset(formData);
-      setImagePreview(profile.profile_url || null);
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        date_of_birth: profile.date_of_birth ? profile.date_of_birth.split('T')[0] : '',
+        province: profile.province || '',
+        municipality: profile.municipality || '',
+        neighborhood: profile.neighborhood || '',
+        address_complement: profile.address_complement || '',
+        contract_type: profile.contract_type || '',
+        services: profile.services || [],
+        availability: profile.availability || '',
+        about_me: profile.about_me || '',
+        profile_url: profile.profile_url || '',
+        facebook_url: profile.facebook_url || '',
+        instagram_url: profile.instagram_url || '',
+        whatsapp_url: profile.whatsapp_url || ''
+      });
     }
-  }, [profile, form]);
+  }, [profile]);
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest(`/api/users/${user?.id}`, 'PUT', data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao actualizar perfil');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Perfil actualizado!",
+        description: "As suas informações foram guardadas com sucesso.",
+      });
+      setEditMode(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/users', user?.id] });
+      refreshUser();
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao actualizar",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest(`/api/users/${user?.id}`, 'DELETE');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao eliminar conta');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Conta eliminada",
+        description: "A sua conta foi eliminada com sucesso.",
+      });
+      logout();
+      setLocation("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao eliminar conta",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logout realizado",
+        description: "Até à próxima!",
+      });
+      setLocation("/");
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const handleSaveProfile = () => {
+    updateProfileMutation.mutate(formData);
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccountMutation.mutate();
+    setDeleteDialogOpen(false);
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: 'Arquivo muito grande',
-          description: 'A imagem deve ter no máximo 5MB.',
-          variant: 'destructive',
-        });
-        return;
+    if (!file) return;
+
+    // Check file size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast({
+        title: "Ficheiro muito grande",
+        description: "A imagem deve ter no máximo 50MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Tipo de ficheiro inválido",
+        description: "Por favor seleccione uma imagem válida",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Compress and convert image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions (max 800x800)
+      const maxSize = 800;
+      let { width, height } = img;
+      
+      if (width > height) {
+        if (width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        }
+      } else {
+        if (height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
       }
       
-      setProfileImageFile(file);
-      uploadImageMutation.mutate(file);
-    }
-  };
+      // Set canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress image
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // Convert to base64 with compression
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      
+      // Update form data
+      setFormData(prev => ({
+        ...prev,
+        profile_url: compressedBase64
+      }));
 
-  const onSubmit = async (data: z.infer<typeof profileSchema>) => {
-    try {
-      await updateProfileMutation.mutateAsync(data);
-    } catch (error) {
-      // Error is handled by mutation
-    }
-  };
-
-  const onPasswordSubmit = async (data: z.infer<typeof passwordSchema>) => {
-    try {
-      await changePasswordMutation.mutateAsync({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-    } catch (error) {
-      // Error is handled by mutation
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
       toast({
-        title: 'Erro ao sair',
-        description: 'Ocorreu um erro ao fazer logout.',
-        variant: 'destructive',
+        title: "Imagem carregada",
+        description: "A imagem foi optimizada e adicionada ao perfil. Clique em 'Guardar' para actualizar.",
       });
-    }
+    };
+    
+    img.onerror = () => {
+      toast({
+        title: "Erro ao carregar imagem",
+        description: "Não foi possível processar a imagem. Tente outra.",
+        variant: "destructive",
+      });
+    };
+    
+    img.src = URL.createObjectURL(file);
   };
 
-  if (isLoading) {
+  const handleServiceToggle = (service: string) => {
+    setFormData(prev => ({
+      ...prev,
+      services: prev.services.includes(service)
+        ? prev.services.filter(s => s !== service)
+        : [...prev.services, service]
+    }));
+  };
+
+  const handleLocationChange = (location: { province?: string; municipality?: string; neighborhood?: string }) => {
+    setFormData(prev => ({ ...prev, ...location }));
+  };
+
+  if (loading || profileLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--angola-red)] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">A carregar perfil...</p>
         </div>
       </div>
     );
   }
 
-  if (!profile) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Perfil não encontrado</CardTitle>
-            <CardDescription>Não foi possível carregar os dados do perfil.</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+  if (!user) {
+    return null;
   }
 
-  const selectedProvince = form.watch('province');
-  const selectedMunicipality = form.watch('municipality');
-  
-  const municipalities = selectedProvince ? locationData[selectedProvince] || [] : [];
-  const neighborhoods = selectedMunicipality && selectedProvince ? 
-    locationData[selectedProvince]?.find(m => m.name === selectedMunicipality)?.neighborhoods || [] : [];
+  const userInitials = profile 
+    ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`
+    : user.email?.[0]?.toUpperCase() || 'U';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Meu Perfil</h1>
-        <p className="text-gray-600 dark:text-gray-300">Gerencie as suas informações pessoais e profissionais</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => setLocation("/")}
+            className="text-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Página Inicial
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleSignOut}
+            className="text-red-600 border-red-200 hover:bg-red-50"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+        </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="personal" className="flex items-center gap-2">
-            <UserIcon className="h-4 w-4" />
-            Pessoal
-          </TabsTrigger>
-          <TabsTrigger value="professional" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Profissional
-          </TabsTrigger>
-          <TabsTrigger value="social" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            Social
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Key className="h-4 w-4" />
-            Configurações
-          </TabsTrigger>
-        </TabsList>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <TabsContent value="personal">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informações Pessoais</CardTitle>
-                  <CardDescription>Atualize os seus dados pessoais</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Profile Image */}
-                  <div className="flex items-center gap-6">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src={imagePreview || profile.profile_url || ''} alt="Foto de perfil" />
-                      <AvatarFallback className="text-2xl bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300">
-                        {profile.first_name[0]}{profile.last_name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{profile.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                        {profile.average_rating > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            {profile.average_rating.toFixed(1)} ({profile.total_reviews} avaliações)
-                          </span>
-                        )}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => document.getElementById('profile-image')?.click()}
-                          disabled={uploadImageMutation.isPending}
-                        >
-                          <Camera className="h-4 w-4 mr-2" />
-                          {uploadImageMutation.isPending ? 'Enviando...' : 'Alterar Foto'}
-                        </Button>
-                        <input
-                          id="profile-image"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageUpload}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Basic Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="first_name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nome *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Seu nome" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+        {/* Profile Header */}
+        <Card className="mb-6 shadow-lg">
+          <CardHeader className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <div className="relative flex-shrink-0 self-center sm:self-auto">
+                <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+                  {(formData.profile_url || profile?.profile_url) ? (
+                    <img 
+                      src={formData.profile_url || profile?.profile_url} 
+                      alt="Foto de perfil" 
+                      className="w-full h-full object-cover rounded-full"
                     />
-                    <FormField
-                      control={form.control}
-                      name="last_name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Sobrenome *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Seu sobrenome" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  ) : (
+                    <AvatarFallback className="text-2xl sm:text-3xl bg-[var(--angola-red)] text-white">
+                      {userInitials}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                {editMode && (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="profile-image-upload"
+                      className="hidden"
+                      onChange={handleImageUpload}
                     />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="seu@email.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Telefone *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="900 000 000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="date_of_birth"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Data de Nascimento *</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Location */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
-                      Localização
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="province"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Província *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a província" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {Object.keys(locationData).map((province) => (
-                                  <SelectItem key={province} value={province}>
-                                    {province}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="municipality"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Município *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione o município" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {municipalities.map((municipality) => (
-                                  <SelectItem key={municipality.name} value={municipality.name}>
-                                    {municipality.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="neighborhood"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Bairro *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione o bairro" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {neighborhoods.map((neighborhood) => (
-                                  <SelectItem key={neighborhood} value={neighborhood}>
-                                    {neighborhood}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="address_complement"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Complemento do Endereço</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ex: Rua das Flores, Casa 123" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="professional">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informações Profissionais</CardTitle>
-                  <CardDescription>Configure os serviços que oferece</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="services"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Serviços Oferecidos *</FormLabel>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                          {serviceOptions.map((service) => (
-                            <label key={service} className="flex items-center space-x-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={field.value?.includes(service) || false}
-                                onChange={(e) => {
-                                  const currentServices = field.value || [];
-                                  if (e.target.checked) {
-                                    field.onChange([...currentServices, service]);
-                                  } else {
-                                    field.onChange(currentServices.filter(s => s !== service));
-                                  }
-                                }}
-                                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                              />
-                              <span className="text-sm">{service}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="contract_type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo de Contrato *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione o tipo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="diarista">Diarista</SelectItem>
-                              <SelectItem value="meio_periodo">Meio Período</SelectItem>
-                              <SelectItem value="tempo_integral">Tempo Integral</SelectItem>
-                              <SelectItem value="permanente">Permanente</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="availability"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Disponibilidade *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ex: Segunda a Sexta, 8h às 17h" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="about_me"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sobre Mim</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Conte-nos sobre a sua experiência e competências..."
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="social">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Redes Sociais</CardTitle>
-                  <CardDescription>Adicione os links das suas redes sociais</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="facebook_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Facebook</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://facebook.com/seuperfil" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="instagram_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Instagram</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://instagram.com/seuperfil" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="whatsapp_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>WhatsApp</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://wa.me/244900000000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="settings">
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Alterar Palavra-passe</CardTitle>
-                    <CardDescription>Atualize a sua palavra-passe de acesso</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Form {...passwordForm}>
-                      <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
-                        <FormField
-                          control={passwordForm.control}
-                          name="currentPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Palavra-passe Atual *</FormLabel>
-                              <FormControl>
-                                <Input type="password" placeholder="Digite a palavra-passe atual" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={passwordForm.control}
-                          name="newPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nova Palavra-passe *</FormLabel>
-                              <FormControl>
-                                <Input type="password" placeholder="Digite a nova palavra-passe" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={passwordForm.control}
-                          name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Confirmar Nova Palavra-passe *</FormLabel>
-                              <FormControl>
-                                <Input type="password" placeholder="Confirme a nova palavra-passe" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button 
-                          type="submit" 
-                          disabled={changePasswordMutation.isPending}
-                          className="w-full"
-                        >
-                          <Key className="h-4 w-4 mr-2" />
-                          {changePasswordMutation.isPending ? 'Alterando...' : 'Alterar Palavra-passe'}
-                        </Button>
-                      </form>
-                    </Form>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Configurações da Conta</CardTitle>
-                    <CardDescription>Gerencie a sua conta</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleLogout}
-                      className="w-full"
+                    <Button
+                      size="sm"
+                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+                      onClick={() => document.getElementById('profile-image-upload')?.click()}
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sair da Conta
+                      <Camera className="h-4 w-4" />
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                )}
               </div>
-            </TabsContent>
-
-            {/* Save Button - Only show for profile tabs */}
-            {activeTab !== 'settings' && (
-              <div className="flex justify-end">
-                <Button 
-                  type="submit" 
-                  disabled={updateProfileMutation.isPending}
-                  className="min-w-[120px]"
+              <div className="flex-1 text-center sm:text-left space-y-2">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                    {profile?.first_name} {profile?.last_name}
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    {profile?.email}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                  <Badge variant="outline" className="bg-[var(--angola-red)]/10 text-[var(--angola-red)] border-[var(--angola-red)]/20">
+                    {profile?.province}
+                  </Badge>
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    {profile?.municipality}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditMode(!editMode)}
+                  className="text-[var(--angola-red)] border-[var(--angola-red)] hover:bg-[var(--angola-red)]/10"
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  {updateProfileMutation.isPending ? 'Guardando...' : 'Guardar Alterações'}
+                  {editMode ? 'Cancelar' : 'Editar Perfil'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setLocation('/change-password')}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  Alterar Palavra-passe
                 </Button>
               </div>
-            )}
-          </form>
-        </Form>
-      </Tabs>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Profile Content */}
+        <Tabs defaultValue="info" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="info">Informações</TabsTrigger>
+            <TabsTrigger value="services">Serviços</TabsTrigger>
+            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
+          </TabsList>
+
+          {/* Information Tab */}
+          <TabsContent value="info" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Personal Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Informações Pessoais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="first_name">Nome</Label>
+                      <Input
+                        id="first_name"
+                        value={formData.first_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                        disabled={!editMode}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="last_name">Apelido</Label>
+                      <Input
+                        id="last_name"
+                        value={formData.last_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                        disabled={!editMode}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Telefone</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      disabled={!editMode}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="date_of_birth">Data de Nascimento</Label>
+                    <Input
+                      id="date_of_birth"
+                      type="date"
+                      value={formData.date_of_birth}
+                      onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                      disabled={!editMode}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="about_me">Sobre mim</Label>
+                    <Textarea
+                      id="about_me"
+                      value={formData.about_me}
+                      onChange={(e) => setFormData(prev => ({ ...prev, about_me: e.target.value }))}
+                      disabled={!editMode}
+                      rows={4}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Location Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Localização
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editMode ? (
+                    <LocationSelector
+                      defaultValues={{
+                        province: formData.province,
+                        municipality: formData.municipality,
+                        neighborhood: formData.neighborhood
+                      }}
+                      onLocationChange={handleLocationChange}
+                    />
+                  ) : (
+                    <div className="space-y-3">
+                      <div>
+                        <Label>Província</Label>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {profile?.province || 'Não especificado'}
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Município</Label>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {profile?.municipality || 'Não especificado'}
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Bairro</Label>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {profile?.neighborhood || 'Não especificado'}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <Label htmlFor="address_complement">Complemento de Endereço</Label>
+                    <Input
+                      id="address_complement"
+                      value={formData.address_complement}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
+                      disabled={!editMode}
+                      placeholder="Ex: Rua X, Casa 123, Prédio Y"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Services Tab */}
+          <TabsContent value="services" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Serviços Oferecidos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="contract_type">Tipo de Contrato</Label>
+                  <Select
+                    value={formData.contract_type}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, contract_type: value }))}
+                    disabled={!editMode}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de contrato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contractTypes.map(type => (
+                        <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Serviços</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                    {serviceOptions.map(service => (
+                      <div key={service} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={service}
+                          checked={formData.services.includes(service)}
+                          onCheckedChange={() => handleServiceToggle(service)}
+                          disabled={!editMode}
+                        />
+                        <Label htmlFor={service} className="text-sm">
+                          {service}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="availability">Disponibilidade</Label>
+                  <Textarea
+                    id="availability"
+                    value={formData.availability}
+                    onChange={(e) => setFormData(prev => ({ ...prev, availability: e.target.value }))}
+                    disabled={!editMode}
+                    rows={3}
+                    placeholder="Ex: Segunda a sexta, 8h às 17h"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Social Media Tab */}
+          <TabsContent value="social" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Redes Sociais
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="facebook_url">Facebook</Label>
+                  <Input
+                    id="facebook_url"
+                    value={formData.facebook_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
+                    disabled={!editMode}
+                    placeholder="https://facebook.com/seuPerfil"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="instagram_url">Instagram</Label>
+                  <Input
+                    id="instagram_url"
+                    value={formData.instagram_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, instagram_url: e.target.value }))}
+                    disabled={!editMode}
+                    placeholder="https://instagram.com/seuPerfil"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="whatsapp_url">WhatsApp</Label>
+                  <Input
+                    id="whatsapp_url"
+                    value={formData.whatsapp_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_url: e.target.value }))}
+                    disabled={!editMode}
+                    placeholder="https://wa.me/244999999999"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Action Buttons */}
+        {editMode && (
+          <Card className="mt-6">
+            <CardContent className="p-6 flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={handleSaveProfile}
+                disabled={updateProfileMutation.isPending}
+                className="flex-1 bg-[var(--angola-red)] hover:bg-[var(--angola-red)]/90"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {updateProfileMutation.isPending ? 'A guardar...' : 'Guardar Alterações'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setEditMode(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Danger Zone */}
+        <Card className="mt-6 border-red-200">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Zona Perigosa
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              Eliminar a conta é uma acção irreversível. Todos os seus dados serão permanentemente removidos.
+            </p>
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar Conta
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirmar Eliminação</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Tem a certeza de que pretende eliminar permanentemente a sua conta? Esta acção não pode ser desfeita.
+                  </p>
+                  <div className="flex gap-4 justify-end">
+                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteAccountMutation.isPending}
+                    >
+                      {deleteAccountMutation.isPending ? 'A eliminar...' : 'Eliminar Conta'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
