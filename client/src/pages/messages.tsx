@@ -119,15 +119,14 @@ export default function MessagesPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/messages/unread-count'] });
       setMessageContent('');
       
-      // Send push notification
-      if (Notification.permission === 'granted') {
-        new Notification('Nova mensagem enviada', {
-          body: 'Mensagem enviada com sucesso!',
-          icon: '/favicon.ico'
-        });
-      }
+      // Success toast
+      toast({
+        title: "Mensagem enviada",
+        description: "Mensagem enviada com sucesso!",
+      });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Erro ao enviar mensagem:', error);
       toast({
         title: "Erro",
         description: "Não foi possível enviar a mensagem.",
@@ -232,7 +231,7 @@ export default function MessagesPage() {
     }
   }, [messages, user?.id]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!selectedConversation || !messageContent.trim()) return;
     
     let content = messageContent.trim();
@@ -248,15 +247,21 @@ export default function MessagesPage() {
     // Apply formatting
     content = formatMessageContent(content);
     
-    sendMessageMutation.mutate({
-      conversationId: selectedConversation,
-      content: content,
-    });
-    
-    // Clear reply and reset formatting
-    setReplyingToMessage(null);
-    setIsBold(false);
-    setMessageContent('');
+    try {
+      await sendMessageMutation.mutateAsync({
+        conversationId: selectedConversation,
+        content: content,
+      });
+      
+      // Clear reply and reset formatting only on success
+      setReplyingToMessage(null);
+      setIsBold(false);
+      setMessageContent('');
+      
+    } catch (error) {
+      console.error('Erro detalhado ao enviar mensagem:', error);
+      // Message content is preserved for retry
+    }
   };
 
   // Handle swipe to reply
@@ -352,9 +357,18 @@ export default function MessagesPage() {
   };
 
   const selectConversation = (conversationId: string) => {
-    setSelectedConversation(conversationId);
-    if (isMobile) {
-      setShowConversationList(false);
+    try {
+      setSelectedConversation(conversationId);
+      if (isMobile) {
+        setShowConversationList(false);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar conversa:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível abrir a conversa.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -420,7 +434,7 @@ export default function MessagesPage() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900 dark:text-gray-100">
                   {selectedConversationData?.participant_name || 'Utilizador'}
                 </div>
               </div>
@@ -467,7 +481,7 @@ export default function MessagesPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="font-medium">{participant.name}</div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">{participant.name}</div>
                           <div className="text-sm text-gray-500">{participant.email}</div>
                         </div>
                       </div>
@@ -480,7 +494,7 @@ export default function MessagesPage() {
         )}
       </div>
 
-      <div className={`${isMobile ? 'h-[calc(100vh-80px)]' : 'flex h-[calc(100vh-120px)]'} bg-white rounded-lg shadow-sm border`}>
+      <div className={`${isMobile ? 'h-[calc(100vh-80px)]' : 'flex h-[calc(100vh-120px)]'} bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700`}>
         {/* Conversations List - Responsive */}
         <div className={`${
           isMobile 
@@ -517,7 +531,7 @@ export default function MessagesPage() {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <div className="font-medium text-gray-900 truncate">
+                        <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
                           {conversation.participant_name || 'Utilizador'}
                         </div>
                         <div className="text-xs text-gray-500">
@@ -561,7 +575,7 @@ export default function MessagesPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-gray-900 dark:text-gray-100">
                         {selectedConversationData?.participant_name || 'Utilizador'}
                       </div>
                       <div className="text-sm text-gray-500">Online</div>
