@@ -115,12 +115,7 @@ export default function MessagesPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Request notification permission
-  useEffect(() => {
-    if (user && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, [user]);
+  // Notification permission removed to prevent crashes
 
   // Redirect if not logged in
   if (!user) {
@@ -201,28 +196,7 @@ export default function MessagesPage() {
     },
   });
 
-  // Delete message mutation
-  const deleteMessageMutation = useMutation({
-    mutationFn: async (messageId: string) => {
-      return await apiRequest(`/api/messages/${messageId}`, 'DELETE');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations', selectedConversation, 'messages'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/messages/conversations'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/messages/unread-count'] });
-      toast({
-        title: "Mensagem eliminada",
-        description: "A mensagem foi eliminada com sucesso.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Não foi possível eliminar a mensagem.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Delete message functionality removed to prevent crashes
 
   // Format message content with bold
   const formatMessageContent = (content: string) => {
@@ -245,94 +219,32 @@ export default function MessagesPage() {
     }
   };
 
-  // Auto-resize textarea - optimized for mobile
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = '20px';
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const maxHeight = 80; // Max height for mobile
-      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
-    }
-  }, [messageContent]);
+  // Auto-resize removed to prevent crashes
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messages && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    
-    // Check for new messages and show notification
-    if (messages && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage && lastMessage.sender_id !== user?.id) {
-        // Show push notification for new message
-        if (Notification.permission === 'granted') {
-          new Notification('Nova mensagem recebida', {
-            body: lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''),
-            icon: '/favicon.ico',
-            badge: '/favicon.ico',
-            tag: 'message-' + lastMessage.id // Prevent duplicate notifications
-          });
-        }
-      }
-    }
-  }, [messages, user?.id]);
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!selectedConversation || !messageContent.trim()) return;
     
-    let content = messageContent.trim();
-    
-    // Add reply prefix if replying to a message
-    if (replyingToMessage) {
-      const replyContent = replyingToMessage.content.length > 30 
-        ? replyingToMessage.content.substring(0, 30) + "..."
-        : replyingToMessage.content;
-      content = `↩️ Resposta a: "${replyContent}"\n\n${content}`;
-    }
-    
-    // Apply formatting
-    content = formatMessageContent(content);
-    
     try {
       await sendMessageMutation.mutateAsync({
         conversationId: selectedConversation,
-        content: content,
+        content: messageContent.trim(),
       });
       
-      // Clear reply and reset formatting only on success
-      setReplyingToMessage(null);
-      setIsBold(false);
       setMessageContent('');
       
     } catch (error) {
-      console.error('Erro detalhado ao enviar mensagem:', error);
-      // Message content is preserved for retry
+      console.error('Erro ao enviar mensagem:', error);
     }
   };
 
-  // Handle swipe to reply
-  const handleSwipeStart = (e: React.TouchEvent, messageId: string) => {
-    const startX = e.touches[0].clientX;
-    const handleSwipeMove = (moveEvent: TouchEvent) => {
-      const currentX = moveEvent.touches[0].clientX;
-      const diff = startX - currentX;
-      
-      if (diff > 50) { // Swipe left detected
-        setSwipedMessageId(messageId);
-        document.removeEventListener('touchmove', handleSwipeMove);
-        document.removeEventListener('touchend', handleSwipeEnd);
-      }
-    };
-    
-    const handleSwipeEnd = () => {
-      document.removeEventListener('touchmove', handleSwipeMove);
-      document.removeEventListener('touchend', handleSwipeEnd);
-    };
-    
-    document.addEventListener('touchmove', handleSwipeMove);
-    document.addEventListener('touchend', handleSwipeEnd);
-  };
+  // Removed swipe functionality that was causing issues
 
   const handleReply = (message: Message) => {
     setReplyingToMessage(message);
@@ -340,45 +252,11 @@ export default function MessagesPage() {
     textareaRef.current?.focus();
   };
 
-  const handleDeleteMessage = (messageId: string) => {
-    deleteMessageMutation.mutate(messageId);
-  };
+  // Removed delete functionality that was causing issues
 
-  // Render message with formatting and reply indicators
+  // Simplified message rendering
   const renderMessageContent = (content: string) => {
-    // Check if this is a reply message
-    if (content.includes('↩️ Resposta a:')) {
-      const parts = content.split('\n\n');
-      const replyPart = parts[0];
-      const messagePart = parts.slice(1).join('\n\n');
-      
-      return (
-        <div>
-          <div className="text-xs opacity-75 mb-2 p-2 bg-black bg-opacity-20 rounded-lg border-l-2 border-white border-opacity-30">
-            {replyPart}
-          </div>
-          <div className="message-text">
-            {messagePart.split(/(\*\*.*?\*\*)/).map((part, index) => {
-              if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={index}>{part.slice(2, -2)}</strong>;
-              }
-              return <span key={index}>{part}</span>;
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // Handle bold formatting for regular messages
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    const parts = content.split(boldRegex);
-    
-    return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        return <strong key={index}>{part}</strong>;
-      }
-      return <span key={index}>{part}</span>;
-    });
+    return content;
   };
 
   // Check if message is sent by current user
@@ -689,68 +567,7 @@ export default function MessagesPage() {
                 )}
               </div>
               
-              {/* Message Input - WhatsApp-like compact design */}
-              <div className="message-input-mobile">
-                {/* Reply indicator - more compact */}
-                {replyingToMessage && (
-                  <div className="mb-2 p-2 bg-blue-50 border-l-2 border-blue-500 rounded-r-md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Reply className="h-3 w-3 text-blue-500" />
-                        <span className="text-xs font-medium text-blue-700">
-                          Responder
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setReplyingToMessage(null)}
-                        className="h-4 w-4 p-0"
-                      >
-                        <X className="h-2 w-2" />
-                      </Button>
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1 truncate">
-                      {replyingToMessage.content}
-                    </div>
-                  </div>
-                )}
 
-                <div className="flex items-end gap-2">
-                  {/* Formatting button - very compact */}
-                  <button
-                    onClick={handleBoldToggle}
-                    className={`message-button format ${isBold ? 'active' : ''}`}
-                    title="Negrito"
-                  >
-                    <Bold className="h-3 w-3" />
-                  </button>
-
-                  {/* Input container - WhatsApp style */}
-                  <div className="flex-1 bg-white border border-gray-200 rounded-full px-3 py-2 flex items-center gap-2">
-                    <Textarea
-                      ref={textareaRef}
-                      placeholder="Mensagem..."
-                      value={messageContent}
-                      onChange={(e) => setMessageContent(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      disabled={sendMessageMutation.isPending}
-                      className="flex-1 border-0 bg-transparent resize-none text-sm min-h-[20px] max-h-[80px] p-0 focus:outline-none"
-                      rows={1}
-                    />
-                  </div>
-
-                  {/* Send button - compact and styled like WhatsApp */}
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                    className="message-button send"
-                    title="Enviar"
-                  >
-                    <Send className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
               
               {/* Message Input */}
               <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
@@ -760,11 +577,12 @@ export default function MessagesPage() {
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
                     className="flex-1 min-h-[44px] max-h-32 resize-none"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.shiftKey) {
                         e.preventDefault();
                         handleSendMessage();
                       }
+                      // Allow normal Enter for line breaks
                     }}
                   />
                   <Button
