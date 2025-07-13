@@ -1154,9 +1154,35 @@ export class MemStorage implements IStorage {
   }
 
   async getUserConversations(userId: string): Promise<Conversation[]> {
-    return Array.from(this.conversations.values())
+    const userConversations = Array.from(this.conversations.values())
       .filter(conv => conv.participant1_id === userId || conv.participant2_id === userId)
       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    
+    // Enrich conversations with participant information
+    const enrichedConversations = await Promise.all(
+      userConversations.map(async (conv) => {
+        const otherParticipantId = conv.participant1_id === userId ? conv.participant2_id : conv.participant1_id;
+        const otherParticipant = await this.getUser(otherParticipantId);
+        
+        // Get last message for preview
+        const messages = await this.getConversationMessages(conv.id);
+        const lastMessage = messages[messages.length - 1];
+        
+        // Count unread messages
+        const unreadCount = messages.filter(msg => msg.sender_id !== userId && !msg.is_read).length;
+        
+        return {
+          ...conv,
+          participant_name: otherParticipant?.name || 'Utilizador',
+          participant_profile_image: otherParticipant?.profile_image || null,
+          last_message: lastMessage?.content || null,
+          last_message_time: lastMessage?.created_at || conv.updated_at,
+          unread_count: unreadCount
+        };
+      })
+    );
+    
+    return enrichedConversations;
   }
 
   async createMessage(message: InsertMessage): Promise<Message> {
