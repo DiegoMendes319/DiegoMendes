@@ -50,6 +50,13 @@ export default function Home() {
     },
   });
 
+  // Auto-search when filters change
+  useEffect(() => {
+    if (Object.keys(searchFilters).length > 0) {
+      refetch();
+    }
+  }, [searchFilters, refetch]);
+
   const handleGeolocationRequest = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(

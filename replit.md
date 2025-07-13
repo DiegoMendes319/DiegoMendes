@@ -75,6 +75,10 @@ Jikulumessu is a full-stack web application designed to connect people with qual
   - Added "Clear All Filters" button for easy filter reset
   - Updated search interface with 3-column layout for better mobile experience
   - Backend support for min_age and max_age filtering in both MemStorage and DatabaseStorage
+  - Eliminated hierarchical dependencies between province → municipality → neighborhood
+  - Removed red asterisks and "(optional)" labels from all filter fields
+  - Implemented automatic search when any filter changes (no manual "Search" button needed)
+  - All location fields now show complete lists independent of other selections
 ✓ **Registration Form Cleanup (Janeiro 2025)**: Removed "Política de Cookies" option from registration forms and fixed Terms/Privacy links to redirect to correct pages
 ✓ **Tutorial Button Removal**: Completely removed tutorial button from navbar while maintaining automatic tutorial functionality for new users
 ✓ **Smart Profile Button**: Implemented intelligent profile button that redirects authenticated users to profile or shows connection message for non-authenticated users

@@ -72,7 +72,7 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="province">
-          Província <span className="text-gray-500">(opcional)</span>
+          Província
         </Label>
         <Select value={selectedProvince} onValueChange={handleProvinceChange}>
           <SelectTrigger className="cascading-select">
@@ -90,22 +90,23 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
       
       <div>
         <Label htmlFor="municipality">
-          Município <span className="text-gray-500">(opcional)</span>
+          Município
         </Label>
         <Select 
           value={selectedMunicipality} 
           onValueChange={handleMunicipalityChange}
-          disabled={!selectedProvince}
         >
           <SelectTrigger className="cascading-select">
             <SelectValue placeholder="Todos os municípios" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(municipalities).map(([key, municipality]) => (
-              <SelectItem key={key} value={key}>
-                {municipality.name}
-              </SelectItem>
-            ))}
+            {Object.entries(locationData).flatMap(([provinceKey, province]) => 
+              Object.entries(province.municipalities).map(([key, municipality]) => (
+                <SelectItem key={`${provinceKey}-${key}`} value={key}>
+                  {municipality.name}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -113,14 +114,13 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="neighborhood">
-            Bairro <span className="text-red-500">*</span>
+            Bairro
           </Label>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={toggleManualInput}
-            disabled={!selectedMunicipality}
             className="text-xs"
           >
             <MapPin className="w-3 h-3 mr-1" />
@@ -133,24 +133,26 @@ export function LocationSelector({ onLocationChange, defaultValues }: LocationSe
             placeholder="Digite o nome do bairro"
             value={manualNeighborhood}
             onChange={(e) => handleManualNeighborhoodChange(e.target.value)}
-            disabled={!selectedMunicipality}
             className="cascading-select"
           />
         ) : (
           <Select 
             value={selectedNeighborhood} 
             onValueChange={handleNeighborhoodChange}
-            disabled={!selectedMunicipality}
           >
             <SelectTrigger className="cascading-select">
-              <SelectValue placeholder="Selecione um bairro" />
+              <SelectValue placeholder="Todos os bairros" />
             </SelectTrigger>
             <SelectContent>
-              {neighborhoods.map((neighborhood) => (
-                <SelectItem key={neighborhood} value={neighborhood.toLowerCase()}>
-                  {neighborhood}
-                </SelectItem>
-              ))}
+              {Object.entries(locationData).flatMap(([provinceKey, province]) => 
+                Object.entries(province.municipalities).flatMap(([munKey, municipality]) => 
+                  municipality.neighborhoods.map((neighborhood) => (
+                    <SelectItem key={`${provinceKey}-${munKey}-${neighborhood}`} value={neighborhood.toLowerCase()}>
+                      {neighborhood}
+                    </SelectItem>
+                  ))
+                )
+              )}
             </SelectContent>
           </Select>
         )}
