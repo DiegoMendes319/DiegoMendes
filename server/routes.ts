@@ -1,8 +1,9 @@
 // server/routes.ts
 import express, { Express } from 'express'
 import { createServer, Server } from 'http'
-import { supabase, signIn, signUp, signOut, requireAuth, optionalAuth } from './auth'
+import { supabase, supabaseAdmin } from './auth'  // <- Ajuste aqui
 import { z } from 'zod'
+
 
 // Schemas de validação (exemplo, adapte conforme @shared/schema)
 const userSchema = z.object({
@@ -22,15 +23,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ─── AUTH ───────────────────────────────────────────
 
+  import { supabase, supabaseAdmin, signUp } from './auth'  // veja nota abaixo
+  import { z } from 'zod'
+
+// Expanda seu schema para os campos de perfil
+  const registerSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    first_name: z.string().min(1),
+    last_name: z.string().min(1),
+    phone: z.string().optional(),
+    date_of_birth: z.string().optional(),          // YYYY-MM-DD
+    province: z.string().optional(),
+    municipality: z.string().optional(),
+    neighborhood: z.string().optional(),
+    address_complement: z.string().optional(),
+    contract_type: z.string().optional(),
+    services: z.array(z.string()).optional(),
+    availability: z.string().optional(),
+    about_me: z.string().optional(),
+    profile_url: z.string().url().optional(),
+  })
+
   app.post('/api/auth/register', async (req, res) => {
     try {
-      const { email, password } = userSchema.parse(req.body)
-      const user = await signUp(email, password)
-      res.status(201).json({ user })
+      // 1) Valida e extrai tudo
+      const {
+        email,
+        password,
+        first_name,
+        last_name,
+        phone,
+        date_of_birth,
+        province,
+        municipality,
+        neighborhood,
+        address_complement,
+        contract_type,
+        services,
+        availability,
+        about_me,
+        profile_url
+      } = registerSchema.parse(req.body)
+
+      // 2) Cria no Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password
+      })
+      if (authError || !authData.user) {
+        throw new Error(authError?.message || 'Erro ao criar usuário no Auth')
+      }
+
+      const authUserId = authData.user.id
+
+      // 3) Insere na tabela public.users
+      const { data: profile, error: profileError } = await supabaseAdmin
+          .from('users')
+          .insert({
+            auth_user_id: authUserId,
+            email,
+            first_name,
+            last_name,
+            phone,
+            date_of_birth: date_of_birth || null,
+            province: province || null,
+            municipality: municipality || null,
+            neighborhood: neighborhood || null,
+            address_complement: address_complement || null,
+            contract_type: contract_type || undefined,
+            services: services || undefined,
+            availability: availability || undefined,
+            about_me: about_me || null,
+            profile_url: profile_url || null
+          })
+          .select()
+          .single()
+
+      if (profileError || !profile) {
+        // Se falhar aqui, opcionalmente limpe o auth user criado:
+        await supabaseAdmin.auth.admin.deleteUser(authUserId)
+        throw new Error(profileError?.message || 'Erro ao criar perfil do usuário')
+      }
+
+      // 4) Retorna ambos ou só o perfil
+      res.status(201).json({
+        user: {
+          id: authUserId,
+          email,
+          first_name,
+          last_name,
+          // outros campos do perfil...
+        },
+        profile
+      })
     } catch (e: any) {
       res.status(400).json({ error: e.message })
     }
   })
+
 
   app.post('/api/auth/login', async (req, res) => {
     try {
