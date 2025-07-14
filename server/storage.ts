@@ -144,3 +144,5 @@ export class Storage {
     return data
   }
 }
+
+export const storage = new Storage()
