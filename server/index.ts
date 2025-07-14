@@ -103,12 +103,14 @@ app.use(async (req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  const PORT = process.env.PORT
+      ? Number(process.env.PORT)
+      : 5000;
+
+// Não passe o '0.0.0.0' como segundo argumento.
+// Apenas deixe o listen usar o host padrão do Node.
+  app.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
   });
+
 })();
